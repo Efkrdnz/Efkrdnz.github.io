@@ -26,65 +26,28 @@
     {
       "phase": "Becoming a Hunter",
       "n": 2,
-      "id": "step-your-kit",
-      "title": "Learn what you actually have",
-      "goal": "Understand your panel and your first skills",
-      "gate": "Right after the Evaluation",
-      "body": "Press **N** to open the System panel. This is where everything lives: your stats, your skill points, your quests and your class information.\n\nYour style decides your native ability tree, not just a damage bonus. A [[classes|Fighter]] running one style plays nothing like the same class running another. Read your style page before you spend anything.\n\nTo fight: **R** toggles combat mode, and **1** through **8** use whatever ability is equipped in that slot. **Z** flips to your second page of equipped skills, so you have sixteen within reach. **X, C, V and B** are fixed quick keys - Melee, Ruler's Authority, Dash and Aura - and cannot be reassigned. Full list on the [[keybinds|Keybinds]] page.",
-      "checklist": [
-        "R toggles combat mode",
-        "1-8 use the ability in that slot; Z flips to page two",
-        "X Melee, C Ruler's Authority, V Dash, B Aura - all fixed"
-      ],
-      "nodes": [
-        "the-system",
-        "classes",
-        "skill-points",
-        "keybinds"
-      ]
-    },
-    {
-      "phase": "Finding your feet",
-      "n": 3,
       "id": "step-first-gates",
       "title": "Clear your first gates",
-      "goal": "Learn the loop and start levelling",
+      "goal": "Learn the loop, and meet the temple",
       "gate": "E and D rank gates",
-      "body": "[[gates|Gates]] are rifts that open into instanced dungeons. Each carries a [[gate-ranks|rank]] from E to S, and the rank tells you how hard what is inside will hit.\n\nStart at the bottom. E and D gates exist to teach you the loop: go in, clear it, take the reward, come out. Mine any [[mana-crystals|mana crystals]] you find — Silk Touch preserves the deposit and Fortune increases the yield.\n\nWatch your [[fatigue|Fatigue]]. It builds as you fight and it does not care that you were winning.",
+      "body": "[[gates|Gates]] are rifts that open into instanced dungeons. Each carries a [[gate-ranks|rank]] from E to S, and the rank tells you how hard what is inside will hit.\n\nStart at the bottom. E and D gates exist to teach you the loop: go in, clear it, take the reward, come out. Mine any [[mana-crystals|mana crystals]] you find - Silk Touch preserves the deposit and Fortune increases the yield.\n\nWatch your [[fatigue|Fatigue]]. It builds as you fight and it does not care that you were winning.\n\nKeep going and the **[[cartenon-temple|Cartenon Temple]] will find you** - it is guaranteed to appear within your first three gates, and it is the next step.",
       "checklist": [
         "Start with E and D gates, not what looks impressive",
         "Fortune increases mana crystal yield",
-        "Fatigue builds while you fight"
+        "Fatigue builds while you fight",
+        "The Cartenon summons arrives within 3 gates"
       ],
       "nodes": [
         "gates",
         "gate-ranks",
         "fatigue",
-        "mana-crystals"
-      ]
-    },
-    {
-      "phase": "Finding your feet",
-      "n": 4,
-      "id": "step-levelling",
-      "title": "Level up and spend your points",
-      "goal": "Turn kills into stats",
-      "gate": "Ongoing",
-      "body": "Every level costs `level x 16 + 8` XP, which means the total to reach level N is exactly `8 x N squared`. The curve is gentle early and steep late.\n\nEach level gives you **3 skill points** to spend in the panel. Points go into Strength, Vitality, Agility, Sense and Intelligence, and what those do depends heavily on how you fight — an Intelligence point is worth far more to a Mage than to a Tanker.\n\nThere is a ceiling: the default level cap is **150**, and reaching it is what reopens the [[cartenon-temple|Cartenon Temple]] for the last time.",
-      "checklist": [
-        "3 skill points per level",
-        "Default level cap is 150",
-        "Hitting the cap reopens the Cartenon Temple"
-      ],
-      "nodes": [
-        "levels-and-xp",
-        "skill-points",
-        "the-system"
+        "mana-crystals",
+        "cartenon-temple"
       ]
     },
     {
       "phase": "Becoming a Player",
-      "n": 5,
+      "n": 3,
       "id": "step-cartenon",
       "title": "Claim the System at the Cartenon Temple",
       "goal": "Lose to the Statue of God on purpose",
@@ -99,6 +62,45 @@
       "nodes": [
         "cartenon-temple",
         "statue-of-god",
+        "the-system"
+      ]
+    },
+    {
+      "phase": "Becoming a Player",
+      "n": 4,
+      "id": "step-your-kit",
+      "title": "Learn what you actually have",
+      "goal": "Read your new panel and your first skills",
+      "gate": "Once the System is yours",
+      "body": "Now that the System is yours, press **N** to open the panel. This is where everything lives: your stats, your skill points, your quests and your class information.\n\nYour style decides your native ability tree, not just a damage bonus. A [[classes|Fighter]] running one style plays nothing like the same class running another. Read your style page before you spend anything.\n\nTo fight: **R** toggles combat mode, and **1** through **8** use whatever ability is equipped in that slot. **Z** flips to your second page of equipped skills, so you have sixteen within reach. **X, C, V and B** are fixed quick keys - Melee, Ruler's Authority, Dash and Aura - and cannot be reassigned. Full list on the [[keybinds|Keybinds]] page.",
+      "checklist": [
+        "R toggles combat mode",
+        "1-8 use the ability in that slot; Z flips to page two",
+        "X Melee, C Ruler's Authority, V Dash, B Aura - all fixed"
+      ],
+      "nodes": [
+        "the-system",
+        "classes",
+        "skill-points",
+        "keybinds"
+      ]
+    },
+    {
+      "phase": "Becoming a Player",
+      "n": 5,
+      "id": "step-levelling",
+      "title": "Level up and spend your points",
+      "goal": "Turn kills into stats",
+      "gate": "Ongoing",
+      "body": "Every level costs `level x 16 + 8` XP, which means the total to reach level N is exactly `8 x N squared`. The curve is gentle early and steep late.\n\nEach level gives you **3 skill points** to spend in the panel. Points go into Strength, Vitality, Agility, Sense and Intelligence, and what those do depends heavily on how you fight — an Intelligence point is worth far more to a Mage than to a Tanker.\n\nThere is a ceiling: the default level cap is **150**, and reaching it is what reopens the [[cartenon-temple|Cartenon Temple]] for the last time.",
+      "checklist": [
+        "3 skill points per level",
+        "Default level cap is 150",
+        "Hitting the cap reopens the Cartenon Temple"
+      ],
+      "nodes": [
+        "levels-and-xp",
+        "skill-points",
         "the-system"
       ]
     },

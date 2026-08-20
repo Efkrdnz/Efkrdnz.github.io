@@ -5,3 +5,5 @@ dist/
 *.log
 .env
 .env.production
+
+# cropped in place by scripts/crop-shots.cjs; keep originals out of the repo

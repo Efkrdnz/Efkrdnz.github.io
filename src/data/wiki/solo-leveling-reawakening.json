@@ -3071,17 +3071,29 @@
    "title": "Vessels",
    "category": "vessel",
    "tagline": "Ten inheritances. One choice per character.",
-   "summary": "A vessel is the Monarch or Ruler power your character inherits after completing the Job Change Quest. It sets your job, your entire skill kit, and how you scale for the rest of the game. Code defines ten vessels: six Rulers and four Monarchs, three of which are still work in progress.",
+   "summary": "At the Job Change trial you pick one vessel and inherit its power. The selection screen splits them into Ruler Vessels and Monarch Vessels, and states the rule plainly: **the choice is permanent.**",
    "accent": "#B965FF",
    "status": "live",
    "facts": [
     {
+     "label": "Availability",
+     "value": "Locked or already-claimed vessels cannot be picked"
+    },
+    {
+     "label": "Permanence",
+     "value": "Permanent — one vessel, no respec"
+    },
+    {
+     "label": "Cost",
+     "value": "50 advancement points"
+    },
+    {
      "label": "Total vessels",
-     "value": "10 (6 Ruler, 6 Monarch split: rulers Ashborn, Christopher Reed, Thomas Andre, Liu Zhigang, Sung Il-Hwan, Go Gunhee; monarchs Sillad, Baran, Rakan, Antares)"
+     "value": "10 — five Ruler, five Monarch"
     },
     {
      "label": "How you get one",
-     "value": "Complete the Job Change Quest, then pick from the selection screen"
+     "value": "Complete the Job Change Quest, then pick one on the selection screen"
     },
     {
      "label": "Server limit",
@@ -3124,6 +3136,10 @@
     {
      "heading": "Changing vessels",
      "body": "The quest completes once. There is no player-facing way to swap vessels afterwards; only server operators can reset a player's vessel status or assign a different one, and a reset releases the world claim so the vessel opens up again."
+    },
+    {
+     "heading": "What is open",
+     "body": "All five Monarch vessels are selectable: Ashborn, Sillad, Baran, Rakan and Antares.\n\nTwo of the five Ruler vessels are selectable — the Adamant Fragment (Thomas Andre) and the Sharpest Fragment (Liu Zhigang). The Blazing, Silent and Brightest Fragments are marked **work in progress** on the selection screen and cannot be taken yet.\n\nA world can also cap how many players hold the same vessel, which is why one may show as claimed even when it is finished."
     }
    ],
    "related": [
@@ -3148,6 +3164,14 @@
    "accent": "#7A5CFF",
    "status": "live",
    "facts": [
+    {
+     "label": "Outcome",
+     "value": "One permanent vessel"
+    },
+    {
+     "label": "Advancement points",
+     "value": "50 required"
+    },
     {
      "label": "Unlock level",
      "value": "Gamerule soloLevelingJobChangeLevel, default 40"
@@ -3217,6 +3241,14 @@
    "accent": "#B965FF",
    "status": "live",
    "facts": [
+    {
+     "label": "Inherited from",
+     "value": "Monarch of Shadows"
+    },
+    {
+     "label": "On the selection screen",
+     "value": "Ashborn"
+    },
     {
      "label": "Job id / identity",
      "value": "1 / ashborn (typed 'ruler' in code, so it also gets Ruler's Authority)"
@@ -3618,6 +3650,14 @@
    "status": "live",
    "facts": [
     {
+     "label": "Inherited from",
+     "value": "Frost Monarch"
+    },
+    {
+     "label": "On the selection screen",
+     "value": "Sillad"
+    },
+    {
      "label": "Job id / identity",
      "value": "3 / sillad"
     },
@@ -3690,6 +3730,14 @@
    "accent": "#B965FF",
    "status": "live",
    "facts": [
+    {
+     "label": "Inherited from",
+     "value": "Monarch of White Flames"
+    },
+    {
+     "label": "On the selection screen",
+     "value": "Baran"
+    },
     {
      "label": "Job id / identity",
      "value": "4 / baran"
@@ -3764,6 +3812,14 @@
    "status": "live",
    "facts": [
     {
+     "label": "Inherited from",
+     "value": "Monarch of Fangs"
+    },
+    {
+     "label": "On the selection screen",
+     "value": "Rakan"
+    },
+    {
      "label": "Job id / identity",
      "value": "9 / rakan"
     },
@@ -3832,6 +3888,14 @@
    "accent": "#B965FF",
    "status": "live",
    "facts": [
+    {
+     "label": "Inherited from",
+     "value": "Monarch of Destruction"
+    },
+    {
+     "label": "On the selection screen",
+     "value": "Antares"
+    },
     {
      "label": "Job id / identity",
      "value": "10 / antares"
@@ -3910,6 +3974,14 @@
    "status": "live",
    "facts": [
     {
+     "label": "Inherited from",
+     "value": "Thomas Andre"
+    },
+    {
+     "label": "On the selection screen",
+     "value": "Adamant Fragment"
+    },
+    {
      "label": "Job id / identity",
      "value": "5 / thomas_andre"
     },
@@ -3978,6 +4050,14 @@
    "accent": "#FFD34E",
    "status": "live",
    "facts": [
+    {
+     "label": "Inherited from",
+     "value": "Liu Zhigang"
+    },
+    {
+     "label": "On the selection screen",
+     "value": "Sharpest Fragment"
+    },
     {
      "label": "Job id / identity",
      "value": "6 / liu_zhigang"
@@ -4048,6 +4128,14 @@
    "status": "wip",
    "facts": [
     {
+     "label": "Inherited from",
+     "value": "Christopher Reed"
+    },
+    {
+     "label": "On the selection screen",
+     "value": "Blazing Fragment"
+    },
+    {
      "label": "Job id / identity",
      "value": "2 / christopher_reed"
     },
@@ -4088,6 +4176,14 @@
    "status": "wip",
    "facts": [
     {
+     "label": "Inherited from",
+     "value": "Sung Il-Hwan"
+    },
+    {
+     "label": "On the selection screen",
+     "value": "Silent Fragment"
+    },
+    {
      "label": "Status in code",
      "value": "Work in progress; not selectable in normal play"
     }
@@ -4114,6 +4210,14 @@
    "accent": "#3FC6FF",
    "status": "wip",
    "facts": [
+    {
+     "label": "Inherited from",
+     "value": "Go Gunhee"
+    },
+    {
+     "label": "On the selection screen",
+     "value": "Brightest Fragment"
+    },
     {
      "label": "Job id / identity",
      "value": "8 / go_gunhee"

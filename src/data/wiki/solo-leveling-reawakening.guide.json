@@ -17,7 +17,11 @@
         "Rank is fixed once rolled, so accept deliberately",
         "Nothing is granted until you press accept"
       ],
-      "nodes": ["evaluation", "classes", "ranks"]
+      "nodes": [
+        "evaluation",
+        "classes",
+        "ranks"
+      ]
     },
     {
       "phase": "Becoming a Hunter",
@@ -26,13 +30,18 @@
       "title": "Learn what you actually have",
       "goal": "Understand your panel and your first skills",
       "gate": "Right after the Evaluation",
-      "body": "Press **N** to open the System panel. This is where everything lives: your stats, your skill points, your quests and your class information.\n\nYour style decides your native ability tree, not just a damage bonus. A [[classes|Fighter]] running one style plays nothing like the same class running another. Read your style page before you spend anything.\n\nTo fight: **R** cycles your selected skill, **Z** uses it. Keys **1** through **8** fire your equipped skill slots directly, and **X / C / V / B** are reserved for job abilities you get much later.",
+      "body": "Press **N** to open the System panel. This is where everything lives: your stats, your skill points, your quests and your class information.\n\nYour style decides your native ability tree, not just a damage bonus. A [[classes|Fighter]] running one style plays nothing like the same class running another. Read your style page before you spend anything.\n\nTo fight: **R** toggles combat mode, and **1** through **8** use whatever ability is equipped in that slot. **Z** flips to your second page of equipped skills, so you have sixteen within reach. **X, C, V and B** are fixed quick keys - Melee, Ruler's Authority, Dash and Aura - and cannot be reassigned. Full list on the [[keybinds|Keybinds]] page.",
       "checklist": [
-        "N opens the System panel",
-        "R cycles the selected skill, Z uses it",
-        "1-8 fire equipped skill slots"
+        "R toggles combat mode",
+        "1-8 use the ability in that slot; Z flips to page two",
+        "X Melee, C Ruler's Authority, V Dash, B Aura - all fixed"
       ],
-      "nodes": ["the-system", "classes", "skill-points"]
+      "nodes": [
+        "the-system",
+        "classes",
+        "skill-points",
+        "keybinds"
+      ]
     },
     {
       "phase": "Finding your feet",
@@ -47,7 +56,12 @@
         "Fortune increases mana crystal yield",
         "Fatigue builds while you fight"
       ],
-      "nodes": ["gates", "gate-ranks", "fatigue", "mana-crystals"]
+      "nodes": [
+        "gates",
+        "gate-ranks",
+        "fatigue",
+        "mana-crystals"
+      ]
     },
     {
       "phase": "Finding your feet",
@@ -62,7 +76,11 @@
         "Default level cap is 150",
         "Hitting the cap reopens the Cartenon Temple"
       ],
-      "nodes": ["levels-and-xp", "skill-points", "the-system"]
+      "nodes": [
+        "levels-and-xp",
+        "skill-points",
+        "the-system"
+      ]
     },
     {
       "phase": "Becoming a Player",
@@ -77,7 +95,11 @@
         "The Statue of God guards it",
         "Bring real gear, not starter gear"
       ],
-      "nodes": ["cartenon-temple", "statue-of-god", "the-system"]
+      "nodes": [
+        "cartenon-temple",
+        "statue-of-god",
+        "the-system"
+      ]
     },
     {
       "phase": "Becoming a Player",
@@ -92,7 +114,11 @@
         "Failing one carries a penalty",
         "Urgent Quests trigger mid-dungeon for extra rewards"
       ],
-      "nodes": ["daily-quests", "urgent-quests", "titles"]
+      "nodes": [
+        "daily-quests",
+        "urgent-quests",
+        "titles"
+      ]
     },
     {
       "phase": "Choosing your power",
@@ -107,7 +133,12 @@
         "Monarchs unlock over time, Rulers start with their manifestation",
         "Shadow Monarch is the extraction path"
       ],
-      "nodes": ["job-change-quest", "vessels", "monarchs", "shadow-monarch"]
+      "nodes": [
+        "job-change-quest",
+        "vessels",
+        "monarchs",
+        "shadow-monarch"
+      ]
     },
     {
       "phase": "Choosing your power",
@@ -122,7 +153,12 @@
         "Runestones ignore class and style restrictions",
         "Shadows grow their own ranks alongside you"
       ],
-      "nodes": ["vessels", "runestones", "shadow-storage", "shadow-ranks"]
+      "nodes": [
+        "vessels",
+        "runestones",
+        "shadow-storage",
+        "shadow-ranks"
+      ]
     },
     {
       "phase": "The long climb",
@@ -137,7 +173,12 @@
         "Twenty floors, with a real choice on Floor 15",
         "/slr stuck and /slr dkc leave get you out safely"
       ],
-      "nodes": ["secret-quest", "demon-kings-castle", "boss-dkc", "recovery-commands"]
+      "nodes": [
+        "secret-quest",
+        "demon-kings-castle",
+        "boss-dkc",
+        "recovery-commands"
+      ]
     },
     {
       "phase": "The long climb",
@@ -152,7 +193,12 @@
         "Red Gates have no easy exit",
         "Level 150 is the summit and reopens the Cartenon Temple"
       ],
-      "nodes": ["spiritual-body-manifestation", "red-gates", "monarch-territories", "boss-monarch"]
+      "nodes": [
+        "spiritual-body-manifestation",
+        "red-gates",
+        "monarch-territories",
+        "boss-monarch"
+      ]
     }
   ]
 }

@@ -277,3 +277,62 @@
   .istep { grid-template-columns: 34px minmax(0, 1fr); gap: var(--s3); }
   .idep__range { margin-left: 0; }
 }
+
+/* ------------------------------------------------------------ branches --- */
+
+.ibranches {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1px;
+  background: var(--panel-edge);
+  border: 1px solid var(--panel-edge);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.ibranch { background: var(--page-bg); padding: var(--s5); display: flex; flex-direction: column; gap: var(--s3); }
+
+/* the live branch carries the accent edge; the frozen one stays neutral so
+   the difference is structural rather than colour alone */
+.ibranch--current { box-shadow: inset 0 2px 0 0 var(--accent); }
+.ibranch--frozen { box-shadow: inset 0 2px 0 0 var(--ash-dim); }
+.ibranch--frozen .ibranch__name { color: var(--ash); }
+
+.ibranch__head { display: flex; align-items: baseline; gap: var(--s3); flex-wrap: wrap; }
+
+.ibranch__name {
+  font-family: var(--head-font);
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: -0.015em;
+  color: var(--bone);
+}
+
+.ibranch__state {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  padding: 2px 7px;
+  white-space: nowrap;
+}
+
+.ibranch__state.is-current { color: #5FE38C; }
+.ibranch__state.is-frozen { color: var(--ash-dim); }
+
+.ibranch__spec {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2) var(--s4);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--ash-dim);
+}
+
+.ibranch__note { margin: 0; font-size: 0.9375rem; line-height: 1.6; color: var(--ash); }
+
+@media (max-width: 600px) { .ibranch__state { margin-left: 0; } }

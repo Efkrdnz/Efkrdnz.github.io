@@ -13,6 +13,10 @@
  * Frames where the resulting box is most of the screen are world shots, and get
  * a centred band that drops the hotbar instead.
  *
+ * Panels keep their own aspect ratio. Padding them out to a wide rectangle just
+ * moves the problem downstream: the page then has a tall GUI inside a wide image
+ * and crops the top off it.
+ *
  * Usage: node scripts/crop-shots.cjs <dir> [--dry]
  */
 const sharp = require('sharp');
@@ -129,9 +133,9 @@ async function detect(file) {
     let w = box.right - box.left;
     let h = box.bottom - box.top;
 
-    if (w / h < MIN_ASPECT) {
+    if (!d.isPanel && w / h < MIN_ASPECT) {
       const want = Math.min(d.W, Math.round(h * MIN_ASPECT));
-      const cx = d.isPanel ? d.W / 2 : (box.left + box.right) / 2;
+      const cx = (box.left + box.right) / 2;
       let l = Math.round(cx - want / 2), r = l + want;
       if (l < 0) { r -= l; l = 0; }
       if (r > d.W) { l -= r - d.W; r = d.W; }

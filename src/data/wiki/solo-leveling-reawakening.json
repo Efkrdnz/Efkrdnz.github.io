@@ -347,7 +347,7 @@
    "title": "Keybinds",
    "category": "setting",
    "tagline": "Default keys for the System, skills, and abilities",
-   "summary": "The mod registers 19 key mappings, most under the Solo Leveling Keybinds category in Options > Controls. All of them can be rebound. Keys only fire while no menu screen is open.",
+   "summary": "Every key below can be rebound under **Options > Controls > Solo Leveling Keybinds**. Keys only fire while no menu is open. The four quick-skill keys are fixed actions, not slots you assign.",
    "status": "live",
    "accent": "",
    "parents": [
@@ -361,65 +361,57 @@
    "facts": [
     {
      "label": "N",
-     "value": "Open Panel. Opens your System panel. In a Dungeon Builder world it opens Builder Studio instead. Players without the System get a basic abilities screen."
+     "value": "Open the System panel. In a Dungeon Builder world it opens Builder Studio instead."
     },
     {
      "label": "R",
-     "value": "Skill Cycle. Cycles the selected skill."
+     "value": "Toggle combat mode."
+    },
+    {
+     "label": "1 - 8",
+     "value": "Use the ability equipped in that slot."
     },
     {
      "label": "Z",
-     "value": "Use the selected skill. Supports press-and-hold; the release time is sent too, so some skills care how long you held it."
-    },
-    {
-     "label": "Right Mouse",
-     "value": "Sword Enhance. Hold-and-release, like Z."
+     "value": "Switch between page 1 and page 2 of your equipped skills."
     },
     {
      "label": "X",
-     "value": "Job Ability 1. Only responds in combat mode, or always if your class is Fighter."
+     "value": "Melee."
     },
     {
      "label": "C",
-     "value": "Job Ability 2. Same combat-mode gate."
+     "value": "Ruler's Authority."
     },
     {
      "label": "V",
-     "value": "Job Ability 3. Same combat-mode gate."
+     "value": "Dash."
     },
     {
      "label": "B",
-     "value": "Job Ability 4. Same combat-mode gate."
+     "value": "Aura."
     },
     {
      "label": "Space",
-     "value": "Triple Jump. Sends your current momentum with the jump request."
-    },
-    {
-     "label": "1 through 8",
-     "value": "Skill hotbar slots 1-8. Press casts the slotted skill; hold-and-release is supported for charged skills."
+     "value": "Triple Jump, when you have it."
     },
     {
      "label": "Tab",
-     "value": "Quest Info. Hold to view quest info; releasing clears the Demon King's Castle quest progress display."
-    },
-    {
-     "label": "Left Mouse",
-     "value": "A mapping named Ddd registered under the Misc category. It has no action attached in the key mapping itself; leave it alone."
+     "value": "Hold to view quest info."
     }
    ],
    "sections": [
     {
-     "heading": "The combat-mode gate",
-     "body": "The four Job Ability keys (X, C, V, B) check a client-side condition before doing anything: your combat mode must be on, or your class must be Fighter. If you mash X and nothing happens, toggle combat mode first. The skill hotbar keys (1-8), Z, R, and the others do not have this client-side gate; the server decides whether the press does anything."
+     "heading": "Two pages of eight",
+     "body": "Your equipped skills live on two pages. **1 through 8** fire whatever is in that slot, and **Z** flips between page one and page two - so sixteen skills are reachable without opening anything.\n\nSet what goes in each slot from the System panel."
     },
     {
-     "heading": "Hold-and-release keys",
-     "body": "Z, Right Mouse (Sword Enhance), X, and the 1-8 slots all report how long you held them when you let go. Charged or channeled skills read that duration. Quick taps and long holds can therefore do different things depending on the skill."
+     "heading": "The four quick-skill keys",
+     "body": "**X, C, V and B are fixed.** They are Melee, Ruler's Authority, Dash and Aura respectively, and they are not assignable slots - nothing else can be bound onto them, job abilities included.\n\nWhich of them actually do something depends on what you have unlocked. Ruler's Authority needs the vessel that grants it."
     },
     {
-     "heading": "Rebinding and label quirks",
-     "body": "Everything lives under Solo Leveling Keybinds in the vanilla controls screen. Note two display quirks in the current language file: the slot-3 key is mislabeled as Ab 2 (same label as slot 2), and several keys share physical defaults with vanilla actions (Space, Tab, number keys, mouse buttons). The mod's mappings coexist with vanilla ones; rebind them if a conflict bothers you."
+     "heading": "Combat mode",
+     "body": "**R** toggles combat mode. It changes how your character holds and swings, and some actions only respond while it is on."
     }
    ]
   },

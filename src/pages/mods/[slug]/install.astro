@@ -105,6 +105,36 @@ const totalDownloads = d.downloads + (d.modrinthDownloads ?? 0);
           </aside>
         </section>
 
+        {info.branches?.length > 0 && (
+          <section class="shell" style="padding-bottom:var(--s6);">
+            <div class="section__head">
+              <div class="section__title">
+                <p class="eyebrow">Versions</p>
+                <h2 class="h2">Two branches</h2>
+              </div>
+              <p class="mono-note">Pick the one your pack or server uses</p>
+            </div>
+
+            <div class="ibranches">
+              {info.branches.map((b: any) => (
+                <div class:list={['ibranch', `ibranch--${b.state}`]}>
+                  <div class="ibranch__head">
+                    <span class="ibranch__name">{b.name}</span>
+                    <span class:list={['ibranch__state', `is-${b.state}`]}>
+                      {b.state === 'current' ? 'Updated' : 'No longer updated'}
+                    </span>
+                  </div>
+                  <div class="ibranch__spec">
+                    <span>Minecraft {b.minecraft}</span>
+                    <span>{b.loader}</span>
+                  </div>
+                  <p class="ibranch__note">{b.note}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
         {info.notices?.length > 0 && (
           <section class="shell" style="padding-bottom:var(--s6);">
             <div class="inst-notices">

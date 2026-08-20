@@ -128,7 +128,7 @@
     {
       "tone": "info",
       "title": "This wiki documents 1.3.0 on NeoForge",
-      "body": "Everything here — the guide, the map, every page — is written against **1.3.0 for Minecraft 1.21.1 on NeoForge**. The last Forge release is a different branch with **major differences**, so if you are playing that version expect pages here not to match it. Back up any world you care about before moving between branches."
+      "body": "Everything here is written against **1.3.0 for Minecraft 1.21.1 on NeoForge**. The 1.20.1 Forge build is still available and still played, but it is **no longer updated** and differs substantially, so expect pages here not to match it. Back up any world you care about before moving between branches."
     }
   ],
   "steps": [
@@ -161,5 +161,21 @@
   "server": {
     "title": "Playing with other people",
     "body": "Every player and the server need the **same mod version and the same GeckoLib version**. Mismatches disconnect rather than degrade. Optional client-side mods — Sodium, Iris, the Arsenal pack — do not need to match, since the server never sees them."
-  }
+  },
+  "branches": [
+    {
+      "name": "1.3.0 — NeoForge",
+      "minecraft": "1.21.1",
+      "loader": "NeoForge 21.1.244+",
+      "state": "current",
+      "note": "The version in active development, and what this wiki documents. New content lands here."
+    },
+    {
+      "name": "Last Forge build",
+      "minecraft": "1.20.1",
+      "loader": "Forge 47.2.0",
+      "state": "frozen",
+      "note": "Still playable and still downloadable — most modpacks, including ProFake's, run on it. It no longer receives updates, and it differs substantially from 1.3.0, so pages here will not always match it."
+    }
+  ]
 }

@@ -131,6 +131,12 @@ export function initVault(): void {
   const byId = new Map<string, WikiNode>();
   nodes.forEach((n) => byId.set(n.id, n));
 
+  /* Optional screenshots, keyed by node id. Built at compile time from
+     whatever happens to be sitting in assets/wiki/shots. */
+  const shotsEl = document.getElementById('vault-shots');
+  const shots: Record<string, { src: string; w: number; h: number }> =
+    shotsEl?.textContent ? JSON.parse(shotsEl.textContent) : {};
+
   /* ---- tree ------------------------------------------------------------- */
   const kids = new Map<string, string[]>();
   const parentOf = new Map<string, string>();
@@ -553,6 +559,14 @@ export function initVault(): void {
             ? 'Work in progress'
             : 'Retired';
       parts.push(`<p><span class="vstatus vstatus--${n.status}">${label}</span></p>`);
+    }
+
+    const shot = shots[id];
+    if (shot) {
+      parts.push(
+        `<img class="vshot" src="${shot.src}" width="${shot.w}" height="${shot.h}" ` +
+          `alt="${escapeHtml(n.title)} in game" loading="lazy" decoding="async">`
+      );
     }
 
     if (n.summary) parts.push(`<p class="vpanel__summary">${fmt(n.summary, hasNode)}</p>`);

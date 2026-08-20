@@ -855,3 +855,14 @@
   .vstep__n { width: 30px; font-size: 11px; }
   .vstep__art { max-height: 150px; }
 }
+
+/* An in-game screenshot, when one exists for this page. */
+.vshot {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--line-hi);
+  border-radius: 2px;
+  margin-bottom: 18px;
+  background: var(--void);
+}

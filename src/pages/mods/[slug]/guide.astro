@@ -1,6 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
 import Base from '../../../layouts/Base.astro';
 import { url } from '../../../lib/util';
 import '../../../styles/vault.css';
@@ -37,6 +37,25 @@ const guides = import.meta.glob<{ default: any }>(
 );
 const guideEntry = Object.entries(guides).find(([p]) => p.endsWith(`/${mod.id}.guide.json`));
 const guide = guideEntry ? guideEntry[1].default : null;
+
+/* Screenshots are convention over configuration: any image dropped into
+   assets/wiki/shots named after a node id or a step id is picked up here and
+   rendered in that node's panel or that step's header. */
+const shotFiles = import.meta.glob<{ default: ImageMetadata }>(
+  '../../../assets/wiki/shots/*.{png,jpg,jpeg,webp}',
+  { eager: true }
+);
+
+const shots: Record<string, { src: string; w: number; h: number }> = {};
+for (const [path, m] of Object.entries(shotFiles)) {
+  const id = path.split('/').pop()!.replace(/\.(png|jpe?g|webp)$/i, '');
+  const optimized = await getImage({ src: m.default, width: 880, format: 'webp' });
+  shots[id] = {
+    src: optimized.src,
+    w: optimized.attributes.width ?? 880,
+    h: optimized.attributes.height ?? 495,
+  };
+}
 
 /* Art per chapter. Keyed by step id so adding a chapter without art is fine. */
 const CHAPTER_ART: Record<string, any> = {
@@ -208,7 +227,17 @@ if (other.length) grouped.push({ key: 'other', label: 'Other', items: other });
                       <p class="vstep__goal">{c.goal}</p>
                       {c.gate && <p class="vstep__gate">{c.gate}</p>}
 
-                      {CHAPTER_ART[c.id] && (
+                      {shots[c.id] ? (
+                        <img
+                          class="vstep__art"
+                          src={shots[c.id].src}
+                          width={shots[c.id].w}
+                          height={shots[c.id].h}
+                          alt={`${c.title} in game`}
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      ) : CHAPTER_ART[c.id] && (
                         <Image
                           class="vstep__art"
                           src={CHAPTER_ART[c.id]}
@@ -283,6 +312,7 @@ if (other.length) grouped.push({ key: 'other', label: 'Other', items: other });
     </div>
 
     <script type="application/json" id="vault-data" set:html={JSON.stringify(nodes)} is:inline></script>
+    <script type="application/json" id="vault-shots" set:html={JSON.stringify(shots)} is:inline></script>
   </div>
 
   <script>

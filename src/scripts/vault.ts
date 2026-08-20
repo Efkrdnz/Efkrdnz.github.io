@@ -180,8 +180,16 @@ export function initVault(): void {
   const gLinks = svg.querySelector<SVGGElement>('.g-links')!;
   const gNodes = svg.querySelector<SVGGElement>('.g-nodes')!;
   const gRoot = svg.querySelector<SVGGElement>('.g-root')!;
+  const gReticle = svg.querySelector<SVGGElement>('.g-reticle');
   const panel = root.querySelector<HTMLElement>('.vpanel')!;
   const hint = root.querySelector<HTMLElement>('.vhint');
+
+  const tel: Record<string, HTMLElement | null> = {
+    nodes: root.querySelector('[data-tel="nodes"]'),
+    depth: root.querySelector('[data-tel="depth"]'),
+    zoom: root.querySelector('[data-tel="zoom"]'),
+    target: root.querySelector('[data-tel="target"]'),
+  };
 
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -346,9 +354,20 @@ export function initVault(): void {
         nodeEls.delete(id);
       }
     });
+    /* Whatever is new this pass materialises in sequence rather than all at
+       once — a branch unfolding, not a flash. Capped so the first paint of a
+       large tree does not turn into a slow roll call. */
+    let fresh = 0;
     vis.forEach((id) => {
       if (nodeEls.has(id)) return;
       const el = buildNode(id);
+      if (!reduce && fresh < 14) {
+        const delay = `${fresh * 26}ms`;
+        el.style.animationDelay = delay;
+        const glyph = el.querySelector<SVGPathElement>('.node__glyph');
+        if (glyph) glyph.style.animationDelay = delay;
+      }
+      fresh++;
       gNodes.appendChild(el);
       nodeEls.set(id, el);
     });
@@ -375,6 +394,20 @@ export function initVault(): void {
       el.setAttribute('x2', (b.x + b.ox).toFixed(1));
       el.setAttribute('y2', (b.y + b.oy).toFixed(1));
     });
+
+    /* The lock rides along with the node it is on, including while the tree
+       is still springing into place. */
+    if (gReticle) {
+      const p = selected ? pos.get(selected) : null;
+      if (p && selected) {
+        const d = depthOf.get(selected) ?? 1;
+        const r = radiusFor(d, !hasKids(selected)) + 13;
+        gReticle.setAttribute(
+          'transform',
+          `translate(${(p.x + p.ox).toFixed(1)},${(p.y + p.oy).toFixed(1)}) scale(${(r / RETICLE_R).toFixed(3)})`
+        );
+      }
+    }
   }
 
   /* ---- tween ------------------------------------------------------------
@@ -498,6 +531,65 @@ export function initVault(): void {
       'transform',
       `translate(${view.x.toFixed(1)},${view.y.toFixed(1)}) scale(${view.k.toFixed(3)})`
     );
+    if (tel.zoom) tel.zoom.textContent = `${view.k.toFixed(2)}×`;
+  }
+
+  /* ---- reticle ----------------------------------------------------------
+     Four arc brackets and a ping, built once and parked on the selection.
+     RETICLE_R is the radius they are drawn at; paint() scales the group so
+     the bracket sits a constant gap outside whatever node is selected. */
+  const RETICLE_R = 30;
+
+  function buildReticle() {
+    if (!gReticle) return;
+    const spin = document.createElementNS(SVG_NS, 'g');
+    spin.setAttribute('class', 'reticle__spin');
+
+    /* One 46-degree arc centred on each diagonal, so the brackets frame the
+       node without ever sitting on top of its label. */
+    for (let q = 0; q < 4; q++) {
+      const mid = (Math.PI / 4) + (q * Math.PI) / 2;
+      const half = (23 * Math.PI) / 180;
+      const [x1, y1] = [RETICLE_R * Math.cos(mid - half), RETICLE_R * Math.sin(mid - half)];
+      const [x2, y2] = [RETICLE_R * Math.cos(mid + half), RETICLE_R * Math.sin(mid + half)];
+      const arc = document.createElementNS(SVG_NS, 'path');
+      arc.setAttribute('class', 'reticle__arc');
+      arc.setAttribute(
+        'd',
+        `M${x1.toFixed(2)},${y1.toFixed(2)}A${RETICLE_R},${RETICLE_R} 0 0 1 ${x2.toFixed(2)},${y2.toFixed(2)}`
+      );
+      spin.appendChild(arc);
+    }
+    gReticle.appendChild(spin);
+
+    const ping = document.createElementNS(SVG_NS, 'circle');
+    ping.setAttribute('class', 'reticle__ping');
+    ping.setAttribute('r', String(RETICLE_R));
+    gReticle.appendChild(ping);
+  }
+
+  /** Restarts the ping so re-selecting the same node still reads as a lock. */
+  function armReticle() {
+    if (!gReticle) return;
+    gReticle.classList.remove('is-on');
+    if (selected) {
+      void gReticle.getBoundingClientRect();
+      gReticle.classList.add('is-on');
+    }
+  }
+
+  function telemetry() {
+    const vis = visibleIds();
+    if (tel.nodes) tel.nodes.textContent = `${vis.length}/${nodes.length}`;
+    if (tel.depth) {
+      /* Counted as layers on screen rather than as a depth index, so the
+         unopened tree reads as one layer instead of as zero. */
+      const deepest = vis.reduce((m, id) => Math.max(m, depthOf.get(id) ?? 0), 0);
+      tel.depth.textContent = String(deepest + 1);
+    }
+    if (tel.target) {
+      tel.target.textContent = selected ? (byId.get(selected)?.title ?? selected) : 'none';
+    }
   }
 
   /* ---- highlight -------------------------------------------------------- */
@@ -520,6 +612,8 @@ export function initVault(): void {
       el.classList.toggle('is-lit', on);
       el.classList.toggle('is-dim', !!id && !on);
     });
+    armReticle();
+    telemetry();
   }
 
   function matchesFilter(id: string): boolean {
@@ -888,6 +982,7 @@ export function initVault(): void {
   }).observe(svg);
 
   /* ---- boot ------------------------------------------------------------- */
+  buildReticle();
   layout();
   pos.forEach((p) => {
     p.x = p.tx;
@@ -896,6 +991,7 @@ export function initVault(): void {
   render();
   paint();
   applyViewTransform();
+  telemetry();
 
   if (hint) {
     const dismiss = () => hint.classList.add('is-gone');

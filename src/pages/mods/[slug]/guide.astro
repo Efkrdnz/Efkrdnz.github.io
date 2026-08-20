@@ -159,8 +159,27 @@ if (other.length) grouped.push({ key: 'other', label: 'Other', items: other });
         <g class="g-root">
           <g class="g-links"></g>
           <g class="g-nodes"></g>
+          {/* Sits above the nodes and inside the pan/zoom group, so the lock
+              travels with the graph rather than floating over it. */}
+          <g class="g-reticle" aria-hidden="true"></g>
         </g>
       </svg>
+
+      {/* System chrome. Decorative except the readout, which is live data and
+          is still hidden from the accessibility tree — the Index view is the
+          readable equivalent of everything the map shows. */}
+      <div class="vscan" aria-hidden="true"></div>
+      <div class="vframe" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+
+      <div class="vtel" aria-hidden="true">
+        <p class="vtel__h">System</p>
+        <div class="vtel__rows">
+          <span class="vtel__k">Nodes</span><span class="vtel__v" data-tel="nodes">—</span>
+          <span class="vtel__k">Depth</span><span class="vtel__v" data-tel="depth">—</span>
+          <span class="vtel__k">Zoom</span><span class="vtel__v" data-tel="zoom">—</span>
+          <span class="vtel__k">Target</span><span class="vtel__v vtel__v--hot" data-tel="target">—</span>
+        </div>
+      </div>
 
       <div class="vlegend" aria-hidden="true">
         <div class="vlegend__h">How to read this</div>

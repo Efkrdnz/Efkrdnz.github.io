@@ -120,6 +120,33 @@ const wiki = d.hasGuide
       </aside>
     </section>
 
+    {d.press.length > 0 && (
+      <section class="shell" style="padding-bottom:var(--s6);">
+        <div class="press reveal">
+          <p class="press__label">
+            Featured by
+            <span class="press__rule" aria-hidden="true"></span>
+          </p>
+          {d.press.map((p) => (
+            <a
+              class="press__item"
+              href={p.url}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              <span class="press__outlet">{p.outlet}</span>
+              <span class="press__kind">
+                {p.kind}
+                {p.date && <> &middot; {p.date}</>}
+              </span>
+              {p.note && <span class="press__note">{p.note}</span>}
+              <span class="press__out" aria-hidden="true">&#8599;</span>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+
     {d.features.length > 0 && (
       <section class="shell section" style="padding-top:0;">
         <div class="section__head reveal">

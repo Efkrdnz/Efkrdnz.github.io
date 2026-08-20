@@ -45,7 +45,39 @@ order: 5                      # sort position, lowest first
 
 Optional: `modrinth`, `author` + `role: contributor` for collaborations,
 `features` (a list of `k` / `t` / `d`) to render the systems grid,
-`loaders` and `mcVersions` once that data is confirmed.
+`loaders` and `mcVersions` once that data is confirmed, `series` to place the
+mod in a family on the home page, and `hasGuide` / `hasCodex` to open its wiki.
+
+### Guides and codices
+
+A mod's wiki takes one of two shapes, and a mod has one or the other:
+
+- **A guide** (`hasGuide: true`, at `/mods/<slug>/guide`) is a route *through* a
+  mod — do this, then this. Solo Leveling: Reawakening has one.
+- **A codex** (`hasCodex: true`, at `/mods/<slug>/codex`) is a database *of* a
+  mod — every entry, filterable, with no path through it. Minefinity Gauntlet
+  has one, because 150 stone abilities are a table, not a journey.
+
+The mod hub advertises whichever exists and falls back to a `SOON` label.
+
+#### The Minefinity codex
+
+`src/data/codex/minefinity-gauntlet.json` is generated, not hand-written:
+
+```bash
+node scripts/build-codex.cjs "E:/minecraft mods"
+```
+
+The script parses `StoneAbilityCatalog.java` out of the mod source, so names,
+descriptions, control contracts and the stable `(stoneId, powerId)` pairs come
+from the thing the server actually validates against. Stone lore, the role each
+ability plays, and the series copy live in the script as authored content keyed
+by the same IDs; an ability with no role assigned fails the build rather than
+landing in a default bucket. It also writes `src/data/series/minefinity.json`,
+which the home page reads for the series section.
+
+Re-run it after any catalog change. The mod path defaults to
+`E:/minecraft mods`; pass `--dry` to see the counts without writing.
 
 ### Adding a theme
 
@@ -102,8 +134,9 @@ the site loads unstyled.
 
 ## Not built yet
 
-- **Wikis.** Routes are reserved at `/mods/<slug>/guide`. The mod hubs already
-  link to them as `SOON`.
+- **Wikis for the rest of the shelf.** Solo Leveling: Reawakening has a guide
+  and Minefinity Gauntlet has a codex; every other mod hub still links to
+  `/mods/<slug>/guide` as `SOON`.
 - **Changelogs** at `/mods/<slug>/changelog`.
 - **Loader and MC version data.** Left empty on purpose rather than guessed —
   fill `loaders` and `mcVersions` in frontmatter and the download line picks

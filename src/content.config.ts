@@ -31,6 +31,23 @@ const mods = defineCollection({
     /* Set when a mod belongs to a family that shares a library. Drives the
        series band on the home page; unset mods are unaffected. */
     series: z.string().optional(),
+    /* Somebody else covered this mod. Only outward-facing coverage belongs
+       here — a platform, a channel, a publication — never efkrdnzz's own
+       posts, which would make the credential meaningless. Link the canonical
+       post on the outlet's real domain, not a mirror or a share link. */
+    press: z
+      .array(
+        z.object({
+          outlet: z.string(),
+          /* What the coverage physically is: "Instagram reel", "video". */
+          kind: z.string(),
+          url: z.string().url(),
+          /* Optional, and left unset rather than guessed. */
+          date: z.string().optional(),
+          note: z.string().optional(),
+        })
+      )
+      .default([]),
     features: z
       .array(z.object({ k: z.string(), t: z.string(), d: z.string() }))
       .default([]),

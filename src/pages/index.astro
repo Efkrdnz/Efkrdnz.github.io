@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import ModTip from '../components/ModTip.astro';
 import Mentions from '../components/Mentions.astro';
+import Series from '../components/Series.astro';
 import { url, compact, full } from '../lib/util';
 
 const all = (await getCollection('mods')).sort((a, b) => a.data.order - b.data.order);
@@ -25,11 +26,26 @@ const platforms = own.some((m) => m.data.modrinth)
   : ['CurseForge'];
 const modCount = own.filter((m) => m.data.kind === 'mod').length;
 const packCount = own.filter((m) => m.data.kind === 'modpack').length;
+
+/* Series modules that have a real page here. Passing this in keeps the
+   series data free of routes, and stops an unpublished module from
+   rendering as a link to nothing. */
+const seriesLinks = Object.fromEntries(
+  own
+    .filter((m) => m.data.series === 'Minefinity Series')
+    .map((m) => [
+      m.id,
+      {
+        href: url(`/mods/${m.id}`),
+        wiki: m.data.hasCodex ? url(`/mods/${m.id}/codex`) : undefined,
+      },
+    ])
+);
 ---
 
 <Base
   title="efkrdnzz — Minecraft mods"
-  description="Minecraft mod developer. Eight projects on CurseForge and Modrinth built around abilities, progression and boss fights, including Solo Leveling: Reawakening."
+  description="Minecraft mod developer. Eight projects on CurseForge and Modrinth built around abilities, progression and boss fights, including Solo Leveling: Reawakening and the Minefinity Series."
 >
   <section class="shell hero">
     <div class="hero__copy">
@@ -38,7 +54,8 @@ const packCount = own.filter((m) => m.data.kind === 'modpack').length;
       <hr class="hero__rule enter enter--2" />
       <p class="lede enter enter--3">
         Eight projects on CurseForge, built around abilities, progression and the
-        fights that test them. Solo Leveling: Reawakening is the big one.
+        fights that test them. Solo Leveling: Reawakening is the big one; the
+        <a href="#series">Minefinity Series</a> is the one still growing.
       </p>
       <div class="actions enter enter--4">
         <a class="btn btn--primary" href={url('/mods')}>
@@ -95,6 +112,8 @@ const packCount = own.filter((m) => m.data.kind === 'modpack').length;
       ))}
     </div>
   </section>
+
+  <Series published={seriesLinks} />
 
   <Mentions items={mentions} />
 </Base>

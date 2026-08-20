@@ -677,8 +677,15 @@
 .cxmap svg { width: 100%; height: 100%; display: block; cursor: grab; }
 .cxmap svg.is-drag { cursor: grabbing; }
 
-/* Gem and node hit areas are separate, larger circles so a 9px dot still has
-   a 24px target — the visual size is not the pointer size. */
+/* Hit areas are separate, larger circles than the visible dots, so pointer
+   size is not tied to visual size.
+
+   Gems clear 24px in every state — they are what the overview asks you to
+   click. An ability dot only reaches ~19px in the zoomed-out overview; it
+   passes 24px once its stone is focused, which is the state that invites
+   clicking one. The unfocused case rests on WCAG 2.2's equivalent-control
+   exception: every dot on this map is also a full-height row in the Index,
+   on the same page. */
 .m-hit { fill: transparent; }
 
 .m-node { cursor: pointer; }
@@ -719,6 +726,172 @@
 .m-sector { transition: opacity 0.28s var(--ease); }
 .cxmap[data-focus] .m-sector { opacity: 0.2; }
 .cxmap[data-focus] .m-sector.is-focus { opacity: 1; }
+
+/* ------------------------------------------------- matrix filter ------- */
+/* Sits directly on the diagram — no panel, no card. Legibility comes from a
+   shadow on the text rather than a box, so the map stays the thing you are
+   looking at. Selected rows read at full strength and the rest drop back,
+   the same relationship the orbs have. */
+
+.cxmf {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  z-index: 4;
+  width: 178px;
+  max-width: calc(100% - 32px);
+  /* Leaves the hint and zoom controls their strip along the bottom. */
+  max-height: calc(100% - 76px);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: none;
+  text-shadow: 0 1px 3px var(--void), 0 0 10px var(--void);
+}
+
+.cxmf__toggle {
+  display: none;
+  align-items: center;
+  gap: 7px;
+  align-self: flex-start;
+  min-height: 34px;
+  padding: 0 10px;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--sub);
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.cxmf__toggle:hover { color: var(--ink); border-color: var(--line-hi); }
+
+.cxmf__body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 0;
+  overflow: auto;
+  scrollbar-width: thin;
+}
+
+.cxmf__search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 4px;
+}
+
+.cxmf__search svg { color: var(--sub-dim); flex: none; }
+
+.cxmf__search input {
+  flex: 1;
+  min-width: 0;
+  height: 30px;
+  padding: 0;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--ink);
+  background: none;
+  border: 0;
+}
+
+.cxmf__search input::placeholder { color: var(--sub-dim); }
+.cxmf__search input:focus { outline: none; }
+.cxmf__search:focus-within { border-bottom-color: var(--gold); }
+.cxmf__search input:focus-visible { outline: 2px solid var(--gold-hi); outline-offset: 2px; }
+
+.cxmf__h {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--sub-dim);
+  margin: 8px 0 1px;
+}
+
+.cxmf__list { list-style: none; margin: 0; padding: 0; }
+
+.cxmf__i {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 26px;
+  padding: 3px 0;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  text-align: left;
+  color: var(--ink);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  /* Unselected rows are present but out of focus, matching the orbs. */
+  opacity: 0.4;
+  transition: opacity 0.18s var(--ease);
+}
+
+.cxmf__i:hover { opacity: 0.8; }
+.cxmf__i[aria-pressed='true'] { opacity: 1; }
+
+.cxmf__i[aria-pressed='true'] span { color: var(--gem, var(--gold-hi)); font-weight: 600; }
+
+.cxmf__i span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+
+.cxmf__i b {
+  font-weight: 400;
+  font-size: 10px;
+  color: var(--sub-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.cxmf__dot {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--gem, var(--gold));
+  box-shadow: 0 0 6px -1px var(--gem, var(--gold));
+}
+
+/* "every stone" has no single hue, so it gets a ring instead of a fill */
+.cxmf__dot--all {
+  background: none;
+  border: 1px solid var(--sub);
+  box-shadow: none;
+}
+
+.cxmf__i--slim { padding-left: 15px; }
+
+.cxmf__count {
+  margin: 10px 0 0;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sub);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --------------------------------------------- filtered-out on the map -- */
+
+.m-node.is-out { opacity: 0.09; pointer-events: none; }
+.m-node .m-dot,
+.m-node.is-out { transition: opacity 0.24s var(--ease); }
+
+/* A stone with nothing left in it drops back as a whole, label included. */
+.m-sector.is-out { opacity: 0.1; pointer-events: none; }
+.cxmap[data-focus] .m-sector.is-out { opacity: 0.1; }
 
 .cxmap__hint {
   position: absolute;
@@ -1119,4 +1292,37 @@
   .cxfilters { padding: 12px; }
   .cxflabel { width: 100%; }
   .cxrows { padding-inline: 12px; }
+
+  /* Touch sizing. Mouse targets of 26-32px are comfortable and clear the
+     24px pointer minimum; a finger needs 44. Only the heights change —
+     type and spacing stay put, so nothing reflows into a different design. */
+  .cxseg button { min-height: 40px; }
+  .cxbtn,
+  .cxbar__search input { height: 44px; }
+  .cxfilters .cxchip { min-height: 40px; padding-inline: 12px; }
+  .cxpanel__close,
+  .cxmap__zoom button { width: 44px; height: 44px; }
+  .cxpitem { padding-block: 12px; }
+
+  /* 16px or iOS zooms the whole page when the field takes focus. */
+  .cxbar__search input,
+  .cxmf__search input { font-size: 16px; }
+
+  /* Collapsed by default here; the toggle is the only thing on screen
+     until it is asked for. */
+  .cxmf { top: 10px; left: 12px; right: 12px; width: auto; }
+  .cxmf__toggle { display: inline-flex; }
+  .cxmf__body { display: none; }
+  .cxmf.is-open .cxmf__body {
+    display: flex;
+    max-height: min(58vh, 380px);
+    padding: 10px 12px;
+    background: color-mix(in srgb, var(--void) 92%, transparent);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+  }
+  .cxmf.is-open { text-shadow: none; }
+  .cxmf__toggle { min-height: 44px; }
+  .cxmf__i { min-height: 40px; }
+  .cxmf__search input { height: 42px; }
 }

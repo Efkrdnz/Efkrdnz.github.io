@@ -619,6 +619,270 @@ a.tip:hover::after { opacity: 1; }
   .mention { grid-template-columns: 1fr; }
 }
 
+/* ---------------------------------------------------- minefinity series -- */
+/* A family of mods that share one library. The relationship is structural,
+   so it is drawn as a tree rather than stated in a sentence: Core on top,
+   a bus below it, modules hanging off the bus. No new accent colour — the
+   shell still gets exactly one, and this section earns its emphasis from
+   layout instead. */
+
+/* The hero links straight here, and the site header is sticky at 58px. */
+#series { scroll-margin-top: 76px; }
+
+.series__lede { max-width: 68ch; margin: 0 0 var(--s6); }
+
+.series { position: relative; }
+
+.core {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.85fr);
+  gap: var(--s6);
+  padding: var(--s6);
+  background:
+    linear-gradient(140deg, rgba(201, 116, 74, 0.09), transparent 58%),
+    var(--stone-800);
+  border: 1px solid var(--copper-dim);
+  border-radius: var(--radius);
+}
+
+@media (max-width: 860px) {
+  .core { grid-template-columns: 1fr; gap: var(--s5); }
+}
+
+.core__copy { display: flex; flex-direction: column; gap: var(--s2); }
+
+.core__role {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--copper-hi);
+  margin: 0 0 var(--s2);
+}
+
+.core__dot {
+  width: 7px;
+  height: 7px;
+  rotate: 45deg;
+  background: var(--copper);
+}
+
+.core__name {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: clamp(1.4rem, 3vw, 1.85rem);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin: 0;
+  color: var(--bone);
+}
+
+.core__tag {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-style: italic;
+  color: var(--copper-hi);
+  margin: 0;
+}
+
+.core__blurb {
+  font-size: 0.93rem;
+  line-height: 1.65;
+  color: var(--ash);
+  margin: var(--s2) 0 0;
+  max-width: 56ch;
+}
+
+.core__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  align-self: start;
+  border: 1px solid var(--edge-dim);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.core__list li {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  padding: 9px 12px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: 0.03em;
+  color: var(--ash);
+  background: var(--stone-900);
+}
+
+.core__list li::before {
+  content: '';
+  flex: none;
+  width: 5px;
+  height: 5px;
+  rotate: 45deg;
+  background: var(--copper-dim);
+}
+
+/* the connector: one stub down from Core, one rail across the modules */
+.series__bus {
+  position: relative;
+  height: var(--s6);
+}
+
+.series__bus::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 1px;
+  height: 50%;
+  background: var(--copper-dim);
+}
+
+.series__bus::after {
+  content: '';
+  position: absolute;
+  left: 12.5%;
+  right: 12.5%;
+  top: 50%;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--edge) 12%, var(--edge) 88%, transparent);
+}
+
+.series__mods {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(228px, 1fr));
+  gap: var(--s4);
+}
+
+.smod {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+  padding: var(--s5);
+  background: var(--stone-800);
+  border: 1px solid var(--edge-dim);
+  border-radius: var(--radius);
+  color: inherit;
+  transition: border-color 0.2s var(--ease), transform 0.2s var(--ease);
+}
+
+/* the drop from the rail into each card */
+.smod::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: calc(var(--s6) / -2 - 1px);
+  width: 1px;
+  height: calc(var(--s6) / 2);
+  background: var(--edge);
+}
+
+/* The rail only means anything while every module sits on one row. Four
+   228px cards plus three 16px gaps need 960px of content, so the grid wraps
+   below a 1008px viewport — and a stub above a second-row card would point
+   at nothing. Past that, the drop from Core carries the idea on its own. */
+@media (max-width: 1009px) {
+  .series__bus { height: var(--s5); }
+  .series__bus::after { display: none; }
+  .smod::before { display: none; }
+}
+
+a.smod:hover {
+  border-color: var(--copper-dim);
+  transform: translateY(-2px);
+  color: inherit;
+}
+
+.smod[data-status='dev'] { background: transparent; border-style: dashed; }
+
+.smod__top { display: flex; align-items: center; gap: var(--s3); }
+
+.smod__role {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--copper);
+}
+
+.smod__status {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ash-dim);
+  padding: 2px 6px;
+  border: 1px solid var(--edge-dim);
+  border-radius: 2px;
+  white-space: nowrap;
+}
+
+.smod[data-status='published'] .smod__status { color: var(--r-uncommon); }
+
+.smod__name {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: -0.02em;
+  color: var(--bone);
+}
+
+.smod__tag {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-style: italic;
+  color: var(--ash-dim);
+  margin: 0;
+}
+
+.smod__blurb {
+  font-size: 0.86rem;
+  line-height: 1.6;
+  color: var(--ash);
+  margin: var(--s1) 0 0;
+}
+
+.smod__foot {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  margin-top: auto;
+  padding-top: var(--s4);
+  border-top: 1px solid var(--edge-dim);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ash-dim);
+}
+
+.smod__go { margin-left: auto; color: var(--copper); transition: transform 0.2s var(--ease); }
+a.smod:hover .smod__go { transform: translateX(3px); }
+
+.series__cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s4);
+  margin-top: var(--s5);
+  padding: var(--s5);
+  border: 1px solid var(--edge-dim);
+  border-radius: var(--radius);
+}
+
 /* ------------------------------------------------------------- footer --- */
 
 .site-footer {

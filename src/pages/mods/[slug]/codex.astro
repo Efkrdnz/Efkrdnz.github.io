@@ -42,7 +42,14 @@ const controlList = Object.keys(controls)
   .map((k) => ({ k, ...controls[k], n: controlUse[k] ?? 0 }))
   .sort((a, b) => b.n - a.n || a.label.localeCompare(b.label));
 
-const roleList = Object.entries(roles).map(([k, label]) => ({ k, label }));
+const roleCount: Record<string, number> = {};
+for (const a of abilities) roleCount[a.role] = (roleCount[a.role] ?? 0) + 1;
+
+const roleList = Object.entries(roles).map(([k, label]) => ({
+  k,
+  label,
+  n: roleCount[k] ?? 0,
+}));
 
 /* ── matrix layout ────────────────────────────────────────────────────────
    Computed here rather than in the browser so the map is real markup: it
@@ -109,7 +116,10 @@ const sectors = ORDER.map((key, i) => {
   return { stone, center, gx, gy, lx, ly, ex, ey, nodes: placed };
 });
 
-const VB = RINGS[RINGS.length - 1] + 110;
+/* Just enough margin for the outer ring's hit circles and the two hub labels.
+   Every unit of slack here is scale the diagram loses when it fits to the
+   stage height, and the nodes are already the smallest thing on screen. */
+const VB = RINGS[RINGS.length - 1] + 45;
 
 /* ── inline formatting ────────────────────────────────────────────────────
    The systems copy carries **emphasis** and `code`; nothing else. Escaping
@@ -371,7 +381,7 @@ const pageTitle = `${d.short} Codex`;
                       role="button"
                       aria-label={`${n.name} — ${sec.stone.name}`}
                     >
-                      <circle class="m-hit" cx={n.x} cy={n.y} r="14"></circle>
+                      <circle class="m-hit" cx={n.x} cy={n.y} r="15"></circle>
                       <circle
                         class="m-ring"
                         cx={n.x}
@@ -441,6 +451,88 @@ const pageTitle = `${d.short} Codex`;
               </defs>
             </g>
           </svg>
+
+          {/* Filter, sitting straight on the diagram with no panel behind
+              it. The same facets as the Index, sharing one state, so
+              narrowing here narrows there and back again. */}
+          <div class="cxmf is-open" data-cx-mapfilter>
+            <button
+              type="button"
+              class="cxmf__toggle"
+              data-cx-mf-toggle
+              aria-expanded="true"
+              aria-controls="cx-mf-body"
+            >
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                <path d="M1 2.5h10M3 6h6M5 9.5h2"></path>
+              </svg>
+              Filter
+            </button>
+
+            <div class="cxmf__body" id="cx-mf-body">
+              <div class="cxmf__search">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
+                  <circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.6-3.6"></path>
+                </svg>
+                <input
+                  type="search"
+                  data-cx-map-search
+                  placeholder="Search"
+                  aria-label="Search the matrix by ability name or description"
+                  autocomplete="off"
+                />
+              </div>
+
+              <p class="cxmf__h" id="cx-mf-stones">Stones</p>
+              <ul class="cxmf__list" aria-labelledby="cx-mf-stones">
+                <li>
+                  <button type="button" class="cxmf__i" data-cx-filter="stone" data-cx-value="" aria-pressed="true">
+                    <i class="cxmf__dot cxmf__dot--all" aria-hidden="true"></i>
+                    <span>Every stone</span>
+                    <b>{abilities.length}</b>
+                  </button>
+                </li>
+                {stones.map((s) => (
+                  <li>
+                    <button
+                      type="button"
+                      class="cxmf__i"
+                      style={`--gem:${s.color}`}
+                      data-cx-filter="stone"
+                      data-cx-value={s.key}
+                      aria-pressed="false"
+                    >
+                      <i class="cxmf__dot" aria-hidden="true"></i>
+                      <span>{s.key === 'infinity' ? 'All six' : s.name.replace(' Stone', '')}</span>
+                      <b>{s.count}</b>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+
+              <p class="cxmf__h" id="cx-mf-roles">Role</p>
+              <ul class="cxmf__list" aria-labelledby="cx-mf-roles">
+                <li>
+                  <button type="button" class="cxmf__i cxmf__i--slim" data-cx-filter="role" data-cx-value="" aria-pressed="true">
+                    <span>Any</span>
+                    <b>{abilities.length}</b>
+                  </button>
+                </li>
+                {roleList.map((r) => (
+                  <li>
+                    <button type="button" class="cxmf__i cxmf__i--slim" data-cx-filter="role" data-cx-value={r.k} aria-pressed="false">
+                      <span>{r.label}</span>
+                      <b>{r.n}</b>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+
+              <p class="cxmf__count" data-cx-map-count role="status">
+                {abilities.length} of {abilities.length} lit
+              </p>
+            </div>
+          </div>
 
           <p class="cxmap__hint">
             <b>Click</b> a gem to open its stone &middot; <b>drag</b> to pan &middot;
@@ -529,7 +621,6 @@ const pageTitle = `${d.short} Codex`;
                       data-stone={a.stone}
                       data-role={a.role}
                       data-control={a.control}
-                      data-text={`${a.name} ${a.desc} ${a.hint}`.toLowerCase()}
                     >
                       <span class="cxrow__id">{String(a.power).padStart(2, '0')}</span>
                       <span class="cxrow__main">

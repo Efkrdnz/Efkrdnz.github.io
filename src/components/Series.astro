@@ -9,13 +9,18 @@ interface Props {
 }
 
 const { published } = Astro.props;
+
+/* The rest of the site spells small counts out ("Eight projects"), so this
+   heading does too rather than dropping a numeral into prose. */
+const WORDS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight'];
+const count = WORDS[series.modules.length] ?? String(series.modules.length);
 ---
 
 <section class="shell section" id="series">
   <div class="section__head reveal">
     <div class="section__title">
       <p class="eyebrow">{series.name}</p>
-      <h2 class="h2">One library, {series.modules.length} modules</h2>
+      <h2 class="h2">One library, {count} modules</h2>
     </div>
     <p class="mono-note">{series.tagline}</p>
   </div>

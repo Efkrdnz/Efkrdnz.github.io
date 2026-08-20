@@ -132,18 +132,46 @@ export function initCodex(): void {
 
   const filters = { stone: '', role: '', control: '', q: '' };
 
-  function apply() {
+  /* One searchable string per ability, built once. The Index rows and the
+     matrix orbs are two views of the same query, so they must not be able
+     to disagree about what matches. */
+  const haystack = new Map(
+    data.abilities.map((a) => [a.ref, `${a.name} ${a.desc} ${a.hint}`.toLowerCase()])
+  );
+
+  function matches(a: Ability | undefined): boolean {
+    if (!a) return false;
     const q = filters.q.trim().toLowerCase();
+    return (
+      (!filters.stone || a.stone === filters.stone) &&
+      (!filters.role || a.role === filters.role) &&
+      (!filters.control || a.control === filters.control) &&
+      (!q || (haystack.get(a.ref) ?? '').includes(q))
+    );
+  }
+
+  const mapNodes = new Map<string, SVGGElement>();
+  svg.querySelectorAll<SVGGElement>('[data-node]').forEach((n) => mapNodes.set(n.dataset.node!, n));
+  const mapSectors = Array.from(svg.querySelectorAll<SVGGElement>('.m-sector'));
+  const mapCount = root.querySelector<HTMLElement>('[data-cx-map-count]');
+  const mapSearch = root.querySelector<HTMLInputElement>('[data-cx-map-search]');
+
+  function apply() {
+    /* A changed query supersedes any drill-down. Without this, focusing one
+       stone and then filtering to another leaves the matches lit inside a
+       sector that focus has made pointer-inert — visibly there, unclickable. */
+    clearFocus();
+
     let shown = 0;
+    const live = new Set<string>();
 
     for (const row of rows) {
-      const ok =
-        (!filters.stone || row.dataset.stone === filters.stone) &&
-        (!filters.role || row.dataset.role === filters.role) &&
-        (!filters.control || row.dataset.control === filters.control) &&
-        (!q || (row.dataset.text ?? '').includes(q));
+      const ok = matches(abilityOf.get(row.dataset.cxRow!));
       row.classList.toggle('is-hidden', !ok);
-      if (ok) shown++;
+      if (ok) {
+        shown++;
+        live.add(row.dataset.cxRow!);
+      }
     }
 
     /* A group header with nothing under it is noise, not structure. */
@@ -152,8 +180,18 @@ export function initCodex(): void {
       g.classList.toggle('is-hidden', !any);
     }
 
+    /* The matrix keeps every orb in place and drops the misses back, so the
+       shape of the catalog stays readable while the answer stands out. */
+    for (const [ref, node] of mapNodes) node.classList.toggle('is-out', !live.has(ref));
+    for (const sec of mapSectors) {
+      const key = sec.dataset.sector!;
+      const anyLeft = (byStone.get(key) ?? []).some((a) => live.has(a.ref));
+      sec.classList.toggle('is-out', !anyLeft);
+    }
+
     empty.classList.toggle('is-hidden', shown > 0);
     countOut.textContent = `${shown} of ${data.abilities.length}`;
+    if (mapCount) mapCount.textContent = `${shown} of ${data.abilities.length} lit`;
   }
 
   root.querySelectorAll<HTMLButtonElement>('[data-cx-filter]').forEach((btn) => {
@@ -174,6 +212,7 @@ export function initCodex(): void {
   root.querySelector('[data-cx-clear]')?.addEventListener('click', () => {
     filters.stone = filters.role = filters.control = filters.q = '';
     search.value = '';
+    if (mapSearch) mapSearch.value = '';
     root
       .querySelectorAll<HTMLButtonElement>('[data-cx-filter]')
       .forEach((b) => b.setAttribute('aria-pressed', String(!b.dataset.cxValue)));
@@ -181,17 +220,44 @@ export function initCodex(): void {
     search.focus();
   });
 
+  /* The matrix filter is a full-height column on a desktop stage and would
+     swallow a phone, so there it collapses behind its own button. */
+  const mapFilter = root.querySelector<HTMLElement>('[data-cx-mapfilter]');
+  const mapFilterToggle = root.querySelector<HTMLButtonElement>('[data-cx-mf-toggle]');
+
+  function setMapFilterOpen(open: boolean) {
+    mapFilter?.classList.toggle('is-open', open);
+    mapFilterToggle?.setAttribute('aria-expanded', String(open));
+  }
+
+  mapFilterToggle?.addEventListener('click', () =>
+    setMapFilterOpen(!mapFilter?.classList.contains('is-open'))
+  );
+
+  const narrow = window.matchMedia('(max-width: 720px)');
+  setMapFilterOpen(!narrow.matches);
+  narrow.addEventListener('change', (e) => setMapFilterOpen(!e.matches));
+
   let searchTimer = 0;
-  search.addEventListener('input', () => {
-    window.clearTimeout(searchTimer);
-    searchTimer = window.setTimeout(() => {
-      filters.q = search.value;
-      apply();
-      /* Typing in a database search means "show me the results", so the
-         search box owns the view while there is a query in it. */
-      if (filters.q.trim() && view !== 'index') setView('index');
-    }, 120);
-  });
+
+  /* Two boxes, one query. The bar's search is a database search and jumps to
+     the results; the matrix's search filters the diagram you are already
+     looking at, so it stays put. */
+  function bindSearch(input: HTMLInputElement, jump: boolean) {
+    input.addEventListener('input', () => {
+      window.clearTimeout(searchTimer);
+      searchTimer = window.setTimeout(() => {
+        filters.q = input.value;
+        if (search !== input) search.value = input.value;
+        if (mapSearch && mapSearch !== input) mapSearch.value = input.value;
+        apply();
+        if (jump && filters.q.trim() && view !== 'index') setView('index');
+      }, 120);
+    });
+  }
+
+  bindSearch(search, true);
+  if (mapSearch) bindSearch(mapSearch, false);
 
   /* =================================================================== */
   /* panel                                                               */
@@ -462,40 +528,89 @@ export function initCodex(): void {
     { passive: false }
   );
 
+  let pressed = false;
   let dragging = false;
   let moved = 0;
   let last = { x: 0, y: 0 };
 
+  /* Capture is taken only once the pointer has actually travelled.
+     Capturing on pointerdown retargets the whole compatibility mouse
+     sequence — click included — to the capture element, so every click
+     arrived with the <svg> as its target and no node ever resolved. Waiting
+     for real movement keeps a plain press behaving like a plain press. */
+  const DRAG_SLOP = 4;
+
+  let pressTarget: Element | null = null;
+
   svg.addEventListener('pointerdown', (e) => {
     if (e.button !== 0) return;
-    dragging = true;
+    pressed = true;
+    dragging = false;
     moved = 0;
     last = { x: e.clientX, y: e.clientY };
-    svg.setPointerCapture(e.pointerId);
-    svg.classList.add('is-drag');
+    /* Read before any capture exists, so it is the element actually under
+       the pointer rather than whatever capture would have retargeted to. */
+    pressTarget = e.target as Element;
   });
 
   svg.addEventListener('pointermove', (e) => {
-    if (!dragging) return;
-    const scale = unitsPerPixel();
+    if (!pressed) return;
     const dx = e.clientX - last.x;
     const dy = e.clientY - last.y;
     moved += Math.abs(dx) + Math.abs(dy);
+
+    if (!dragging) {
+      if (moved <= DRAG_SLOP) return;
+      dragging = true;
+      pressTarget = null;
+      /* Re-anchor here so the pan does not jump by the slop distance. */
+      last = { x: e.clientX, y: e.clientY };
+      svg.setPointerCapture(e.pointerId);
+      svg.classList.add('is-drag');
+      return;
+    }
+
+    const scale = unitsPerPixel();
     t.x += dx * scale;
     t.y += dy * scale;
     last = { x: e.clientX, y: e.clientY };
     draw();
   });
 
-  const endDrag = (e: PointerEvent) => {
-    if (!dragging) return;
-    dragging = false;
-    svg.releasePointerCapture?.(e.pointerId);
-    svg.classList.remove('is-drag');
+  const endPress = (e: PointerEvent) => {
+    if (!pressed) return;
+    pressed = false;
+    const target = pressTarget;
+    pressTarget = null;
+
+    if (dragging) {
+      dragging = false;
+      try {
+        svg.releasePointerCapture(e.pointerId);
+      } catch {
+        /* capture may already be gone; nothing to undo */
+      }
+      svg.classList.remove('is-drag');
+      return;
+    }
+    activate(target);
   };
 
-  svg.addEventListener('pointerup', endDrag);
-  svg.addEventListener('pointercancel', endDrag);
+  svg.addEventListener('pointerup', endPress);
+
+  svg.addEventListener('pointercancel', (e) => {
+    pressed = false;
+    pressTarget = null;
+    if (dragging) {
+      dragging = false;
+      try {
+        svg.releasePointerCapture(e.pointerId);
+      } catch {
+        /* as above */
+      }
+      svg.classList.remove('is-drag');
+    }
+  });
 
   root.querySelectorAll<HTMLButtonElement>('[data-cx-zoom]').forEach((b) =>
     b.addEventListener('click', () => {
@@ -507,25 +622,38 @@ export function initCodex(): void {
     })
   );
 
-  /* Nodes and gems. A drag that happens to end on a node is a pan, not a
-     click, so anything past a few pixels of travel is ignored here. */
-  svg.addEventListener('click', (e) => {
-    if (moved > 6) return;
-    const target = e.target as Element;
+  /* One activation path for gems, ability dots and the hub, reached from a
+     press that did not turn into a pan. Not bound to `click`, which pointer
+     capture is free to retarget. */
+  function activate(target: Element | null) {
+    if (!target) return;
+
     const gem = target.closest<SVGGElement>('[data-stone]');
     if (gem) {
       opener = gem as unknown as HTMLElement;
       const key = gem.dataset.stone!;
-      if (mapBox.dataset.focus === key && mode === 'stone') closePanel();
-      else showStone(key);
+      if (mapBox.dataset.focus === key && mode === 'stone') {
+        closePanel();
+        clearFocus();
+      } else showStone(key);
       return;
     }
+
     const node = target.closest<SVGGElement>('[data-node]');
     if (node) {
       opener = node as unknown as HTMLElement;
       showAbility(node.dataset.node!, mapBox.dataset.focus ?? '');
+      return;
     }
-  });
+
+    /* Anywhere on the hub, or empty space inside it, backs out to the
+       whole matrix — the way out of a focused stone. */
+    if (target.closest('.m-hub')) {
+      clearFocus();
+      closePanel();
+      ease({ x: 0, y: 0, k: 1 });
+    }
+  }
 
   svg.addEventListener('keydown', (e) => {
     if (e.key !== 'Enter' && e.key !== ' ') return;
@@ -550,7 +678,12 @@ export function initCodex(): void {
     if (!gem) return;
     const cx = Number(gem.getAttribute('cx')) * 2.4;
     const cy = Number(gem.getAttribute('cy')) * 2.4;
-    const k = 1.42;
+    /* Overview and focus have different jobs. In overview the gems are the
+       targets and they are large; the ability dots are only ever clicked
+       once a stone is focused, so focus zooms far enough to carry them past
+       a 24px pointer target on a normal-height stage. (The full-size
+       equivalent for every one of them is the Index row.) */
+    const k = 1.62;
     ease({ x: -cx * k, y: -cy * k, k });
   }
 
@@ -562,13 +695,6 @@ export function initCodex(): void {
     });
   }
 
-  /* Clicking the hub is the way out of a focused stone. */
-  svg.querySelector('.m-hub')?.addEventListener('click', () => {
-    if (moved > 6) return;
-    clearFocus();
-    closePanel();
-    ease({ x: 0, y: 0, k: 1 });
-  });
 
   /* =================================================================== */
   /* addressing                                                          */

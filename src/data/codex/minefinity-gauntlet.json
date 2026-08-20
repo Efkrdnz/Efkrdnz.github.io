@@ -11,65 +11,6 @@
    "GeckoLib 4.9.2"
   ]
  },
- "series": {
-  "name": "Minefinity Series",
-  "tagline": "One library, one control scheme, one creative tab.",
-  "blurb": "Every Minefinity mod is a module. Minefinity Core holds the parts they all need — the shared keybinds, the Superpowers creative tab, the private client outlines, the third-person animation runtime — and each hero or artifact plugs into it. Core never depends on a module, so installing one does not drag the rest in.",
-  "core": {
-   "key": "core",
-   "name": "Minefinity Core",
-   "role": "Library",
-   "tagline": "The shared runtime every module consumes.",
-   "blurb": "Owns the five rebindable controls under `Minefinity Universe`, the one Superpowers creative tab with its alignment and collection filters, the client glow registry for private colored outlines, and the animation data model, sampler, live library and server-authoritative playback used for third-person clips.",
-   "provides": [
-    "Shared controls: R, V, Z, X, C",
-    "One Superpowers creative tab",
-    "Private colored client outlines",
-    "Third-person animation runtime",
-    "Server-side semantic input routing"
-   ],
-   "status": "library"
-  },
-  "modules": [
-   {
-    "key": "gauntlet",
-    "name": "Minefinity Gauntlet",
-    "role": "Artifact",
-    "tagline": "Six stones. No restrictions.",
-    "blurb": "The Infinity Gauntlet as a 150-ability catalog: install gems into one stack, pick a stone with R, pick a power with V, and program persistent world rules in the Universal Law forge.",
-    "status": "published",
-    "slug": "minefinity-gauntlet",
-    "stat": "150 abilities"
-   },
-   {
-    "key": "ironman",
-    "name": "Minefinity Ironman",
-    "role": "Hero",
-    "tagline": "A suit, and a voice that answers it.",
-    "blurb": "A controllable four-piece suit with server-authoritative flight and weapons, dual-arm loadouts on left and right click, and a private voice-driven JARVIS. Speech is transcribed on the server; explicit suit orders go through a deterministic allow-list, and generated text never executes anything.",
-    "status": "dev",
-    "stat": "In development"
-   },
-   {
-    "key": "spiderman",
-    "name": "Minefinity Spiderman",
-    "role": "Hero",
-    "tagline": "Three suits, and the city to swing through.",
-    "blurb": "Web slinging, wall movement and wrist-mounted shooters. Suits are registered data rather than hardcoded checks — a suit owns its four pieces, the skin it paints on the wearer, and the abilities it grants, so adding one is a registration instead of another branch through every power.",
-    "status": "dev",
-    "stat": "In development"
-   },
-   {
-    "key": "thor",
-    "name": "Minefinity Thor",
-    "role": "Hero",
-    "tagline": "The weapon is the power.",
-    "blurb": "Mjolnir and Stormbreaker, and the storm they command. The other modules ask which suit is worn; this one asks which weapon is held. Mjolnir judges its wielder and Stormbreaker does not — a weapon that refuses you says so rather than leaving the keys silently dead.",
-    "status": "dev",
-    "stat": "In development"
-   }
-  ]
- },
  "controls": {
   "TAP_USE": {
    "label": "Tap Use",

@@ -12,6 +12,10 @@ curseforge: "https://www.curseforge.com/minecraft/mc-mods/minefinity-gauntlet"
 order: 4
 series: "Minefinity Series"
 hasCodex: true
+press:
+  - outlet: "CurseForge"
+    kind: "Instagram reel"
+    url: "https://www.instagram.com/reels/DNx6XjIUo0P/"
 loaders: ["NeoForge"]
 mcVersions: ["1.21.1"]
 features:

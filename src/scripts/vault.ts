@@ -1,12 +1,13 @@
 /* ==========================================================================
    The Vault — expandable knowledge graph
 
-   Deliberately starts collapsed. A 120-node hairball is impressive and
-   useless; showing only the roots and growing the graph as you open things
-   keeps the structure readable and makes exploring it the interaction.
+   Layout is a radial tidy tree, not a force simulation. A physics sim treats
+   every node as equal and settles into a ball; this content is a hierarchy,
+   so children fan outward from their parent along the direction the branch
+   was already travelling. Deterministic, no overlap, reads as a tree.
 
-   No graph library: the simulation is ~60 lines of repulsion + springs, and
-   avoiding d3 keeps the whole page under a few KB of script.
+   No graph library. Positions tween toward their computed targets, which
+   costs a few lines and keeps the whole page tiny.
    ========================================================================== */
 
 export interface Fact {
@@ -33,36 +34,51 @@ export interface WikiNode {
   accent?: string;
 }
 
-interface Body {
-  id: string;
+interface Pos {
   x: number;
   y: number;
-  vx: number;
-  vy: number;
-  depth: number;
-  pinned: boolean;
+  tx: number;
+  ty: number;
+  ox: number;
+  oy: number;
 }
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const DEFAULT_ACCENT = '#3FC6FF';
-
-/* simulation constants — tuned by eye against the real node counts */
-const REPULSE = 5400;
-const SPRING = 0.032;
-const GRAVITY = 0.012;
-const DAMPING = 0.86;
-const MIN_ENERGY = 0.02;
-
-function restLength(depth: number): number {
-  return depth <= 1 ? 150 : depth === 2 ? 116 : 96;
-}
+const DRAG_SLOP = 4;
 
 function radiusFor(depth: number, leaf: boolean): number {
-  if (depth === 0) return 26;
-  if (depth === 1) return leaf ? 9 : 20;
-  if (depth === 2) return leaf ? 8 : 15;
-  return 7;
+  if (depth === 0) return 25;
+  if (depth === 1) return leaf ? 10 : 19;
+  if (depth === 2) return leaf ? 9 : 15;
+  return 8;
 }
+
+/** How far a child sits from its parent. Wider fans get pushed further out. */
+function branchLength(depth: number, siblings: number): number {
+  const base = depth === 0 ? 250 : depth === 1 ? 190 : depth === 2 ? 155 : 130;
+  return base + Math.max(0, siblings - 3) * 15;
+}
+
+/**
+ * The angular wedge a node hands to its children. Narrows with depth so
+ * branches stay separated, but widens again when a node has many children
+ * rather than crushing them into one arc.
+ */
+function fanFor(depth: number, parentFan: number, siblings = 1): number {
+  const inherited =
+    depth === 0 ? (150 * Math.PI) / 180 : Math.max((46 * Math.PI) / 180, parentFan * 0.66);
+  const needed = siblings * ((9.5 * Math.PI) / 180);
+  return Math.min((172 * Math.PI) / 180, Math.max(inherited, needed));
+}
+
+/**
+ * Sibling sets larger than this alternate between two radii. Staggering the
+ * ring is what stops long labels colliding: neighbours end up at different
+ * distances from the parent instead of side by side on one arc.
+ */
+const STAGGER_FROM = 7;
+const STAGGER_GAP = 66;
 
 function hexPath(r: number): string {
   const pts: string[] = [];
@@ -97,30 +113,33 @@ export function initVault(): void {
   const byId = new Map<string, WikiNode>();
   nodes.forEach((n) => byId.set(n.id, n));
 
-  /* ---- derive the tree -------------------------------------------------- */
+  /* ---- tree ------------------------------------------------------------- */
   const kids = new Map<string, string[]>();
+  const parentOf = new Map<string, string>();
   const roots: string[] = [];
+
   nodes.forEach((n) => {
-    const ps = (n.parents || []).filter((p) => byId.has(p));
+    const ps = (n.parents || []).filter((p) => byId.has(p) && p !== n.id);
     if (!ps.length) {
       roots.push(n.id);
       return;
     }
-    ps.forEach((p) => {
-      if (!kids.has(p)) kids.set(p, []);
-      kids.get(p)!.push(n.id);
-    });
+    /* one structural parent keeps the layout a tree; extra links live in
+       "See also" inside the panel instead of tangling the picture */
+    const p = ps[0];
+    parentOf.set(n.id, p);
+    if (!kids.has(p)) kids.set(p, []);
+    kids.get(p)!.push(n.id);
   });
 
   const depthOf = new Map<string, number>();
-  const walk = (id: string, d: number, seen: Set<string>) => {
+  const setDepth = (id: string, d: number, seen: Set<string>) => {
     if (seen.has(id)) return;
     seen.add(id);
-    const prev = depthOf.get(id);
-    if (prev === undefined || d < prev) depthOf.set(id, d);
-    (kids.get(id) || []).forEach((k) => walk(k, d + 1, seen));
+    depthOf.set(id, d);
+    (kids.get(id) || []).forEach((k) => setDepth(k, d + 1, seen));
   };
-  roots.forEach((r) => walk(r, 0, new Set()));
+  roots.forEach((r) => setDepth(r, 0, new Set()));
   nodes.forEach((n) => {
     if (!depthOf.has(n.id)) depthOf.set(n.id, 1);
   });
@@ -129,7 +148,7 @@ export function initVault(): void {
 
   /* ---- state ------------------------------------------------------------ */
   const expanded = new Set<string>();
-  const bodies = new Map<string, Body>();
+  const pos = new Map<string, Pos>();
   let selected: string | null = null;
   let filter = '';
 
@@ -149,10 +168,7 @@ export function initVault(): void {
   /* ---- visible set ------------------------------------------------------ */
   function visibleIds(): string[] {
     const out: string[] = [];
-    const seen = new Set<string>();
     const push = (id: string) => {
-      if (seen.has(id)) return;
-      seen.add(id);
       out.push(id);
       if (expanded.has(id)) (kids.get(id) || []).forEach(push);
     };
@@ -163,96 +179,63 @@ export function initVault(): void {
   function visibleLinks(vis: Set<string>): Array<[string, string]> {
     const out: Array<[string, string]> = [];
     vis.forEach((id) => {
-      (kids.get(id) || []).forEach((k) => {
-        if (vis.has(k)) out.push([id, k]);
-      });
+      const p = parentOf.get(id);
+      if (p && vis.has(p)) out.push([p, id]);
     });
     return out;
   }
 
-  function ensureBody(id: string): Body {
-    let b = bodies.get(id);
-    if (b) return b;
-    const d = depthOf.get(id) ?? 1;
-    /* spawn just off the parent so an expansion visibly grows outward */
-    const parent = (byId.get(id)?.parents || []).find((p) => bodies.has(p));
-    const pb = parent ? bodies.get(parent)! : null;
-    const a = Math.random() * Math.PI * 2;
-    const r = 40 + Math.random() * 30;
-    b = {
-      id,
-      x: pb ? pb.x + Math.cos(a) * r : W / 2 + Math.cos(a) * 180,
-      y: pb ? pb.y + Math.sin(a) * r : H / 2 + Math.sin(a) * 180,
-      vx: 0,
-      vy: 0,
-      depth: d,
-      pinned: false,
-    };
-    bodies.set(id, b);
-    return b;
+  function ensurePos(id: string, x: number, y: number): Pos {
+    let p = pos.get(id);
+    if (!p) {
+      p = { x, y, tx: x, ty: y, ox: 0, oy: 0 };
+      pos.set(id, p);
+    }
+    return p;
   }
 
-  /* ---- simulation ------------------------------------------------------- */
-  let energy = 1;
+  /* ---- radial tidy tree ------------------------------------------------- */
+  function layout() {
+    const cx = W / 2;
+    const cy = H / 2;
 
-  function step(vis: string[], links: Array<[string, string]>) {
-    const list = vis.map(ensureBody);
+    /* roots evenly around a ring, each facing outward from centre */
+    const ring = Math.min(W, H) * (roots.length > 4 ? 0.3 : 0.24);
 
-    for (let i = 0; i < list.length; i++) {
-      for (let j = i + 1; j < list.length; j++) {
-        const a = list[i];
-        const b = list[j];
-        let dx = a.x - b.x;
-        let dy = a.y - b.y;
-        let d2 = dx * dx + dy * dy;
-        if (d2 < 1) {
-          dx = Math.random() - 0.5;
-          dy = Math.random() - 0.5;
-          d2 = 1;
-        }
-        const d = Math.sqrt(d2);
-        const f = REPULSE / d2;
-        const fx = (dx / d) * f;
-        const fy = (dy / d) * f;
-        a.vx += fx;
-        a.vy += fy;
-        b.vx -= fx;
-        b.vy -= fy;
-      }
+    roots.forEach((id, i) => {
+      const a = (i / roots.length) * Math.PI * 2 - Math.PI / 2;
+      const x = cx + Math.cos(a) * ring;
+      const y = cy + Math.sin(a) * ring;
+      const p = ensurePos(id, x, y);
+      p.tx = x;
+      p.ty = y;
+      place(id, a, fanFor(0, 0, 1), 0);
+    });
+
+    /* children fan around the direction the branch is already heading */
+    function place(id: string, outward: number, parentFan: number, depth: number) {
+      if (!expanded.has(id)) return;
+      const cs = kids.get(id) || [];
+      if (!cs.length) return;
+
+      const parent = pos.get(id)!;
+      const fan = fanFor(depth, parentFan, cs.length);
+      const base = branchLength(depth, cs.length);
+      const stagger = cs.length >= STAGGER_FROM;
+      const step = cs.length > 1 ? fan / (cs.length - 1) : 0;
+      const start = outward - fan / 2;
+
+      cs.forEach((cid, i) => {
+        const a = cs.length > 1 ? start + i * step : outward;
+        const len = base + (stagger && i % 2 === 1 ? STAGGER_GAP : 0);
+        const x = parent.tx + Math.cos(a) * len;
+        const y = parent.ty + Math.sin(a) * len;
+        const cp = ensurePos(cid, parent.x, parent.y);
+        cp.tx = x;
+        cp.ty = y;
+        place(cid, a, fan, depth + 1);
+      });
     }
-
-    links.forEach(([s, t]) => {
-      const a = bodies.get(s)!;
-      const b = bodies.get(t)!;
-      const dx = b.x - a.x;
-      const dy = b.y - a.y;
-      const d = Math.hypot(dx, dy) || 1;
-      const rest = restLength(b.depth);
-      const f = (d - rest) * SPRING;
-      const fx = (dx / d) * f;
-      const fy = (dy / d) * f;
-      a.vx += fx;
-      a.vy += fy;
-      b.vx -= fx;
-      b.vy -= fy;
-    });
-
-    let e = 0;
-    list.forEach((b) => {
-      b.vx += (W / 2 - b.x) * GRAVITY;
-      b.vy += (H / 2 - b.y) * GRAVITY;
-      if (b.pinned) {
-        b.vx = 0;
-        b.vy = 0;
-        return;
-      }
-      b.vx *= DAMPING;
-      b.vy *= DAMPING;
-      b.x += b.vx;
-      b.y += b.vy;
-      e += Math.abs(b.vx) + Math.abs(b.vy);
-    });
-    energy = list.length ? e / list.length : 0;
   }
 
   /* ---- rendering -------------------------------------------------------- */
@@ -286,13 +269,12 @@ export function initVault(): void {
 
     const glyph = document.createElementNS(SVG_NS, 'path');
     glyph.setAttribute('class', 'node__glyph');
-    glyph.setAttribute('d', leaf ? hexPath(r * 0.86) : hexPath(r));
+    glyph.setAttribute('d', hexPath(leaf ? r * 0.85 : r));
     g.appendChild(glyph);
 
-    /* generous invisible hit area — the glyphs are small on purpose */
     const hit = document.createElementNS(SVG_NS, 'circle');
     hit.setAttribute('class', 'node__hit');
-    hit.setAttribute('r', String(Math.max(r + 10, 18)));
+    hit.setAttribute('r', String(Math.max(r + 12, 20)));
     g.appendChild(hit);
 
     if (!leaf) {
@@ -305,26 +287,28 @@ export function initVault(): void {
 
     const label = document.createElementNS(SVG_NS, 'text');
     label.setAttribute('class', 'node__label');
-    label.setAttribute('dy', String(r + 15));
-    label.style.fontSize = d === 0 ? '13.5px' : d === 1 ? '12.5px' : '11.5px';
+    label.setAttribute('dy', String(r + 16));
+    label.style.fontSize = d === 0 ? '13px' : d === 1 ? '12px' : '11px';
     label.textContent = n.title;
     g.appendChild(label);
 
     return g;
   }
 
-  function render(vis: string[], links: Array<[string, string]>) {
+  function render() {
+    const vis = visibleIds();
     const visSet = new Set(vis);
+    const links = visibleLinks(visSet);
 
     linkEls.forEach((el, key) => {
-      const [s, t] = key.split(' ');
+      const [s, t] = key.split('>');
       if (!visSet.has(s) || !visSet.has(t)) {
         el.remove();
         linkEls.delete(key);
       }
     });
     links.forEach(([s, t]) => {
-      const key = `${s} ${t}`;
+      const key = `${s}>${t}`;
       if (linkEls.has(key)) return;
       const el = document.createElementNS(SVG_NS, 'line');
       el.setAttribute('class', 'link');
@@ -345,29 +329,99 @@ export function initVault(): void {
       nodeEls.set(id, el);
     });
 
-    paint(vis, links);
+    highlight(selected);
   }
 
-  function paint(vis: string[], links: Array<[string, string]>) {
-    linkEls.forEach((el, key) => {
-      const [s, t] = key.split(' ');
-      const a = bodies.get(s);
-      const b = bodies.get(t);
-      if (!a || !b) return;
-      el.setAttribute('x1', a.x.toFixed(1));
-      el.setAttribute('y1', a.y.toFixed(1));
-      el.setAttribute('x2', b.x.toFixed(1));
-      el.setAttribute('y2', b.y.toFixed(1));
-    });
-
+  function paint() {
     nodeEls.forEach((el, id) => {
-      const b = bodies.get(id);
-      if (!b) return;
-      el.setAttribute('transform', `translate(${b.x.toFixed(1)},${b.y.toFixed(1)})`);
+      const p = pos.get(id);
+      if (!p) return;
+      el.setAttribute(
+        'transform',
+        `translate(${(p.x + p.ox).toFixed(1)},${(p.y + p.oy).toFixed(1)})`
+      );
     });
+    linkEls.forEach((el, key) => {
+      const [s, t] = key.split('>');
+      const a = pos.get(s);
+      const b = pos.get(t);
+      if (!a || !b) return;
+      el.setAttribute('x1', (a.x + a.ox).toFixed(1));
+      el.setAttribute('y1', (a.y + a.oy).toFixed(1));
+      el.setAttribute('x2', (b.x + b.ox).toFixed(1));
+      el.setAttribute('y2', (b.y + b.oy).toFixed(1));
+    });
+  }
 
-    void links;
-    void vis;
+  /* ---- tween ------------------------------------------------------------
+     The animation is a nicety. Correctness never depends on it: refresh()
+     paints synchronously, and a safety timer snaps to the final layout if
+     requestAnimationFrame is throttled (which browsers do in background or
+     non-compositing tabs, where the graph would otherwise sit stacked on
+     each parent's spawn point).                                          */
+  let raf = 0;
+  let safety = 0;
+
+  function snap() {
+    pos.forEach((p) => {
+      p.x = p.tx;
+      p.y = p.ty;
+    });
+  }
+
+  function stopTween() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    window.clearTimeout(safety);
+    safety = 0;
+  }
+
+  function tick() {
+    let moving = false;
+    pos.forEach((p) => {
+      const dx = p.tx - p.x;
+      const dy = p.ty - p.y;
+      if (Math.abs(dx) + Math.abs(dy) > 0.4) {
+        p.x += dx * 0.2;
+        p.y += dy * 0.2;
+        moving = true;
+      } else {
+        p.x = p.tx;
+        p.y = p.ty;
+      }
+    });
+    paint();
+    if (moving) {
+      raf = requestAnimationFrame(tick);
+    } else {
+      raf = 0;
+      window.clearTimeout(safety);
+      safety = 0;
+    }
+  }
+
+  function settle() {
+    if (reduce) {
+      snap();
+      paint();
+      return;
+    }
+    if (!raf) raf = requestAnimationFrame(tick);
+    window.clearTimeout(safety);
+    safety = window.setTimeout(() => {
+      stopTween();
+      snap();
+      paint();
+    }, 900);
+  }
+
+  function refresh() {
+    layout();
+    render();
+    /* paint before animating so a newly expanded branch is never left
+       sitting on top of its parent */
+    paint();
+    settle();
   }
 
   function applyViewTransform() {
@@ -377,21 +431,22 @@ export function initVault(): void {
     );
   }
 
-  /* ---- highlight / dim -------------------------------------------------- */
+  /* ---- highlight -------------------------------------------------------- */
   function highlight(id: string | null) {
     const kin = new Set<string>();
     if (id) {
       kin.add(id);
-      (byId.get(id)?.parents || []).forEach((p) => kin.add(p));
+      const p = parentOf.get(id);
+      if (p) kin.add(p);
       (kids.get(id) || []).forEach((k) => kin.add(k));
     }
     nodeEls.forEach((el, nid) => {
-      el.classList.toggle('is-dim', !!id && !kin.has(nid) && !matchesFilter(nid));
+      el.classList.toggle('is-dim', !!id && !kin.has(nid));
       el.classList.toggle('is-lit', !!id && kin.has(nid) && nid !== id);
       el.classList.toggle('is-selected', nid === selected);
     });
     linkEls.forEach((el, key) => {
-      const [s, t] = key.split(' ');
+      const [s, t] = key.split('>');
       const on = !!id && (s === id || t === id);
       el.classList.toggle('is-lit', on);
       el.classList.toggle('is-dim', !!id && !on);
@@ -411,8 +466,6 @@ export function initVault(): void {
   }
 
   /* ---- panel ------------------------------------------------------------ */
-  let lastFocus: HTMLElement | SVGElement | null = null;
-
   function openPanel(id: string) {
     const n = byId.get(id);
     if (!n) return;
@@ -436,12 +489,10 @@ export function initVault(): void {
           : n.status === 'wip'
             ? 'Work in progress'
             : 'Retired';
-      parts.push(
-        `<p><span class="vstatus vstatus--${n.status}">${label}</span></p>`
-      );
+      parts.push(`<p><span class="vstatus vstatus--${n.status}">${label}</span></p>`);
     }
 
-    parts.push(`<p class="vpanel__summary">${fmt(n.summary)}</p>`);
+    if (n.summary) parts.push(`<p class="vpanel__summary">${fmt(n.summary)}</p>`);
 
     if (n.facts?.length) {
       parts.push('<dl class="vfacts">');
@@ -458,9 +509,7 @@ export function initVault(): void {
         .split(/\n{2,}/)
         .map((p) => `<p>${fmt(p.trim())}</p>`)
         .join('');
-      parts.push(
-        `<section class="vsec"><h3>${escapeHtml(s.heading)}</h3>${paras}</section>`
-      );
+      parts.push(`<section class="vsec"><h3>${escapeHtml(s.heading)}</h3>${paras}</section>`);
     });
 
     if (kidList.length) {
@@ -496,79 +545,113 @@ export function initVault(): void {
     selected = null;
     root.style.setProperty('--accent', DEFAULT_ACCENT);
     highlight(null);
-    if (lastFocus && 'focus' in lastFocus) (lastFocus as HTMLElement).focus();
   }
 
   /* ---- selection -------------------------------------------------------- */
-  function select(id: string, opts: { toggle?: boolean } = {}) {
+  function select(id: string, toggle = false) {
     if (hasKids(id)) {
-      if (opts.toggle && expanded.has(id) && selected === id) expanded.delete(id);
+      if (toggle && expanded.has(id) && selected === id) expanded.delete(id);
       else expanded.add(id);
     }
-    /* keep ancestors open so a deep jump does not orphan the node */
-    let cur = byId.get(id);
+    /* open ancestors so a jump from search or the index is reachable */
+    let cur = parentOf.get(id);
     const guard = new Set<string>();
-    while (cur && cur.parents?.length && !guard.has(cur.id)) {
-      guard.add(cur.id);
-      const p = cur.parents[0];
-      expanded.add(p);
-      cur = byId.get(p);
+    while (cur && !guard.has(cur)) {
+      guard.add(cur);
+      expanded.add(cur);
+      cur = parentOf.get(cur);
     }
-    sync();
+    refresh();
     openPanel(id);
     centerOn(id);
-    energy = 1;
-    kick();
   }
 
   function centerOn(id: string) {
-    const b = bodies.get(id);
-    if (!b) return;
+    const p = pos.get(id);
+    if (!p) return;
     const panelW = panel.classList.contains('is-open') && W > 860 ? panel.clientWidth : 0;
-    const targetX = (W - panelW) / 2;
-    view.x = targetX - b.x * view.k;
-    view.y = H / 2 - b.y * view.k;
+    view.x = (W - panelW) / 2 - (p.tx + p.ox) * view.k;
+    view.y = H / 2 - (p.ty + p.oy) * view.k;
     applyViewTransform();
   }
 
-  function sync() {
-    const vis = visibleIds();
-    const links = visibleLinks(new Set(vis));
-    vis.forEach(ensureBody);
-    render(vis, links);
-    highlight(selected);
-    return { vis, links };
-  }
+  /* ---- pointer: click vs drag vs pan -----------------------------------
+     setPointerCapture is applied only once a real drag starts. Capturing on
+     every pointerdown retargets the following click to the <svg>, which is
+     what made nodes unclickable.                                          */
+  let downNode: string | null = null;
+  let downX = 0;
+  let downY = 0;
+  let dragging = false;
+  let panning = false;
+  let activeId = -1;
 
-  /* ---- animation loop --------------------------------------------------- */
-  let raf = 0;
-  function frame() {
-    const vis = visibleIds();
-    const links = visibleLinks(new Set(vis));
-    step(vis, links);
-    paint(vis, links);
-    if (energy > MIN_ENERGY) raf = requestAnimationFrame(frame);
-    else raf = 0;
-  }
-
-  function kick() {
-    if (reduce) {
-      const vis = visibleIds();
-      const links = visibleLinks(new Set(vis));
-      for (let i = 0; i < 260; i++) step(vis, links);
-      paint(vis, links);
-      return;
-    }
-    if (!raf) raf = requestAnimationFrame(frame);
-  }
-
-  /* ---- events ----------------------------------------------------------- */
-  gNodes.addEventListener('click', (e) => {
+  svg.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0) return;
     const g = (e.target as Element).closest('.node') as SVGGElement | null;
-    if (!g || dragMoved) return;
-    lastFocus = g;
-    select(g.getAttribute('data-id')!, { toggle: true });
+    downNode = g ? g.getAttribute('data-id') : null;
+    downX = e.clientX;
+    downY = e.clientY;
+    dragging = false;
+    panning = false;
+    activeId = e.pointerId;
   });
+
+  svg.addEventListener('pointermove', (e) => {
+    if (e.pointerId !== activeId) return;
+    const dx = e.clientX - downX;
+    const dy = e.clientY - downY;
+
+    if (!dragging && !panning) {
+      if (Math.abs(dx) + Math.abs(dy) < DRAG_SLOP) return;
+      if (downNode) dragging = true;
+      else {
+        panning = true;
+        svg.classList.add('is-panning');
+      }
+      try {
+        svg.setPointerCapture(e.pointerId);
+      } catch {
+        /* capture is a nicety, not a requirement */
+      }
+    }
+
+    if (dragging && downNode) {
+      const p = pos.get(downNode);
+      if (p) {
+        p.ox += (e.clientX - downX) / view.k;
+        p.oy += (e.clientY - downY) / view.k;
+      }
+      paint();
+    } else if (panning) {
+      view.x += e.clientX - downX;
+      view.y += e.clientY - downY;
+      applyViewTransform();
+    }
+    downX = e.clientX;
+    downY = e.clientY;
+  });
+
+  function endPointer(e: PointerEvent) {
+    if (e.pointerId !== activeId) return;
+    /* a press that never turned into a drag is a click */
+    if (!dragging && !panning && downNode) select(downNode, true);
+    if (dragging || panning) {
+      try {
+        svg.releasePointerCapture(e.pointerId);
+      } catch {
+        /* already released */
+      }
+    }
+    downNode = null;
+    dragging = false;
+    panning = false;
+    activeId = -1;
+    svg.classList.remove('is-panning');
+  }
+
+  svg.addEventListener('pointerup', endPointer);
+  svg.addEventListener('pointercancel', endPointer);
 
   gNodes.addEventListener('keydown', (e) => {
     const ke = e as KeyboardEvent;
@@ -576,20 +659,18 @@ export function initVault(): void {
     const g = (ke.target as Element).closest('.node') as SVGGElement | null;
     if (!g) return;
     ke.preventDefault();
-    lastFocus = g;
-    select(g.getAttribute('data-id')!, { toggle: true });
+    select(g.getAttribute('data-id')!, true);
   });
 
   gNodes.addEventListener('pointerover', (e) => {
-    if (selected) return;
+    if (selected || dragging || panning) return;
     const g = (e.target as Element).closest('.node') as SVGGElement | null;
     if (g) highlight(g.getAttribute('data-id'));
   });
 
   gNodes.addEventListener('pointerout', (e) => {
-    if (selected) return;
-    const g = (e.target as Element).closest('.node');
-    if (g) highlight(null);
+    if (selected || dragging || panning) return;
+    if ((e.target as Element).closest('.node')) highlight(null);
   });
 
   panel.addEventListener('click', (e) => {
@@ -606,70 +687,6 @@ export function initVault(): void {
     if (e.key === 'Escape' && panel.classList.contains('is-open')) closePanel();
   });
 
-  /* ---- drag nodes + pan ------------------------------------------------- */
-  let dragId: string | null = null;
-  let dragMoved = false;
-  let panning = false;
-  let px = 0;
-  let py = 0;
-
-  svg.addEventListener('pointerdown', (e) => {
-    const g = (e.target as Element).closest('.node') as SVGGElement | null;
-    dragMoved = false;
-    px = e.clientX;
-    py = e.clientY;
-    if (g) {
-      dragId = g.getAttribute('data-id');
-      const b = bodies.get(dragId!);
-      if (b) b.pinned = true;
-    } else {
-      panning = true;
-      svg.classList.add('is-panning');
-    }
-    svg.setPointerCapture(e.pointerId);
-  });
-
-  svg.addEventListener('pointermove', (e) => {
-    const dx = e.clientX - px;
-    const dy = e.clientY - py;
-    if (Math.abs(dx) + Math.abs(dy) > 3) dragMoved = true;
-    if (dragId) {
-      const b = bodies.get(dragId);
-      if (b) {
-        b.x += dx / view.k;
-        b.y += dy / view.k;
-      }
-      energy = 1;
-      kick();
-    } else if (panning) {
-      view.x += dx;
-      view.y += dy;
-      applyViewTransform();
-    }
-    px = e.clientX;
-    py = e.clientY;
-  });
-
-  function endDrag(e: PointerEvent) {
-    if (dragId) {
-      const b = bodies.get(dragId);
-      if (b) b.pinned = false;
-      dragId = null;
-      energy = 1;
-      kick();
-    }
-    panning = false;
-    svg.classList.remove('is-panning');
-    try {
-      svg.releasePointerCapture(e.pointerId);
-    } catch {
-      /* pointer already released */
-    }
-  }
-
-  svg.addEventListener('pointerup', endDrag);
-  svg.addEventListener('pointercancel', endDrag);
-
   svg.addEventListener(
     'wheel',
     (e) => {
@@ -677,7 +694,7 @@ export function initVault(): void {
       const rect = svg.getBoundingClientRect();
       const mx = e.clientX - rect.left;
       const my = e.clientY - rect.top;
-      const k2 = Math.max(0.35, Math.min(2.4, view.k * (e.deltaY < 0 ? 1.12 : 0.893)));
+      const k2 = Math.max(0.3, Math.min(2.4, view.k * (e.deltaY < 0 ? 1.12 : 0.893)));
       view.x = mx - ((mx - view.x) / view.k) * k2;
       view.y = my - ((my - view.y) / view.k) * k2;
       view.k = k2;
@@ -691,39 +708,37 @@ export function initVault(): void {
   search?.addEventListener('input', () => {
     filter = search.value.trim();
     if (!filter) {
+      refresh();
       highlight(selected);
       return;
     }
-    /* open every ancestor of a match so results are actually reachable */
     nodes.forEach((n) => {
       if (!matchesFilter(n.id)) return;
-      let cur: WikiNode | undefined = n;
+      let cur = parentOf.get(n.id);
       const guard = new Set<string>();
-      while (cur && cur.parents?.length && !guard.has(cur.id)) {
-        guard.add(cur.id);
-        expanded.add(cur.parents[0]);
-        cur = byId.get(cur.parents[0]);
+      while (cur && !guard.has(cur)) {
+        guard.add(cur);
+        expanded.add(cur);
+        cur = parentOf.get(cur);
       }
     });
-    sync();
+    refresh();
     nodeEls.forEach((el, id) => {
       const hit = matchesFilter(id);
       el.classList.toggle('is-dim', !hit);
       el.classList.toggle('is-lit', hit);
     });
     linkEls.forEach((el) => el.classList.add('is-dim'));
-    energy = 1;
-    kick();
   });
 
-  /* ---- view toggle ------------------------------------------------------ */
+  /* ---- views ------------------------------------------------------------ */
   const index = root.querySelector<HTMLElement>('.vindex');
   root.querySelectorAll<HTMLButtonElement>('[data-view]').forEach((btn) => {
     btn.addEventListener('click', () => {
       const mode = btn.getAttribute('data-view');
-      root.querySelectorAll('[data-view]').forEach((b) =>
-        b.setAttribute('aria-pressed', String(b === btn))
-      );
+      root
+        .querySelectorAll('[data-view]')
+        .forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
       index?.classList.toggle('is-open', mode === 'index');
     });
   });
@@ -732,54 +747,47 @@ export function initVault(): void {
     const it = (e.target as HTMLElement).closest<HTMLElement>('[data-goto]');
     if (!it) return;
     index.classList.remove('is-open');
-    root.querySelectorAll('[data-view]').forEach((b) =>
-      b.setAttribute('aria-pressed', String(b.getAttribute('data-view') === 'graph'))
-    );
+    root
+      .querySelectorAll('[data-view]')
+      .forEach((b) => b.setAttribute('aria-pressed', String(b.getAttribute('data-view') === 'graph')));
     select(it.getAttribute('data-goto')!);
   });
 
   root.querySelector('[data-reset]')?.addEventListener('click', () => {
     expanded.clear();
-    roots.forEach((r) => expanded.add(r));
-    bodies.clear();
+    pos.forEach((p) => {
+      p.ox = 0;
+      p.oy = 0;
+    });
     view.x = 0;
     view.y = 0;
     view.k = 1;
     applyViewTransform();
     closePanel();
-    sync();
-    energy = 1;
-    kick();
+    if (search) search.value = '';
+    filter = '';
+    refresh();
   });
 
   /* ---- resize ----------------------------------------------------------- */
-  const ro = new ResizeObserver(() => {
-    W = svg.clientWidth || W;
-    H = svg.clientHeight || H;
-    energy = 1;
-    kick();
-  });
-  ro.observe(svg);
+  new ResizeObserver(() => {
+    const w = svg.clientWidth;
+    const h = svg.clientHeight;
+    if (!w || !h || (w === W && h === H)) return;
+    W = w;
+    H = h;
+    refresh();
+  }).observe(svg);
 
   /* ---- boot ------------------------------------------------------------- */
-  /* seed roots on a ring so the first frame is already legible */
-  roots.forEach((id, i) => {
-    const a = (i / Math.max(1, roots.length)) * Math.PI * 2 - Math.PI / 2;
-    bodies.set(id, {
-      id,
-      x: W / 2 + Math.cos(a) * Math.min(W, H) * 0.26,
-      y: H / 2 + Math.sin(a) * Math.min(W, H) * 0.26,
-      vx: 0,
-      vy: 0,
-      depth: 0,
-      pinned: false,
-    });
+  layout();
+  pos.forEach((p) => {
+    p.x = p.tx;
+    p.y = p.ty;
   });
-
-  sync();
+  render();
+  paint();
   applyViewTransform();
-  energy = 1;
-  kick();
 
   if (hint) {
     const dismiss = () => hint.classList.add('is-gone');

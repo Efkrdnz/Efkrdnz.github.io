@@ -2087,7 +2087,7 @@
    "title": "E-Rank",
    "category": "rank",
    "parents": [
-    "evaluation"
+    "ranks"
    ],
    "tagline": "Where nearly everyone starts",
    "summary": "E is the lowest hunter rank and the default result for a low roll. It still counts: even E-Rank gets the first ability of its class tree and the full awakening stat package at its smallest scale.",
@@ -2132,7 +2132,7 @@
    "title": "D-Rank",
    "category": "rank",
    "parents": [
-    "evaluation"
+    "ranks"
    ],
    "tagline": "The first rung above the floor",
    "summary": "D-Rank is either a decent awakening roll or the automatic promotion every hunter gets at level 15. It unlocks the second ability of your class tree.",
@@ -2177,7 +2177,7 @@
    "title": "C-Rank",
    "category": "rank",
    "parents": [
-    "evaluation"
+    "ranks"
    ],
    "tagline": "Mid-table, and the level where secrets start",
    "summary": "C-Rank arrives by roll or at level 30. Level 30 is also the threshold where your Daily Quest can secretly become a Secret Quest, so the C band is where the mod starts hiding things from you.",
@@ -2226,7 +2226,7 @@
    "title": "B-Rank",
    "category": "rank",
    "parents": [
-    "evaluation"
+    "ranks"
    ],
    "tagline": "The last rank that gets the compensation boost",
    "summary": "B-Rank is a 12% default awakening roll or the level 50 floor. It is the highest rank whose awakening package still receives the 15% stat rounding boost - A and S are expected to carry themselves.",
@@ -2274,7 +2274,7 @@
    "title": "A-Rank",
    "category": "rank",
    "parents": [
-    "evaluation"
+    "ranks"
    ],
    "tagline": "One step from the top",
    "summary": "A-Rank is a 10% default awakening roll or the level 75 floor. It unlocks the fifth ability of your class tree and puts A-scale gates on your doorstep.",
@@ -2318,7 +2318,7 @@
    "title": "S-Rank",
    "category": "rank",
    "parents": [
-    "evaluation"
+    "ranks"
    ],
    "tagline": "The measurement error that isn't",
    "summary": "S is the top rank: a 3% default roll, the level 100 floor, or automatic for anyone carrying a Monarch vessel. The evaluator theatrically reports a measurement error before admitting the result.",
@@ -3269,7 +3269,7 @@
     }
    ],
    "parents": [
-    "vessels"
+    "monarchs"
    ],
    "related": [
     "shadow-extraction",
@@ -3673,7 +3673,7 @@
     }
    ],
    "parents": [
-    "vessels"
+    "monarchs"
    ],
    "related": [
     "spiritual-body-manifestation",
@@ -3746,7 +3746,7 @@
     }
    ],
    "parents": [
-    "vessels"
+    "monarchs"
    ],
    "related": [
     "spiritual-body-manifestation",
@@ -3815,7 +3815,7 @@
     }
    ],
    "parents": [
-    "vessels"
+    "monarchs"
    ],
    "related": [
     "spiritual-body-manifestation",
@@ -3892,7 +3892,7 @@
     }
    ],
    "parents": [
-    "vessels"
+    "monarchs"
    ],
    "related": [
     "spiritual-body-manifestation",
@@ -3961,7 +3961,7 @@
     }
    ],
    "parents": [
-    "vessels"
+    "rulers"
    ],
    "related": [
     "spiritual-body-manifestation",
@@ -4030,7 +4030,7 @@
     }
    ],
    "parents": [
-    "vessels"
+    "rulers"
    ],
    "related": [
     "spiritual-body-manifestation",
@@ -4071,7 +4071,7 @@
     }
    ],
    "parents": [
-    "vessels"
+    "rulers"
    ],
    "related": [
     "vessels",
@@ -4099,7 +4099,7 @@
     }
    ],
    "parents": [
-    "vessels"
+    "rulers"
    ],
    "related": [
     "vessels"
@@ -4134,7 +4134,7 @@
     }
    ],
    "parents": [
-    "vessels"
+    "rulers"
    ],
    "related": [
     "vessels"
@@ -4785,7 +4785,7 @@
    "status": "live",
    "accent": "",
    "parents": [
-    "demon-kings-castle"
+    "boss-gate"
    ],
    "related": [
     "demon-kings-castle",
@@ -4829,7 +4829,7 @@
    "status": "live",
    "accent": "",
    "parents": [
-    "demon-kings-castle"
+    "boss-gate"
    ],
    "related": [
     "demon-kings-castle",
@@ -4886,7 +4886,7 @@
    "status": "live",
    "accent": "#B94CFF",
    "parents": [
-    "demon-kings-castle"
+    "boss-gate"
    ],
    "related": [
     "demon-kings-castle",
@@ -4938,7 +4938,7 @@
    "status": "live",
    "accent": "",
    "parents": [
-    "demon-kings-castle"
+    "boss-gate"
    ],
    "related": [
     "demon-kings-castle",
@@ -5639,7 +5639,7 @@
     }
    ],
    "parents": [
-    "items"
+    "weapons"
    ],
    "related": [
     "unique-weapons",
@@ -5696,7 +5696,7 @@
     }
    ],
    "parents": [
-    "items"
+    "weapons"
    ],
    "related": [
     "kamish-wrath",
@@ -6300,7 +6300,7 @@
    "tagline": "The first wall",
    "summary": "A giant venomous serpent most players meet early. Its fangs live on as craftable daggers - Kasaka's Venom Fang, with an awakened form.",
    "parents": [
-    "bosses"
+    "boss-gate"
    ],
    "facts": [
     {
@@ -6317,7 +6317,7 @@
    "tagline": "Ruler of the sewers",
    "summary": "Boss of the goblin line found through the Goblin Sewers gate. Goblins are also among the first shadows you can extract as the Shadow Monarch.",
    "parents": [
-    "bosses"
+    "boss-gate"
    ],
    "facts": [
     {
@@ -6334,7 +6334,7 @@
    "tagline": "Cave ambusher",
    "summary": "Boss of its own large cave gate.",
    "parents": [
-    "bosses"
+    "boss-gate"
    ],
    "facts": [
     {
@@ -6351,7 +6351,7 @@
    "tagline": "Master of the cemetery",
    "summary": "Commands skeleton warriors and brutes in the Cemetery gate.",
    "parents": [
-    "bosses"
+    "boss-gate"
    ],
    "facts": [
     {
@@ -6368,7 +6368,7 @@
    "tagline": "Machine of the lab",
    "summary": "Boss of the Abandoned Lab gate.",
    "parents": [
-    "bosses"
+    "boss-gate"
    ],
    "facts": [
     {
@@ -6385,7 +6385,7 @@
    "tagline": "Guardian of the cave",
    "summary": "Stone colossus of the Ancient Golem Cave gate. The related Gem Golem and Manastone Golem share its line.",
    "parents": [
-    "bosses"
+    "boss-gate"
    ],
    "facts": [
     {
@@ -6402,7 +6402,7 @@
    "tagline": "A knight's duel",
    "summary": "Blood Red Commander Igris fights you with honor - a duel, not a raid. Beating him matters for the Shadow Monarch path, where he returns as your shadow.",
    "parents": [
-    "bosses"
+    "boss-gate"
    ],
    "facts": [
     {
@@ -6423,7 +6423,7 @@
    "tagline": "The Red Gate's master",
    "summary": "Ice elf chieftain at the heart of the Red Gate. His dagger is a unique drop.",
    "parents": [
-    "bosses"
+    "boss-gate"
    ],
    "facts": [
     {
@@ -6444,7 +6444,7 @@
    "tagline": "Throne room tyrant",
    "summary": "High orc shaman boss of the Throne Room gate.",
    "parents": [
-    "bosses"
+    "boss-gate"
    ],
    "facts": [
     {
@@ -6461,7 +6461,7 @@
    "tagline": "Terror of the nest",
    "summary": "Boss of the Ant Nest gate. As the Shadow Monarch you can extract him afterward - one of the strongest shadows in the mod.",
    "parents": [
-    "bosses"
+    "boss-gate"
    ],
    "facts": [
     {
@@ -6482,7 +6482,7 @@
    "tagline": "The dragon",
    "summary": "A dragon boss whose remains forge Kamish's Wrath and Kamish Tooth. Also extractable as a shadow at the top end.",
    "parents": [
-    "bosses"
+    "boss-monarch"
    ],
    "facts": [
     {
@@ -6503,7 +6503,7 @@
    "tagline": "It was always watching",
    "summary": "The heart of the Cartenon Temple encounter, alongside the statue arsenal - sword, axe and hammer statues.",
    "parents": [
-    "bosses"
+    "boss-monarch"
    ],
    "facts": [
     {
@@ -6520,7 +6520,7 @@
    "tagline": "Gatekeeper of the tenth floor",
    "summary": "Demon boss holding Floor 10 of the Demon King's Castle.",
    "parents": [
-    "bosses"
+    "boss-dkc"
    ],
    "facts": [
     {
@@ -6537,7 +6537,7 @@
    "tagline": "The Demon King",
    "summary": "Monarch of White Flames, waiting at the summit of the Demon King's Castle with Kaiselin. Defeating him is tied to the White Flames vessel inheritance.",
    "parents": [
-    "bosses"
+    "boss-dkc"
    ],
    "facts": [
     {
@@ -6554,7 +6554,7 @@
    "tagline": "The winged shadow",
    "summary": "Fights beside Baran on the final floor. As the Shadow Monarch, extractable as the flying shadow Kaisel.",
    "parents": [
-    "bosses"
+    "boss-dkc"
    ],
    "facts": [
     {
@@ -6575,7 +6575,7 @@
    "tagline": "Winter remembers",
    "summary": "A Monarch-tier boss with a fully named moveset: Ice Spear, Frost Cleave, Frost Step, Flash Freeze, Frozen Path, Spire Cage, Glacial Execution, Whiteout Procession, Stillness Decree, Winter Remembers, Frost Counter, Crown of Winter, Absolute Zero - and a phase transition, Sovereign Winter Awakening.",
    "parents": [
-    "bosses"
+    "boss-monarch"
    ],
    "facts": [
     {
@@ -6586,6 +6586,72 @@
      "label": "Signature",
      "value": "Absolute Zero"
     }
+   ],
+   "related": []
+  },
+  {
+   "id": "monarchs",
+   "title": "Monarchs",
+   "category": "vessel",
+   "tagline": "Inherit a Monarch’s authority",
+   "summary": "Monarch vessels grant a themed skill tree that unlocks with your level, ending in Spiritual Body Manifestation at level 120.",
+   "parents": [
+    "vessels"
+   ],
+   "related": []
+  },
+  {
+   "id": "rulers",
+   "title": "Rulers",
+   "category": "vessel",
+   "tagline": "Inherit a Ruler’s power",
+   "summary": "Ruler vessels receive their Spiritual Body Manifestation immediately on selection, then unlock shared Ruler abilities as they level.",
+   "parents": [
+    "vessels"
+   ],
+   "related": []
+  },
+  {
+   "id": "boss-gate",
+   "title": "Gate Bosses",
+   "category": "boss",
+   "tagline": "Guarding a specific gate",
+   "summary": "Each of these holds a named gate. Clear the gate, claim the drop.",
+   "parents": [
+    "bosses"
+   ],
+   "related": []
+  },
+  {
+   "id": "boss-dkc",
+   "title": "Castle Bosses",
+   "category": "boss",
+   "tagline": "Demon King's Castle floors",
+   "summary": "The bosses standing between you and the top of the twenty-floor tower.",
+   "parents": [
+    "bosses"
+   ],
+   "related": []
+  },
+  {
+   "id": "boss-monarch",
+   "title": "Monarch-tier",
+   "category": "boss",
+   "tagline": "The hardest fights in the mod",
+   "summary": "Monarch and dragon-tier encounters, and the endgame Cartenon fight.",
+   "parents": [
+    "bosses"
+   ],
+   "related": []
+  },
+  {
+   "id": "weapons",
+   "title": "Weapons",
+   "category": "item",
+   "tagline": "Ranked ladder and unique drops",
+   "summary": "Swords, daggers and katanas run an E through S ladder. Named weapons drop from specific bosses.",
+   "parents": [
+    "items"
    ],
    "related": []
   }

@@ -9,6 +9,10 @@ kind: "mod"
 downloads: 2300000
 categories: ["Adventure & RPG", "Magic"]
 curseforge: "https://www.curseforge.com/minecraft/mc-mods/solo-craft-reawakening"
+modrinth: "https://modrinth.com/mod/solo-craft-reawakening"
+modrinthDownloads: 137964
+loaders: ["Forge"]
+mcVersions: ["1.20.1"]
 featured: true
 order: 1
 hasGuide: false

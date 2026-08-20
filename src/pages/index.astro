@@ -2,20 +2,34 @@
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import ModTip from '../components/ModTip.astro';
+import Mentions from '../components/Mentions.astro';
 import { url, compact, full } from '../lib/util';
 
-const mods = (await getCollection('mods')).sort((a, b) => a.data.order - b.data.order);
-const featured = mods.find((m) => m.data.featured) ?? mods[0];
-const rest = mods.filter((m) => m.id !== featured.id);
+const all = (await getCollection('mods')).sort((a, b) => a.data.order - b.data.order);
 
-const totalDownloads = mods.reduce((n, m) => n + m.data.downloads, 0);
-const modCount = mods.filter((m) => m.data.kind === 'mod').length;
-const packCount = mods.filter((m) => m.data.kind === 'modpack').length;
+/* Only authored work counts as portfolio. Projects efkrdnzz helped on are
+   listed separately and never fold into the headline numbers. */
+const own = all.filter((m) => m.data.role === 'author');
+const mentions = all.filter((m) => m.data.role !== 'author');
+
+const featured = own.find((m) => m.data.featured) ?? own[0];
+const rest = own.filter((m) => m.id !== featured.id);
+
+/* Counts both platforms, but only work efkrdnzz actually authored. */
+const totalDownloads = own.reduce(
+  (n, m) => n + m.data.downloads + (m.data.modrinthDownloads ?? 0),
+  0
+);
+const platforms = own.some((m) => m.data.modrinth)
+  ? ['CurseForge', 'Modrinth']
+  : ['CurseForge'];
+const modCount = own.filter((m) => m.data.kind === 'mod').length;
+const packCount = own.filter((m) => m.data.kind === 'modpack').length;
 ---
 
 <Base
   title="efkrdnzz — Minecraft mods"
-  description="Minecraft mod developer. Ten projects on CurseForge built around abilities, progression and boss fights, including Solo Leveling: Reawakening."
+  description="Minecraft mod developer. Eight projects on CurseForge and Modrinth built around abilities, progression and boss fights, including Solo Leveling: Reawakening."
 >
   <section class="shell hero">
     <div class="hero__copy">
@@ -23,8 +37,8 @@ const packCount = mods.filter((m) => m.data.kind === 'modpack').length;
       <h1 class="display hero__name enter enter--2">efkrdnzz</h1>
       <hr class="hero__rule enter enter--2" />
       <p class="lede enter enter--3">
-        Ten projects on CurseForge, built around abilities, progression and the fights
-        that test them. Solo Leveling: Reawakening is the big one.
+        Eight projects on CurseForge, built around abilities, progression and the
+        fights that test them. Solo Leveling: Reawakening is the big one.
       </p>
       <div class="actions enter enter--4">
         <a class="btn btn--primary" href={url('/mods')}>
@@ -51,7 +65,7 @@ const packCount = mods.filter((m) => m.data.kind === 'modpack').length;
       </div>
       <div class="rail__cell">
         <span class="rail__k">Projects</span>
-        <span class="rail__v">{mods.length}</span>
+        <span class="rail__v">{own.length}</span>
       </div>
       <div class="rail__cell">
         <span class="rail__k">Mods &middot; Packs</span>
@@ -59,7 +73,7 @@ const packCount = mods.filter((m) => m.data.kind === 'modpack').length;
       </div>
       <div class="rail__cell">
         <span class="rail__k">Published on</span>
-        <span class="rail__v" style="font-size:1rem;">CurseForge</span>
+        <span class="rail__v" style="font-size:0.95rem;">{platforms.join(' · ')}</span>
       </div>
     </div>
   </section>
@@ -81,4 +95,6 @@ const packCount = mods.filter((m) => m.data.kind === 'modpack').length;
       ))}
     </div>
   </section>
+
+  <Mentions items={mentions} />
 </Base>

@@ -1,0 +1,42 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { full } from '../lib/util';
+
+interface Props {
+  items: CollectionEntry<'mods'>[];
+}
+
+const { items } = Astro.props;
+---
+
+{items.length > 0 && (
+  <section class="shell section" style="padding-top:0;">
+    <div class="section__head reveal">
+      <div class="section__title">
+        <p class="eyebrow">Honorable mentions</p>
+        <h2 class="h2">Other people&rsquo;s projects</h2>
+      </div>
+      <p class="mono-note">Not my projects &mdash; links go to the authors</p>
+    </div>
+
+    <div class="mentions reveal">
+      {items.map((m) => (
+        <a
+          class="mention"
+          href={m.data.curseforge}
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          <span class="mention__main">
+            <span class="mention__name">{m.data.title}</span>
+            <span class="mention__note">{m.data.note ?? `by ${m.data.author}`}</span>
+          </span>
+          <span class="mention__meta">
+            <span>{full(m.data.downloads)}</span>
+            <span class="mention__out" aria-hidden="true">&#8599;</span>
+          </span>
+        </a>
+      ))}
+    </div>
+  </section>
+)}

@@ -3,9 +3,10 @@ import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import { url, full, compact } from '../lib/util';
 
-const mods = await getCollection('mods');
+const all = await getCollection('mods');
+const mods = all.filter((m) => m.data.role === 'author');
 const totalDownloads = mods.reduce((n, m) => n + m.data.downloads, 0);
-const collabs = mods.filter((m) => m.data.role === 'contributor');
+const collabs = all.filter((m) => m.data.role === 'contributor');
 
 /* Everything on this page is drawn from real project data. The personal
    bio is deliberately left for efkrdnzz to write — see the note below. */
@@ -13,7 +14,7 @@ const collabs = mods.filter((m) => m.data.role === 'contributor');
 
 <Base
   title="About — efkrdnzz"
-  description="Minecraft mod developer behind Solo Leveling: Reawakening and nine other CurseForge projects."
+  description="Minecraft mod developer behind Solo Leveling: Reawakening and seven other CurseForge projects."
 >
   <section class="shell section">
     <div class="section__head">
@@ -41,8 +42,10 @@ const collabs = mods.filter((m) => m.data.role === 'contributor');
 
       {collabs.length > 0 && (
         <p class="lede">
-          Some of it is collaborative &mdash; {collabs.map((c) => c.data.title).join(' and ')}
-          {collabs.length === 1 ? ' is' : ' are'} built alongside{' '}
+          I have also lent a hand on other people&rsquo;s projects &mdash;{' '}
+          {collabs.map((c) => c.data.title).join(' and ')}{' '}
+          {collabs.length === 1 ? 'is' : 'are'} theirs, not mine, and{' '}
+          {collabs.length === 1 ? 'is' : 'are'} credited to{' '}
           {[...new Set(collabs.map((c) => c.data.author))].join(' and ')}.
         </p>
       )}

@@ -11,5 +11,6 @@ categories: ["Adventure & RPG", "Exploration", "Magic"]
 curseforge: "https://www.curseforge.com/minecraft/modpacks/rise-of-the-dark-sovereign"
 author: "Jo_Zen"
 role: "contributor"
+note: "Modpack by Jo_Zen, built on SLR"
 order: 6
 ---

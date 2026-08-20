@@ -23,21 +23,6 @@
   --glow: rgba(56, 189, 248, 0.18);
 }
 
-/* Invincible Craft — comic panel */
-[data-mod='invincible'] {
-  --page-bg: #12100E;
-  --panel: #1A1714;
-  --edge: #3A342C;
-  --edge-dim: #2A2620;
-  --panel-edge: #2E2922;
-  --accent: #E4C441;
-  --accent-hi: #F3D869;
-  --bone: #F3EFE7;
-  --ash: #A39A8B;
-  --ash-dim: #888076;
-  --glow: rgba(200, 30, 30, 0.16);
-}
-
 /* Minefinity Gauntlet — burnished gold, gem spectrum */
 [data-mod='gauntlet'] {
   --page-bg: #120E14;
@@ -270,12 +255,18 @@
   animation: sysline 0.42s var(--ease) forwards;
 }
 
-.sys__row:nth-child(1) { animation-delay: 0.30s; }
-.sys__row:nth-child(2) { animation-delay: 0.42s; }
-.sys__row:nth-child(3) { animation-delay: 0.54s; }
-.sys__row:nth-child(4) { animation-delay: 0.66s; }
-.sys__row:nth-child(5) { animation-delay: 0.78s; }
-.sys__row:nth-child(6) { animation-delay: 0.90s; }
+/* Must cover every row a panel can render, or an unlisted row fires at 0s
+   and lands before row 1. Extend this if the panel grows past 10. */
+.sys__row:nth-child(1)  { animation-delay: 0.30s; }
+.sys__row:nth-child(2)  { animation-delay: 0.39s; }
+.sys__row:nth-child(3)  { animation-delay: 0.48s; }
+.sys__row:nth-child(4)  { animation-delay: 0.57s; }
+.sys__row:nth-child(5)  { animation-delay: 0.66s; }
+.sys__row:nth-child(6)  { animation-delay: 0.75s; }
+.sys__row:nth-child(7)  { animation-delay: 0.84s; }
+.sys__row:nth-child(8)  { animation-delay: 0.93s; }
+.sys__row:nth-child(9)  { animation-delay: 1.02s; }
+.sys__row:nth-child(10) { animation-delay: 1.11s; }
 
 @keyframes sysline {
   from { opacity: 0; transform: translateX(-6px); }
@@ -308,7 +299,7 @@
   align-items: center;
   gap: var(--s2);
   opacity: 0;
-  animation: sysline 0.42s var(--ease) 1.02s forwards;
+  animation: sysline 0.42s var(--ease) 1.25s forwards;
 }
 
 .sys__caret {

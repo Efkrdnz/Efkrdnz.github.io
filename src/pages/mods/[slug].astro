@@ -5,7 +5,11 @@ import { url, full } from '../../lib/util';
 
 export async function getStaticPaths() {
   const mods = await getCollection('mods');
-  return mods.map((mod) => ({ params: { slug: mod.id }, props: { mod } }));
+  /* Projects efkrdnzz only helped on do not get a hub page here — they are
+     listed as honorable mentions and link out to their actual authors. */
+  return mods
+    .filter((mod) => mod.data.role === 'author')
+    .map((mod) => ({ params: { slug: mod.id }, props: { mod } }));
 }
 
 const { mod } = Astro.props;
@@ -13,7 +17,8 @@ const d = mod.data;
 
 const isHud = d.theme === 'slr';
 const panelLabel = isHud ? 'System' : 'Project data';
-const credit = d.role === 'contributor' ? `${d.author} (with efkrdnzz)` : d.author;
+const totalDownloads = d.downloads + (d.modrinthDownloads ?? 0);
+const platforms = d.modrinth ? 'CurseForge and Modrinth' : 'CurseForge';
 ---
 
 <Base title={`${d.title} — efkrdnzz`} description={d.blurb} mod={d.theme}>
@@ -65,7 +70,7 @@ const credit = d.role === 'contributor' ? `${d.author} (with efkrdnzz)` : d.auth
             <span class="sys__v">{d.kind}</span>
           </div>
           <div class="sys__row">
-            <span class="sys__k">Downloads</span>
+            <span class="sys__k">CurseForge</span>
             <span class="sys__v">{full(d.downloads)}</span>
           </div>
           <div class="sys__row">
@@ -74,12 +79,24 @@ const credit = d.role === 'contributor' ? `${d.author} (with efkrdnzz)` : d.auth
           </div>
           <div class="sys__row">
             <span class="sys__k">Author</span>
-            <span class="sys__v">{credit}</span>
+            <span class="sys__v">{d.author}</span>
           </div>
           {d.loaders.length > 0 && (
             <div class="sys__row">
-              <span class="sys__k">Loaders</span>
+              <span class="sys__k">Loader</span>
               <span class="sys__v">{d.loaders.join(', ')}</span>
+            </div>
+          )}
+          {d.mcVersions.length > 0 && (
+            <div class="sys__row">
+              <span class="sys__k">Minecraft</span>
+              <span class="sys__v">{d.mcVersions.join(', ')}</span>
+            </div>
+          )}
+          {d.modrinthDownloads !== undefined && (
+            <div class="sys__row">
+              <span class="sys__k">Modrinth</span>
+              <span class="sys__v">{full(d.modrinthDownloads)}</span>
             </div>
           )}
         </div>
@@ -132,8 +149,9 @@ const credit = d.role === 'contributor' ? `${d.author} (with efkrdnzz)` : d.auth
           <p class="eyebrow">Download</p>
           <h2 class="h3">{d.title}</h2>
           <p class="mono-note">
-            {full(d.downloads)} downloads &middot; {d.kind}
+            {full(totalDownloads)} downloads on {platforms}
             {d.mcVersions.length > 0 && ` · ${d.mcVersions.join(', ')}`}
+            {d.loaders.length > 0 && ` · ${d.loaders.join(', ')}`}
           </p>
         </div>
 

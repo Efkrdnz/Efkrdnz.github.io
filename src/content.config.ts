@@ -15,6 +15,10 @@ const mods = defineCollection({
     categories: z.array(z.string()),
     curseforge: z.string().url(),
     modrinth: z.string().url().optional(),
+    modrinthDownloads: z.number().optional(),
+    /* Set on projects efkrdnzz did not author. Describes the actual
+       relationship rather than flattening everything to "contributor". */
+    note: z.string().optional(),
     author: z.string().default('efkrdnzz'),
     role: z.enum(['author', 'contributor']).default('author'),
     featured: z.boolean().default(false),

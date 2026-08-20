@@ -1,0 +1,86 @@
+---
+import { url } from '../lib/util';
+import series from '../data/series/minefinity.json';
+
+interface Props {
+  /* Modules that exist as real pages here. Anything else renders as a card
+     without a link rather than a link to a 404. */
+  published: Record<string, { href: string; wiki?: string }>;
+}
+
+const { published } = Astro.props;
+---
+
+<section class="shell section" id="series">
+  <div class="section__head reveal">
+    <div class="section__title">
+      <p class="eyebrow">{series.name}</p>
+      <h2 class="h2">One library, {series.modules.length} modules</h2>
+    </div>
+    <p class="mono-note">{series.tagline}</p>
+  </div>
+
+  <p class="lede series__lede reveal">{series.blurb}</p>
+
+  {/* The tree is the point: Core sits above, everything else hangs off it,
+      and the connector is drawn rather than described. */}
+  <div class="series reveal">
+    <article class="core">
+      <div class="core__copy">
+        <p class="core__role">
+          <span class="core__dot" aria-hidden="true"></span>
+          {series.core.role}
+        </p>
+        <h3 class="core__name">{series.core.name}</h3>
+        <p class="core__tag">{series.core.tagline}</p>
+        <p class="core__blurb">{series.core.blurb}</p>
+      </div>
+      <ul class="core__list">
+        {series.core.provides.map((p: string) => <li>{p}</li>)}
+      </ul>
+    </article>
+
+    <div class="series__bus" aria-hidden="true"></div>
+
+    <div class="series__mods">
+      {series.modules.map((m: any) => {
+        const link = m.slug ? published[m.slug] : undefined;
+        const Tag = link ? 'a' : 'div';
+        return (
+          <Tag class="smod" href={link?.href} data-status={m.status}>
+            <span class="smod__top">
+              <span class="smod__role">{m.role}</span>
+              <span class="smod__status">
+                {m.status === 'published' ? 'Released' : 'In development'}
+              </span>
+            </span>
+            <span class="smod__name">{m.name}</span>
+            <p class="smod__tag">{m.tagline}</p>
+            <p class="smod__blurb">{m.blurb}</p>
+            <span class="smod__foot">
+              {link ? (
+                <>
+                  <span>{m.stat}</span>
+                  <span class="smod__go" aria-hidden="true">&rarr;</span>
+                </>
+              ) : (
+                <span>Not published yet</span>
+              )}
+            </span>
+          </Tag>
+        );
+      })}
+    </div>
+  </div>
+
+  {published['minefinity-gauntlet']?.wiki && (
+    <div class="series__cta reveal">
+      <p class="mono-note">
+        The Gauntlet&rsquo;s catalog is documented in full &mdash; 150 abilities across seven stones
+      </p>
+      <a class="btn" href={published['minefinity-gauntlet'].wiki}>
+        Open the Codex <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+      </a>
+    </div>
+  )}
+</section>

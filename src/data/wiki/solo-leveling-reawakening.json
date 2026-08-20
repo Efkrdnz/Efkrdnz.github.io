@@ -2906,59 +2906,67 @@
    "id": "cartenon-temple",
    "title": "Cartenon Temple",
    "category": "dungeon",
-   "tagline": "Where the System begins, and where it ends",
-   "summary": "A hidden instanced dimension behind a gate that only appears for hunters without the System. Dying inside triggers the awakening choice. At the level cap, the temple calls you back for the finale against the Statue of God.",
+   "tagline": "Where you stop being a Hunter and become a Player",
+   "summary": "The Cartenon Temple is the second awakening. You do not fight your way past it - you **lose** to it, and losing is the point. It is guaranteed to turn up within your first three gates, so you will meet it early whether or not you are ready.",
    "accent": "#9B5CFF",
    "status": "live",
    "facts": [
     {
-     "label": "Dimension",
-     "value": "sololeveling:cartenon_temple, instanced per party on a 512-block grid"
+     "label": "When it appears",
+     "value": "Guaranteed within your first 3 gates"
     },
     {
-     "label": "Discovery",
-     "value": "Clear a D/C/B/A/S/snow dungeon boss with no System holders in the party - a hidden gate spawns"
+     "label": "To answer the summons",
+     "value": "Hold crouch for 2 seconds, on the ground"
     },
     {
-     "label": "First visit",
-     "value": "A lethal hit is cancelled and becomes the awakening choice: accept the System, or decline and die"
+     "label": "To leave mid-fight",
+     "value": "Hold crouch for 4 seconds"
     },
     {
-     "label": "Decline",
-     "value": "Recorded permanently - the gate never responds to you again"
+     "label": "Statue melee",
+     "value": "18 damage"
     },
     {
-     "label": "Finale trigger",
-     "value": "Reach the level cap, receive 'The Way Back' quest, kneel (hold sneak on the ground for 2 seconds)"
+     "label": "Statue beam",
+     "value": "48 block range, 1.25s telegraph"
     },
     {
-     "label": "Finale reward",
-     "value": "Shadow Monarch job: the Black Heart (+100,000 flat max mana, unlimited shadow storage); anyone else: True Vessel Awakening"
+     "label": "Guardians",
+     "value": "9 damage each"
+    },
+    {
+     "label": "Can you die here?",
+     "value": "Not on your first visit"
     }
    ],
    "sections": [
     {
-     "heading": "The first visit",
-     "body": "The hidden gate appears only when a dungeon boss falls to a party in which nobody has the System and nobody has already made their choice. It admits only the participants. Inside the temple, you cannot die: any hit that would kill you is zeroed, you are frozen in place, and the System makes its offer. Accept, and you become a Player - full heal, teleport to the overworld, 'You have become a Player.' Decline, and after a few frozen seconds you die, and the System writes your answer down for good."
+     "heading": "Kneel to open the gate",
+     "body": "When the summons is active, **hold crouch while standing on the ground**. Two seconds of it opens the gate.\n\nIt is a held action on purpose - a tap will not do it, because crouching by accident is normal and this should never fire by mistake. Purple particles puff up around you every half second while it counts, so you can tell it is working. Let go and the count resets to zero."
     },
     {
-     "heading": "The Way Back",
-     "body": "Reaching the level cap (default 150) fires 'THE PEAK' and, shortly after, an urgent quest titled The Way Back: 'Kneel to open the way to the Cartenon Temple.' Hold sneak while standing on the ground for two full seconds - deliberately long enough that it is never accidental. A one-use return gate opens beside you. It closes behind you."
+     "heading": "You are supposed to lose",
+     "body": "Inside, **[[statue-of-god|the Statue of God]]** is not a fight you are meant to win. It hits for **18** in melee and fires a beam with **48 blocks** of reach after a **1.25 second** telegraph, roughly every five and a half seconds. Its guardians add **9** a hit.\n\nFight it anyway. The intended outcome is that it kills you."
     },
     {
-     "heading": "The finale",
-     "body": "The Architect - the voice that built the System - speaks through System popups. Then every posed statue in the temple wakes at once. Then the Statue of God itself: heavy melee, plus a telegraphed eye beam (25-tick warning marker, 45 damage in a 3.5-block column, on a 5.5-second cooldown - stand in the circle and you deserve it). There is no dialog box at the end. Killing the Statue of God IS the decision."
+     "heading": "Except it will not let you die",
+     "body": "On your first visit the temple **cannot kill you**. The blow that should have finished you is intercepted, the damage is zeroed, and instead the System asks:\n\n**\"Would you like to become a Player?\"**\n\nAccept, and you are pulled out of the dimension to the overworld spawn with **WELCOME - You have become a Player.** That is the awakening. The death you were walking into was the door."
     },
     {
-     "heading": "The release",
-     "body": "The Architect concedes, and the System is released: it keeps running with nobody at the controls. No more quests, XP, levels or reward payouts - ever - but every stat, ability, shadow and item you earned keeps working. Shadow Monarchs inherit the Black Heart: a flat 100,000 bonus mana that never inflates ability costs, and no ceiling on shadow storage. Every other path gets the True Vessel Awakening. Then the temple puts you out, and closes: it has nothing left to measure."
+     "heading": "The way out is the awakening",
+     "body": "The Cartenon dimension **has no return portal of its own**. Dying is not an exit because dying is disabled, and there is no gate home - accepting the offer is the way out.\n\nIf you are not ready to commit, you can **hold crouch for four seconds** to withdraw from the fight. That is deliberately twice as long as the entry kneel, because crouching mid-fight is normal and it must not trigger by accident. Withdrawing cancels the run and re-opens the summons, so nothing is lost and you can come back."
+    },
+    {
+     "heading": "Coming back later",
+     "body": "The immortality is a one-time script. Once you have accepted and become a Player, later visits to the temple are **ordinary** - the statue can kill you like anything else.\n\nYou return here at the end: reaching the **[[levels-and-xp|level cap]]** reopens the Cartenon Temple for the last time."
     }
    ],
    "related": [
+    "statue-of-god",
     "the-system",
     "levels-and-xp",
-    "story-mode",
-    "intelligence"
+    "gates"
    ],
    "parents": [
     "the-system"

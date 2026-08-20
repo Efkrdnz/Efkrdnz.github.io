@@ -87,13 +87,14 @@
       "n": 5,
       "id": "step-cartenon",
       "title": "Claim the System at the Cartenon Temple",
-      "goal": "The second awakening",
-      "gate": "After you can handle mid-rank content",
-      "body": "Getting a job at the Evaluation made you a Hunter. The [[cartenon-temple|Cartenon Temple]] is what makes you a **Player** — the point where the System properly attaches itself to you.\n\nThe temple is guarded. [[statue-of-god|The Statue of God]] sits at its heart, with an arsenal of animated statues around it, and it is a real step up from anything a low-rank gate has shown you.\n\nCome prepared. This is the first fight in the mod that expects you to have actually built your character rather than just levelled it.",
+      "goal": "Lose to the Statue of God on purpose",
+      "gate": "Within your first 3 gates",
+      "body": "Getting a job at the Evaluation made you a Hunter. The [[cartenon-temple|Cartenon Temple]] is what makes you a **Player**, and it is **guaranteed to appear within your first three gates** - so this happens early, ready or not.\n\nWhen the summons is up, **hold crouch on the ground for two seconds** to answer it. Particles confirm it is counting; releasing resets it.\n\nThen fight [[statue-of-god|the Statue of God]] and **lose**. That is the intended outcome. The temple will not actually let you die on this first visit - the killing blow is intercepted and the System asks whether you want to become a Player instead. Say yes and you are pulled back to the overworld, awakened.\n\nNot ready? **Hold crouch for four seconds** to withdraw. The summons re-opens and you lose nothing.",
       "checklist": [
-        "This is the awakening that grants the System itself",
-        "The Statue of God guards it",
-        "Bring real gear, not starter gear"
+        "Guaranteed within your first 3 gates",
+        "Hold crouch 2 seconds to answer the summons",
+        "You are meant to lose - the killing blow becomes the awakening offer",
+        "Hold crouch 4 seconds to withdraw and try later"
       ],
       "nodes": [
         "cartenon-temple",

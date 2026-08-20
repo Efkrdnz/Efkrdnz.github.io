@@ -29,6 +29,7 @@ const platforms = d.modrinth ? 'CurseForge and Modrinth' : 'CurseForge';
         {d.hasGuide
           ? <a class="subnav__link" href={url(`/mods/${mod.id}/guide`)}>Guide</a>
           : <span class="subnav__soon">Guide</span>}
+        {d.hasGuide && <a class="subnav__link" href={url(`/mods/${mod.id}/install`)}>Install</a>}
         <span class="subnav__soon">Changelog</span>
         <a class="subnav__link" href="#download">Download</a>
         <a class="subnav__link" href={url('/mods')} style="margin-left:auto;">&larr; All mods</a>
@@ -187,6 +188,9 @@ const platforms = d.modrinth ? 'CurseForge and Modrinth' : 'CurseForge';
             <a class="btn" href={d.modrinth} rel="noopener noreferrer" target="_blank">
               Modrinth
             </a>
+          )}
+          {d.hasGuide && (
+            <a class="btn" href={url(`/mods/${mod.id}/install`)}>Install guide</a>
           )}
         </div>
       </div>

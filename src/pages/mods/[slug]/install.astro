@@ -1,0 +1,252 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../../layouts/Base.astro';
+import { url, full } from '../../../lib/util';
+import '../../../styles/install.css';
+
+export async function getStaticPaths() {
+  const mods = await getCollection('mods');
+  return mods
+    .filter((m) => m.data.hasGuide)
+    .map((mod) => ({ params: { slug: mod.id }, props: { mod } }));
+}
+
+const { mod } = Astro.props;
+const d = mod.data;
+
+const files = import.meta.glob<{ default: any }>('../../../data/wiki/*.install.json', {
+  eager: true,
+});
+const entry = Object.entries(files).find(([p]) => p.endsWith(`/${mod.id}.install.json`));
+const info = entry ? entry[1].default : null;
+
+function esc(s: string): string {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function inline(s: string): string {
+  return esc(s)
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/`(.+?)`/g, '<code>$1</code>');
+}
+
+const totalDownloads = d.downloads + (d.modrinthDownloads ?? 0);
+---
+
+<Base
+  title={`Install ${d.short} — efkrdnzz`}
+  description={`How to install ${d.title}: downloads, required and optional dependencies, the official Arsenal texture pack, and multiplayer notes.`}
+  mod={d.theme}
+>
+  <div class="mod-page">
+    <nav class="subnav" aria-label={`${d.short} sections`}>
+      <div class="shell subnav__in">
+        <a class="subnav__link" href={url(`/mods/${mod.id}`)}>Overview</a>
+        <a class="subnav__link" href={url(`/mods/${mod.id}/guide`)}>Guide</a>
+        <a class="subnav__link" href={url(`/mods/${mod.id}/install`)} aria-current="page">Install</a>
+        <span class="subnav__soon">Changelog</span>
+        <a class="subnav__link" href={url('/mods')} style="margin-left:auto;">&larr; All mods</a>
+      </div>
+    </nav>
+
+    {info && (
+      <>
+        <section class="shell inst-hero">
+          <div class="inst-hero__copy">
+            <p class="eyebrow">Installation</p>
+            <h1 class="mod-title">Get {d.short} running</h1>
+            <p class="lede">
+              Two required files, a handful of optional ones, and the official texture pack.
+              Ten minutes if you have installed a mod before.
+            </p>
+
+            <div class="actions">
+              {info.downloads.map((dl: any) => (
+                <a
+                  class:list={['btn', dl.primary && 'btn--primary']}
+                  href={dl.href}
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  {dl.name}
+                  {dl.primary && <span class="btn__arrow" aria-hidden="true">&rarr;</span>}
+                </a>
+              ))}
+            </div>
+          </div>
+
+          <aside class="sys" aria-label="Version requirements">
+            <div class="sys__label">Requirements</div>
+            <div class="sys__rows">
+              <div class="sys__row">
+                <span class="sys__k">Version</span>
+                <span class="sys__v sys__v--hot">{info.version}</span>
+              </div>
+              <div class="sys__row">
+                <span class="sys__k">Minecraft</span>
+                <span class="sys__v">{info.minecraft}</span>
+              </div>
+              <div class="sys__row">
+                <span class="sys__k">Loader</span>
+                <span class="sys__v">{info.loader} {info.loaderVersion}+</span>
+              </div>
+              <div class="sys__row">
+                <span class="sys__k">Java</span>
+                <span class="sys__v">{info.java}</span>
+              </div>
+              <div class="sys__row">
+                <span class="sys__k">Downloads</span>
+                <span class="sys__v">{full(totalDownloads)}</span>
+              </div>
+            </div>
+            <div class="sys__foot">
+              <span>not Fabric &middot; not Forge</span>
+              <span class="sys__caret" aria-hidden="true"></span>
+            </div>
+          </aside>
+        </section>
+
+        {info.notices?.length > 0 && (
+          <section class="shell" style="padding-bottom:var(--s6);">
+            <div class="inst-notices">
+              {info.notices.map((n: any) => (
+                <div class:list={['inotice', `inotice--${n.tone}`]}>
+                  <span class="inotice__mark" aria-hidden="true">!</span>
+                  <div>
+                    <span class="inotice__t">{n.title}</span>
+                    <p class="inotice__d" set:html={inline(n.body)} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        <section class="shell section" style="padding-top:0;">
+          <div class="section__head">
+            <div class="section__title">
+              <p class="eyebrow">Required</p>
+              <h2 class="h2">You need these two</h2>
+            </div>
+            <p class="mono-note">The mod will not start without them</p>
+          </div>
+
+          <div class="idep-list">
+            {info.required.map((dep: any) => (
+              <article class="idep idep--req">
+                <div class="idep__head">
+                  <h3 class="idep__name">{dep.name}</h3>
+                  <span class="idep__range">{dep.range}</span>
+                </div>
+                <p class="idep__why">{dep.why}</p>
+                <div class="idep__foot">
+                  <span class="idep__side">{dep.side}</span>
+                  <span class="idep__links">
+                    {dep.links.map((l: any) => (
+                      <a href={l.href} rel="noopener noreferrer" target="_blank">{l.label}</a>
+                    ))}
+                  </span>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section class="shell section" style="padding-top:0;">
+          <div class="section__head">
+            <div class="section__title">
+              <p class="eyebrow">Optional</p>
+              <h2 class="h2">Strongly worth having</h2>
+            </div>
+            <p class="mono-note">The mod runs fine without any of them</p>
+          </div>
+
+          <div class="idep-list">
+            {info.optional.map((dep: any) => (
+              <article class="idep">
+                <div class="idep__head">
+                  <h3 class="idep__name">{dep.name}</h3>
+                  {dep.recommended && <span class="idep__pick">Recommended</span>}
+                  <span class="idep__range">{dep.range}</span>
+                </div>
+                <p class="idep__why">{dep.why}</p>
+                <div class="idep__foot">
+                  <span class="idep__side">{dep.side}</span>
+                  <span class="idep__links">
+                    {dep.links.map((l: any) => (
+                      <a href={l.href} rel="noopener noreferrer" target="_blank">{l.label}</a>
+                    ))}
+                  </span>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section class="shell section" style="padding-top:0;">
+          <div class="section__head">
+            <div class="section__title">
+              <p class="eyebrow">Companions</p>
+              <h2 class="h2">Packs built for this mod</h2>
+            </div>
+          </div>
+
+          <div class="icomp-list">
+            {info.companions.map((c: any) => (
+              <a
+                class:list={['icomp', c.featured && 'icomp--featured']}
+                href={c.href}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                <span class="icomp__kind">{c.kind}</span>
+                <span class="icomp__name">{c.name}</span>
+                <span class="icomp__by">by {c.by}</span>
+                <span class="icomp__note">{c.note}</span>
+                <span class="icomp__go" aria-hidden="true">&#8599;</span>
+              </a>
+            ))}
+          </div>
+        </section>
+
+        <section class="shell section" style="padding-top:0;">
+          <div class="section__head">
+            <div class="section__title">
+              <p class="eyebrow">Step by step</p>
+              <h2 class="h2">Putting it together</h2>
+            </div>
+          </div>
+
+          <ol class="isteps">
+            {info.steps.map((s: any) => (
+              <li class="istep">
+                <span class="istep__n">{String(s.n).padStart(2, '0')}</span>
+                <div>
+                  <h3 class="istep__t">{s.title}</h3>
+                  <p class="istep__d" set:html={inline(s.body)} />
+                </div>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        <section class="shell section" style="padding-top:0;">
+          <div class="dl">
+            <div class="dl__copy">
+              <p class="eyebrow">Multiplayer</p>
+              <h2 class="h3">{info.server.title}</h2>
+              <p class="mono-note" set:html={inline(info.server.body)} />
+            </div>
+            <div class="actions">
+              <a class="btn" href="https://discord.gg/U3RtGxd5uw" rel="noopener noreferrer" target="_blank">
+                Discord
+              </a>
+              <a class="btn btn--primary" href={url(`/mods/${mod.id}/guide`)}>
+                Read the guide <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+              </a>
+            </div>
+          </div>
+        </section>
+      </>
+    )}
+  </div>
+</Base>

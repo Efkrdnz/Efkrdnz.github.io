@@ -1,0 +1,143 @@
+{
+  "version": "1.2.0",
+  "minecraft": "1.21.1",
+  "loader": "NeoForge",
+  "loaderVersion": "21.1.244",
+  "java": "21",
+  "downloads": [
+    {
+      "name": "CurseForge",
+      "note": "The main release channel",
+      "href": "https://www.curseforge.com/minecraft/mc-mods/solo-craft-reawakening",
+      "primary": true
+    },
+    {
+      "name": "Modrinth",
+      "note": "Same builds, mirrored",
+      "href": "https://modrinth.com/mod/solo-craft-reawakening",
+      "primary": false
+    }
+  ],
+  "required": [
+    {
+      "id": "neoforge",
+      "name": "NeoForge",
+      "range": "21.1.244 or newer",
+      "why": "The mod loader itself. This is a NeoForge mod — it will not load on Fabric, and the old Forge builds are a separate, older branch.",
+      "side": "Both",
+      "links": [{ "label": "neoforged.net", "href": "https://neoforged.net/" }]
+    },
+    {
+      "id": "geckolib",
+      "name": "GeckoLib",
+      "range": "4.9.2 up to (not including) 5.0",
+      "why": "Drives every animated model in the mod — bosses, shadows, weapons. Nothing renders correctly without it, and a 5.x build will not work.",
+      "side": "Both",
+      "links": [
+        { "label": "CurseForge", "href": "https://www.curseforge.com/minecraft/mc-mods/geckolib" },
+        { "label": "Modrinth", "href": "https://modrinth.com/mod/geckolib" }
+      ]
+    }
+  ],
+  "optional": [
+    {
+      "id": "bettercombat",
+      "name": "Better Combat",
+      "range": "2.4 up to (not including) 3.0",
+      "why": "The mod ships dedicated Better Combat support: SLR weapons get proper attack animations and swing arcs instead of the vanilla flail. The single biggest feel upgrade you can install.",
+      "side": "Both",
+      "recommended": true,
+      "links": [
+        { "label": "CurseForge", "href": "https://www.curseforge.com/minecraft/mc-mods/better-combat-by-daedelus" },
+        { "label": "Modrinth", "href": "https://modrinth.com/mod/better-combat" }
+      ]
+    },
+    {
+      "id": "sodium",
+      "name": "Sodium",
+      "range": "0.6.13 up to (not including) 0.9",
+      "why": "Rendering performance. SLR throws a lot of particles and shader work at the screen during boss fights, and Sodium is what keeps that playable on modest hardware.",
+      "side": "Client only",
+      "recommended": true,
+      "links": [{ "label": "Modrinth", "href": "https://modrinth.com/mod/sodium" }]
+    },
+    {
+      "id": "iris",
+      "name": "Iris Shaders",
+      "range": "1.8 up to (not including) 1.9",
+      "why": "Shader support. The mod's own visual effects are built to sit alongside Iris rather than fight it, so gates and abilities hold up with shaders on.",
+      "side": "Client only",
+      "recommended": false,
+      "links": [{ "label": "Modrinth", "href": "https://modrinth.com/mod/iris" }]
+    }
+  ],
+  "companions": [
+    {
+      "name": "Solo Leveling: Arsenal",
+      "by": "Zerotekz",
+      "kind": "Official texture pack",
+      "note": "The official companion pack. Replaces SLR's daggers, swords, katanas, bows and axes with 3D models. 1.6M downloads, and it covers 1.20.1 and 1.21.1.",
+      "href": "https://www.curseforge.com/minecraft/texture-packs/solo-leveling-arsenal",
+      "featured": true
+    },
+    {
+      "name": "Solo Leveling Reawakening Server",
+      "by": "efkrdnzz",
+      "kind": "Official modpack",
+      "note": "The pack running the official server. If you would rather not assemble anything yourself, start here — it is already put together.",
+      "href": "https://www.curseforge.com/minecraft/modpacks/solo-leveling-reawakening-server",
+      "featured": false
+    },
+    {
+      "name": "Rise of the Dark Sovereign",
+      "by": "Jo_Zen",
+      "kind": "Community modpack",
+      "note": "A community pack built on top of SLR, with its own dungeon and ability curation.",
+      "href": "https://www.curseforge.com/minecraft/modpacks/rise-of-the-dark-sovereign",
+      "featured": false
+    }
+  ],
+  "notices": [
+    {
+      "tone": "warn",
+      "title": "The Epic Fight addon is gone",
+      "body": "The Epic Fight compatibility addon is no longer available and is not coming back. Do not go looking for it, and do not install an old copy against a current build — it will not match. **Better Combat is the supported animation path now**, and it is wired into the mod directly."
+    },
+    {
+      "tone": "warn",
+      "title": "This is the NeoForge branch",
+      "body": "Version 1.2.0 targets **Minecraft 1.21.1 on NeoForge**. The older Forge 1.20.1 builds are a different branch — worlds and mod lists do not carry across cleanly between them. Back up any world you care about before updating."
+    }
+  ],
+  "steps": [
+    {
+      "n": 1,
+      "title": "Install NeoForge",
+      "body": "Get the **21.1.244** installer or newer for Minecraft **1.21.1** from neoforged.net and run it. Launch the game once on the new NeoForge profile so it creates your `mods` folder."
+    },
+    {
+      "n": 2,
+      "title": "Drop in the mod and GeckoLib",
+      "body": "Put the SLR jar and a **4.9.x** GeckoLib jar into `mods`. Two files, same folder. Version-matching GeckoLib matters more than people expect — a 5.x build fails."
+    },
+    {
+      "n": 3,
+      "title": "Add the optional pieces",
+      "body": "Better Combat if you want proper weapon animations, Sodium if you want frames. Both go in the same `mods` folder. Neither is required to play."
+    },
+    {
+      "n": 4,
+      "title": "Add the Arsenal pack",
+      "body": "Download **Solo Leveling: Arsenal** and drop it in `resourcepacks`, then enable it in **Options → Resource Packs**. It is a texture pack, not a mod, so it does not go in `mods`."
+    },
+    {
+      "n": 5,
+      "title": "Create a world",
+      "body": "World creation has a **Solo Leveling** tab: Story Mode, progression speed, difficulty, XP rate, job change level, gate access and death rules. You can leave every one of them alone and play the intended defaults."
+    }
+  ],
+  "server": {
+    "title": "Playing with other people",
+    "body": "Every player and the server need the **same mod version and the same GeckoLib version**. Mismatches disconnect rather than degrade. Optional client-side mods — Sodium, Iris, the Arsenal pack — do not need to match, since the server never sees them."
+  }
+}

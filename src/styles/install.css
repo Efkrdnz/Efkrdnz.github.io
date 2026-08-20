@@ -1,0 +1,279 @@
+/* ==========================================================================
+   Installation page
+
+   Reuses the mod-page skeleton (subnav, sys panel, dl slab) so it reads as
+   part of the same product. Only the pieces unique to install instructions
+   are defined here.
+   ========================================================================== */
+
+.inst-hero {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.78fr);
+  gap: var(--s8);
+  align-items: start;
+  padding-block: var(--s8) var(--s7);
+}
+
+@media (max-width: 980px) {
+  .inst-hero {
+    grid-template-columns: 1fr;
+    gap: var(--s6);
+    padding-block: var(--s7) var(--s6);
+  }
+}
+
+.inst-hero__copy { display: flex; flex-direction: column; gap: var(--s5); }
+
+/* ------------------------------------------------------------- notices --- */
+
+.inst-notices { display: flex; flex-direction: column; gap: var(--s3); }
+
+.inotice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s4);
+  padding: var(--s5);
+  border: 1px solid var(--edge-dim);
+  border-left-width: 2px;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  background: color-mix(in srgb, var(--panel) 70%, transparent);
+}
+
+.inotice--warn { border-left-color: #FFD166; }
+.inotice--info { border-left-color: var(--accent); }
+
+.inotice__mark {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: #FFD166;
+}
+
+.inotice--info .inotice__mark { color: var(--accent); }
+
+.inotice__t {
+  display: block;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--bone);
+  margin-bottom: 5px;
+}
+
+.inotice__d {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--ash);
+  max-width: 74ch;
+}
+
+.inotice__d strong { color: var(--bone); font-weight: 600; }
+
+/* -------------------------------------------------------- dependencies --- */
+
+.idep-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1px;
+  background: var(--panel-edge);
+  border: 1px solid var(--panel-edge);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.idep {
+  background: var(--page-bg);
+  padding: var(--s5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+}
+
+/* required entries carry a top edge in the accent so the distinction is
+   structural, not only a heading above them */
+.idep--req { box-shadow: inset 0 2px 0 0 var(--accent); }
+
+.idep__head { display: flex; align-items: baseline; gap: var(--s3); flex-wrap: wrap; }
+
+.idep__name {
+  font-family: var(--head-font);
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: -0.015em;
+  margin: 0;
+  color: var(--bone);
+}
+
+.idep__range {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ash-dim);
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.idep__pick {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  padding: 2px 6px;
+}
+
+.idep__why {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--ash);
+  flex: 1;
+}
+
+.idep__foot {
+  display: flex;
+  align-items: center;
+  gap: var(--s4);
+  padding-top: var(--s3);
+  border-top: 1px solid var(--edge-dim);
+  font-family: var(--mono);
+  font-size: 11px;
+}
+
+.idep__side { color: var(--ash-dim); }
+.idep__links { margin-left: auto; display: flex; gap: var(--s4); }
+.idep__links a { color: var(--accent); }
+.idep__links a:hover { color: var(--accent-hi); }
+
+/* ---------------------------------------------------------- companions --- */
+
+.icomp-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--s4);
+}
+
+.icomp {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+  padding: var(--s5);
+  background: var(--panel);
+  border: 1px solid var(--edge-dim);
+  border-radius: var(--radius);
+  color: inherit;
+  transition: border-color 0.2s var(--ease), transform 0.2s var(--ease);
+}
+
+.icomp:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  color: inherit;
+}
+
+.icomp--featured { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 40%, transparent); }
+
+.icomp__kind {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.icomp__name {
+  font-family: var(--head-font);
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: -0.015em;
+  color: var(--bone);
+  padding-right: 20px;
+}
+
+.icomp__by { font-family: var(--mono); font-size: 11px; color: var(--ash-dim); }
+
+.icomp__note {
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--ash);
+  margin-top: var(--s1);
+}
+
+.icomp__go {
+  position: absolute;
+  top: var(--s5);
+  right: var(--s5);
+  color: var(--ash-dim);
+  transition: color 0.2s var(--ease), transform 0.2s var(--ease);
+}
+
+.icomp:hover .icomp__go { color: var(--accent); transform: translate(2px, -2px); }
+
+/* --------------------------------------------------------------- steps --- */
+
+.isteps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.istep {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: var(--s4);
+  padding: var(--s5) 0;
+  border-bottom: 1px solid var(--panel-edge);
+}
+
+.istep:last-child { border-bottom: 0; }
+
+.istep__n {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  border: 1px solid var(--edge);
+  border-radius: 2px;
+  padding: 4px 0;
+  text-align: center;
+  height: fit-content;
+  font-variant-numeric: tabular-nums;
+}
+
+.istep__t {
+  font-family: var(--head-font);
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin: 0 0 4px;
+  color: var(--bone);
+}
+
+.istep__d {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.62;
+  color: var(--ash);
+  max-width: 72ch;
+}
+
+.istep__d strong { color: var(--bone); font-weight: 600; }
+
+@media (max-width: 600px) {
+  .istep { grid-template-columns: 34px minmax(0, 1fr); gap: var(--s3); }
+  .idep__range { margin-left: 0; }
+}

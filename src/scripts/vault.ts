@@ -101,9 +101,23 @@ function escapeHtml(s: string): string {
     .replace(/"/g, '&quot;');
 }
 
-/** Very small inline formatter: **bold** and `code` only. */
-function fmt(s: string): string {
+/**
+ * Very small inline formatter: **bold**, `code`, and [[id|Label]] wikilinks.
+ * A wikilink becomes a button the graph already knows how to handle, so
+ * prose can send you straight to another page on the map.
+ */
+function fmt(s: string, known?: (id: string) => boolean): string {
   return escapeHtml(s)
+    .replace(/\[\[([a-z0-9-]+)\|([^\]]+)\]\]/g, (_m, id: string, label: string) =>
+      !known || known(id)
+        ? `<button type="button" class="vlink" data-goto="${id}">${label}</button>`
+        : label
+    )
+    .replace(/\[\[([a-z0-9-]+)\]\]/g, (_m, id: string) =>
+      !known || known(id)
+        ? `<button type="button" class="vlink" data-goto="${id}">${id.replace(/-/g, ' ')}</button>`
+        : id.replace(/-/g, ' ')
+    )
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/`(.+?)`/g, '<code>$1</code>');
 }
@@ -541,13 +555,13 @@ export function initVault(): void {
       parts.push(`<p><span class="vstatus vstatus--${n.status}">${label}</span></p>`);
     }
 
-    if (n.summary) parts.push(`<p class="vpanel__summary">${fmt(n.summary)}</p>`);
+    if (n.summary) parts.push(`<p class="vpanel__summary">${fmt(n.summary, hasNode)}</p>`);
 
     if (n.facts?.length) {
       parts.push('<dl class="vfacts">');
       n.facts.forEach((f) => {
         parts.push(
-          `<div class="vfact"><dt>${escapeHtml(f.label)}</dt><dd>${fmt(f.value)}</dd></div>`
+          `<div class="vfact"><dt>${escapeHtml(f.label)}</dt><dd>${fmt(f.value, hasNode)}</dd></div>`
         );
       });
       parts.push('</dl>');
@@ -556,7 +570,7 @@ export function initVault(): void {
     (n.sections || []).forEach((s) => {
       const paras = s.body
         .split(/\n{2,}/)
-        .map((p) => `<p>${fmt(p.trim())}</p>`)
+        .map((p) => `<p>${fmt(p.trim(), hasNode)}</p>`)
         .join('');
       parts.push(`<section class="vsec"><h3>${escapeHtml(s.heading)}</h3>${paras}</section>`);
     });
@@ -596,8 +610,23 @@ export function initVault(): void {
     highlight(null);
   }
 
+  const hasNode = (id: string) => byId.has(id);
+
   /* ---- selection -------------------------------------------------------- */
+  function showGraph() {
+    const guide = root.querySelector('.vguide');
+    const index = root.querySelector('.vindex');
+    guide?.classList.remove('is-open');
+    index?.classList.remove('is-open');
+    root
+      .querySelectorAll('[data-view]')
+      .forEach((b) =>
+        b.setAttribute('aria-pressed', String(b.getAttribute('data-view') === 'graph'))
+      );
+  }
+
   function select(id: string, toggle = false) {
+    if (!byId.has(id)) return;
     if (hasKids(id)) {
       if (toggle && expanded.has(id) && selected === id) expanded.delete(id);
       else expanded.add(id);
@@ -733,8 +762,6 @@ export function initVault(): void {
       closePanel();
       return;
     }
-    const goto = t.closest<HTMLElement>('[data-goto]');
-    if (goto) select(goto.getAttribute('data-goto')!);
   });
 
   document.addEventListener('keydown', (e) => {
@@ -794,17 +821,30 @@ export function initVault(): void {
         .querySelectorAll('[data-view]')
         .forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
       index?.classList.toggle('is-open', mode === 'index');
+      root.querySelector('.vguide')?.classList.toggle('is-open', mode === 'guide');
+      if (mode !== 'graph') closePanel();
     });
   });
 
-  index?.addEventListener('click', (e) => {
+  /* One delegated handler: any [data-goto] on the page - index rows, guide
+     wikilinks, panel chips - opens that node on the map. */
+  root.addEventListener('click', (e) => {
     const it = (e.target as HTMLElement).closest<HTMLElement>('[data-goto]');
     if (!it) return;
-    index.classList.remove('is-open');
-    root
-      .querySelectorAll('[data-view]')
-      .forEach((b) => b.setAttribute('aria-pressed', String(b.getAttribute('data-view') === 'graph')));
-    select(it.getAttribute('data-goto')!);
+    const id = it.getAttribute('data-goto');
+    if (!id || !byId.has(id)) return;
+    e.preventDefault();
+    showGraph();
+    select(id);
+  });
+
+  /* in-prose shortcuts that switch view rather than open a node */
+  root.addEventListener('click', (e) => {
+    const j = (e.target as HTMLElement).closest<HTMLElement>('[data-view-jump]');
+    if (!j) return;
+    const mode = j.getAttribute('data-view-jump');
+    const btn = root.querySelector<HTMLButtonElement>(`[data-view="${mode}"]`);
+    btn?.click();
   });
 
   root.querySelector('[data-reset]')?.addEventListener('click', () => {

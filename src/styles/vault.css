@@ -611,3 +611,247 @@
   .vpanel { transition: none; }
   .link, .node__glyph, .node__label, .node__ring { transition: none; }
 }
+
+/* ========================================================================== 
+   Guide view — the walkthrough
+
+   Steps are numbered because they are a genuine sequence: the order is the
+   information. Everything else in the vault is unordered reference.
+   ========================================================================== */
+
+.vguide {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  background: var(--void);
+  overflow-y: auto;
+  display: none;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-hi) transparent;
+}
+
+.vguide.is-open { display: block; }
+.vguide__in { max-width: 780px; margin: 0 auto; padding: 40px 22px 90px; }
+
+.vguide__head { border-bottom: 1px solid var(--line); padding-bottom: 26px; margin-bottom: 30px; }
+
+.vguide__eyebrow {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin: 0 0 12px;
+}
+
+.vguide__title {
+  font-family: var(--disp);
+  font-weight: 700;
+  font-size: clamp(32px, 6vw, 52px);
+  line-height: 1;
+  letter-spacing: -0.025em;
+  margin: 0 0 16px;
+}
+
+.vguide__lead p {
+  font-size: 17px;
+  line-height: 1.62;
+  color: var(--sub);
+  margin: 0 0 12px;
+  max-width: 62ch;
+}
+
+/* ---- contents ---- */
+
+.vtoc {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  margin-bottom: 40px;
+}
+
+.vtoc__item {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 10px 13px;
+  background: var(--void);
+  color: var(--sub);
+  text-decoration: none;
+  font-size: 13.5px;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.vtoc__item:hover { background: var(--panel-2); color: var(--ink); }
+.vtoc__n { font-family: var(--mono); font-size: 10.5px; color: var(--cyan); flex: none; }
+
+/* ---- phases + steps ---- */
+
+.vphase { margin-bottom: 12px; }
+
+.vphase__h {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+  margin: 34px 0 4px;
+}
+
+.vstep {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr);
+  gap: 18px;
+  padding: 26px 0;
+  border-bottom: 1px solid var(--line);
+  scroll-margin-top: 20px;
+}
+
+.vstep:last-child { border-bottom: 0; }
+
+.vstep__rail { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+
+.vstep__n {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--cyan);
+  border: 1px solid var(--cyan-dim);
+  background: var(--cyan-soft);
+  border-radius: 2px;
+  padding: 4px 0;
+  width: 34px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* the connecting line makes the sequence visible at a glance */
+.vstep__rail::after {
+  content: '';
+  flex: 1;
+  width: 1px;
+  min-height: 20px;
+  background: linear-gradient(to bottom, var(--line-hi), transparent);
+}
+
+.vstep__t {
+  font-family: var(--disp);
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: -0.015em;
+  margin: 0 0 5px;
+  color: var(--ink);
+}
+
+.vstep__goal { font-size: 15px; color: var(--sub); margin: 0 0 6px; }
+
+.vstep__gate {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--sub-dim);
+  border: 1px solid var(--line-hi);
+  border-radius: 2px;
+  padding: 3px 8px;
+  margin: 0 0 16px;
+}
+
+.vstep__art {
+  width: 100%;
+  height: auto;
+  max-height: 200px;
+  object-fit: cover;
+  object-position: center;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  margin-bottom: 16px;
+  background: var(--panel);
+}
+
+.vstep__prose p {
+  font-size: 15.5px;
+  line-height: 1.68;
+  color: var(--sub);
+  margin: 0 0 13px;
+  max-width: 64ch;
+}
+
+.vstep__prose strong { color: var(--ink); font-weight: 600; }
+
+.vcheck {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 14px 16px;
+  background: var(--panel);
+  border-left: 2px solid var(--cyan-dim);
+  border-radius: 0 2px 2px 0;
+}
+
+.vcheck li {
+  position: relative;
+  padding-left: 20px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--sub);
+  margin-bottom: 7px;
+}
+
+.vcheck li:last-child { margin-bottom: 0; }
+
+.vcheck li::before {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 8px;
+  width: 6px;
+  height: 6px;
+  background: var(--cyan);
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+}
+
+.vchips--guide { margin-top: 16px; }
+
+/* ---- the wikilink: prose that opens the map ---- */
+
+.vlink {
+  display: inline;
+  padding: 0 1px;
+  margin: 0;
+  background: none;
+  border: 0;
+  border-bottom: 1px dashed var(--cyan-dim);
+  color: var(--cyan);
+  font: inherit;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background-color 0.15s;
+}
+
+.vlink:hover {
+  color: var(--ink);
+  border-bottom-color: var(--cyan);
+  background: var(--cyan-soft);
+}
+
+.vlink:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+
+.vguide__foot {
+  margin-top: 36px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.vguide__foot p { font-size: 15px; color: var(--sub); margin: 0; max-width: 62ch; }
+
+@media (max-width: 700px) {
+  .vguide__in { padding: 28px 16px 70px; }
+  .vstep { grid-template-columns: 34px minmax(0, 1fr); gap: 12px; }
+  .vstep__n { width: 30px; font-size: 11px; }
+  .vstep__art { max-height: 150px; }
+}

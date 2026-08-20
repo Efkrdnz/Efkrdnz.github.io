@@ -1,8 +1,17 @@
 ---
 import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
 import Base from '../../../layouts/Base.astro';
 import { url } from '../../../lib/util';
 import '../../../styles/vault.css';
+
+import artClasses from '../../../assets/wiki/classes.png';
+import artLeveling from '../../../assets/wiki/leveling.png';
+import artDungeon from '../../../assets/wiki/dungeon.png';
+import artBosses from '../../../assets/wiki/bosses.png';
+import artSystem from '../../../assets/wiki/system.png';
+import artShadow from '../../../assets/wiki/shadowmonarch.png';
+import artFrost from '../../../assets/wiki/frostmonarch.png';
 
 export async function getStaticPaths() {
   const mods = await getCollection('mods');
@@ -14,17 +23,69 @@ export async function getStaticPaths() {
 const { mod } = Astro.props;
 const d = mod.data;
 
-/* One JSON file per mod that has a wiki. Adding another mod's guide is a new
-   file here plus hasGuide: true in its frontmatter — no code changes. */
 const wikis = import.meta.glob<{ default: { nodes: any[] } }>(
   '../../../data/wiki/*.json',
   { eager: true }
 );
-const entry = Object.entries(wikis).find(([path]) => path.endsWith(`/${mod.id}.json`));
-const nodes: any[] = entry ? (entry[1].default.nodes ?? []) : [];
+const dataEntry = Object.entries(wikis).find(([p]) => p.endsWith(`/${mod.id}.json`));
+const nodes: any[] = dataEntry ? (dataEntry[1].default.nodes ?? []) : [];
+const known = new Set(nodes.map((n) => n.id));
 
-/* The Index view is rendered on the server, so the page has real crawlable
-   text and still works with JavaScript switched off. */
+const guides = import.meta.glob<{ default: any }>(
+  '../../../data/wiki/*.guide.json',
+  { eager: true }
+);
+const guideEntry = Object.entries(guides).find(([p]) => p.endsWith(`/${mod.id}.guide.json`));
+const guide = guideEntry ? guideEntry[1].default : null;
+
+/* Art per chapter. Keyed by step id so adding a chapter without art is fine. */
+const CHAPTER_ART: Record<string, any> = {
+  'step-evaluator': artClasses,
+  'step-your-kit': artSystem,
+  'step-first-gates': artDungeon,
+  'step-levelling': artLeveling,
+  'step-cartenon': artSystem,
+  'step-job-change': artShadow,
+  'step-dkc': artBosses,
+  'step-endgame': artFrost,
+};
+
+/* Server-side wikilink rendering: the guide is crawlable and works with
+   JavaScript off, where links fall back to plain emphasised text. */
+function esc(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function inline(s: string): string {
+  return esc(s)
+    .replace(/\[\[([a-z0-9-]+)\|([^\]]+)\]\]/g, (_m, id: string, label: string) =>
+      known.has(id)
+        ? `<button type="button" class="vlink" data-goto="${id}">${label}</button>`
+        : `<em>${label}</em>`
+    )
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/`(.+?)`/g, '<code>$1</code>');
+}
+
+function prose(body: string): string {
+  return body
+    .split(/\n{2,}/)
+    .map((p) => `<p>${inline(p.trim())}</p>`)
+    .join('');
+}
+
+const chapters: any[] = guide?.chapters ?? [];
+const phases: { name: string; items: any[] }[] = [];
+chapters.forEach((c) => {
+  const last = phases[phases.length - 1];
+  if (last && last.name === c.phase) last.items.push(c);
+  else phases.push({ name: c.phase, items: [c] });
+});
+
 const GROUP_ORDER = [
   'system', 'evaluation', 'rank', 'class', 'style', 'skill',
   'vessel', 'shadow', 'dungeon', 'boss', 'item', 'setting',
@@ -46,13 +107,11 @@ const grouped = GROUP_ORDER
 
 const other = nodes.filter((n) => !GROUP_ORDER.includes(n.category));
 if (other.length) grouped.push({ key: 'other', label: 'Other', items: other });
-
-const rootCount = nodes.filter((n) => !(n.parents ?? []).length).length;
 ---
 
 <Base
   title={`${d.short} Wiki — efkrdnzz`}
-  description={`An interactive wiki for ${d.title}. Explore classes, styles, vessels, gates and bosses as a connected map.`}
+  description={`A guide and interactive map for ${d.title}: what to do first, then next, with every class, style, vessel, gate and boss connected.`}
   mod={d.theme}
   bare
 >
@@ -67,7 +126,8 @@ const rootCount = nodes.filter((n) => !(n.parents ?? []).length).length;
       <div class="vbar__spacer"></div>
 
       <div class="vseg" role="group" aria-label="View mode">
-        <button type="button" data-view="graph" aria-pressed="true">Graph</button>
+        <button type="button" data-view="guide" aria-pressed="true">Guide</button>
+        <button type="button" data-view="graph" aria-pressed="false">Map</button>
         <button type="button" data-view="index" aria-pressed="false">Index</button>
       </div>
 
@@ -75,7 +135,7 @@ const rootCount = nodes.filter((n) => !(n.parents ?? []).length).length;
     </div>
 
     <div class="vstage">
-      <svg class="vstage__svg" role="application" aria-label={`${d.short} wiki map. Use the Index view for a plain list.`}>
+      <svg class="vstage__svg" role="application" aria-label={`${d.short} wiki map. Use the Guide or Index view for a readable version.`}>
         <g class="g-root">
           <g class="g-links"></g>
           <g class="g-nodes"></g>
@@ -105,12 +165,7 @@ const rootCount = nodes.filter((n) => !(n.parents ?? []).length).length;
         <b>Click</b> a node to open it &middot; <b>drag</b> to move &middot; <b>scroll</b> to zoom
       </div>
 
-      <aside
-        class="vpanel"
-        role="dialog"
-        aria-label="Page details"
-        aria-hidden="true"
-      >
+      <aside class="vpanel" role="dialog" aria-label="Page details" aria-hidden="true">
         <div class="vpanel__head">
           <div class="vpanel__eyebrow"></div>
           <h2 class="vpanel__title"></h2>
@@ -120,11 +175,94 @@ const rootCount = nodes.filter((n) => !(n.parents ?? []).length).length;
         <div class="vpanel__body"></div>
       </aside>
 
+      {guide && (
+        <div class="vguide is-open">
+          <div class="vguide__in">
+            <header class="vguide__head">
+              <p class="vguide__eyebrow">{d.title}</p>
+              <h1 class="vguide__title">{guide.intro.title}</h1>
+              <div class="vguide__lead" set:html={prose(guide.intro.body)} />
+            </header>
+
+            <nav class="vtoc" aria-label="Guide steps">
+              {chapters.map((c: any) => (
+                <a class="vtoc__item" href={`#${c.id}`}>
+                  <span class="vtoc__n">{String(c.n).padStart(2, '0')}</span>
+                  <span class="vtoc__t">{c.title}</span>
+                </a>
+              ))}
+            </nav>
+
+            {phases.map((ph) => (
+              <section class="vphase">
+                <h2 class="vphase__h">{ph.name}</h2>
+
+                {ph.items.map((c: any) => (
+                  <article class="vstep" id={c.id}>
+                    <div class="vstep__rail">
+                      <span class="vstep__n">{String(c.n).padStart(2, '0')}</span>
+                    </div>
+
+                    <div class="vstep__body">
+                      <h3 class="vstep__t">{c.title}</h3>
+                      <p class="vstep__goal">{c.goal}</p>
+                      {c.gate && <p class="vstep__gate">{c.gate}</p>}
+
+                      {CHAPTER_ART[c.id] && (
+                        <Image
+                          class="vstep__art"
+                          src={CHAPTER_ART[c.id]}
+                          alt=""
+                          widths={[420, 760]}
+                          sizes="(max-width: 700px) 100vw, 640px"
+                          loading="lazy"
+                          densities={undefined}
+                        />
+                      )}
+
+                      <div class="vstep__prose" set:html={prose(c.body)} />
+
+                      {c.checklist?.length > 0 && (
+                        <ul class="vcheck">
+                          {c.checklist.map((li: string) => (
+                            <li set:html={inline(li)} />
+                          ))}
+                        </ul>
+                      )}
+
+                      {c.nodes?.length > 0 && (
+                        <div class="vchips vchips--guide">
+                          {c.nodes
+                            .filter((id: string) => known.has(id))
+                            .map((id: string) => (
+                              <button type="button" class="vchip" data-goto={id}>
+                                {nodes.find((n) => n.id === id)?.title ?? id}
+                              </button>
+                            ))}
+                        </div>
+                      )}
+                    </div>
+                  </article>
+                ))}
+              </section>
+            ))}
+
+            <footer class="vguide__foot">
+              <p>
+                That is the spine of it. Everything else &mdash; every class, style, vessel,
+                gate, boss and item &mdash; is on the <button type="button" class="vlink" data-view-jump="graph">map</button>,
+                or listed in the <button type="button" class="vlink" data-view-jump="index">index</button>.
+              </p>
+            </footer>
+          </div>
+        </div>
+      )}
+
       <div class="vindex">
         <div class="vindex__in">
           <p class="vindex__lead">
-            Every page in the vault, grouped. {nodes.length} entries across {rootCount} sections
-            &mdash; pick one to open it on the map.
+            Every page in the vault, grouped. {nodes.length} entries &mdash; pick one to open it
+            on the map.
           </p>
 
           {grouped.map((g) => (

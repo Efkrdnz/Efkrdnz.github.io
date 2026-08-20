@@ -1,0 +1,158 @@
+{
+  "intro": {
+    "title": "Start here",
+    "body": "This is the order things happen in. Every underlined term opens that page on the map, so you can dip into detail and come straight back.\n\nYou do not need to read it all. If you are already levelling, jump to the step you are on."
+  },
+  "chapters": [
+    {
+      "phase": "Becoming a Hunter",
+      "n": 1,
+      "id": "step-evaluator",
+      "title": "Find the Evaluator",
+      "goal": "Get a class, a style and a rank",
+      "gate": "Any level",
+      "body": "Nothing in the mod opens until you are measured. Look for a **Hunter Rank Evaluator** and use it. The [[evaluation|Evaluation]] rolls three things: your [[classes|class]], your style within that class, and your [[ranks|Hunter rank]].\n\nClass and style can both be rerolled as many times as you like before you accept. Your **rank cannot be rerolled** — so if you are chasing a specific rank, your only lever is the world settings that control the odds.\n\nTake your time here. Accepting is what grants your first abilities, and nothing is handed out until you do.",
+      "checklist": [
+        "Reroll class and style freely — it costs nothing",
+        "Rank is fixed once rolled, so accept deliberately",
+        "Nothing is granted until you press accept"
+      ],
+      "nodes": ["evaluation", "classes", "ranks"]
+    },
+    {
+      "phase": "Becoming a Hunter",
+      "n": 2,
+      "id": "step-your-kit",
+      "title": "Learn what you actually have",
+      "goal": "Understand your panel and your first skills",
+      "gate": "Right after the Evaluation",
+      "body": "Press **N** to open the System panel. This is where everything lives: your stats, your skill points, your quests and your class information.\n\nYour style decides your native ability tree, not just a damage bonus. A [[classes|Fighter]] running one style plays nothing like the same class running another. Read your style page before you spend anything.\n\nTo fight: **R** cycles your selected skill, **Z** uses it. Keys **1** through **8** fire your equipped skill slots directly, and **X / C / V / B** are reserved for job abilities you get much later.",
+      "checklist": [
+        "N opens the System panel",
+        "R cycles the selected skill, Z uses it",
+        "1-8 fire equipped skill slots"
+      ],
+      "nodes": ["the-system", "classes", "skill-points"]
+    },
+    {
+      "phase": "Finding your feet",
+      "n": 3,
+      "id": "step-first-gates",
+      "title": "Clear your first gates",
+      "goal": "Learn the loop and start levelling",
+      "gate": "E and D rank gates",
+      "body": "[[gates|Gates]] are rifts that open into instanced dungeons. Each carries a [[gate-ranks|rank]] from E to S, and the rank tells you how hard what is inside will hit.\n\nStart at the bottom. E and D gates exist to teach you the loop: go in, clear it, take the reward, come out. Mine any [[mana-crystals|mana crystals]] you find — Silk Touch preserves the deposit and Fortune increases the yield.\n\nWatch your [[fatigue|Fatigue]]. It builds as you fight and it does not care that you were winning.",
+      "checklist": [
+        "Start with E and D gates, not what looks impressive",
+        "Fortune increases mana crystal yield",
+        "Fatigue builds while you fight"
+      ],
+      "nodes": ["gates", "gate-ranks", "fatigue", "mana-crystals"]
+    },
+    {
+      "phase": "Finding your feet",
+      "n": 4,
+      "id": "step-levelling",
+      "title": "Level up and spend your points",
+      "goal": "Turn kills into stats",
+      "gate": "Ongoing",
+      "body": "Every level costs `level x 16 + 8` XP, which means the total to reach level N is exactly `8 x N squared`. The curve is gentle early and steep late.\n\nEach level gives you **3 skill points** to spend in the panel. Points go into Strength, Vitality, Agility, Sense and Intelligence, and what those do depends heavily on how you fight — an Intelligence point is worth far more to a Mage than to a Tanker.\n\nThere is a ceiling: the default level cap is **150**, and reaching it is what reopens the [[cartenon-temple|Cartenon Temple]] for the last time.",
+      "checklist": [
+        "3 skill points per level",
+        "Default level cap is 150",
+        "Hitting the cap reopens the Cartenon Temple"
+      ],
+      "nodes": ["levels-and-xp", "skill-points", "the-system"]
+    },
+    {
+      "phase": "Becoming a Player",
+      "n": 5,
+      "id": "step-cartenon",
+      "title": "Claim the System at the Cartenon Temple",
+      "goal": "The second awakening",
+      "gate": "After you can handle mid-rank content",
+      "body": "Getting a job at the Evaluation made you a Hunter. The [[cartenon-temple|Cartenon Temple]] is what makes you a **Player** — the point where the System properly attaches itself to you.\n\nThe temple is guarded. [[statue-of-god|The Statue of God]] sits at its heart, with an arsenal of animated statues around it, and it is a real step up from anything a low-rank gate has shown you.\n\nCome prepared. This is the first fight in the mod that expects you to have actually built your character rather than just levelled it.",
+      "checklist": [
+        "This is the awakening that grants the System itself",
+        "The Statue of God guards it",
+        "Bring real gear, not starter gear"
+      ],
+      "nodes": ["cartenon-temple", "statue-of-god", "the-system"]
+    },
+    {
+      "phase": "Becoming a Player",
+      "n": 6,
+      "id": "step-dailies",
+      "title": "Make Daily Quests a habit",
+      "goal": "Free progression, on a timer",
+      "gate": "Once you are a Player",
+      "body": "The System starts setting you [[daily-quests|Daily Quests]]. They reset every day and they are the most reliable progression in the mod.\n\nThey are not optional in spirit. **Failing a daily carries a penalty**, and the penalty is designed to be unpleasant enough that you remember it. If your world has punishment switched off in the settings, this is much gentler.\n\nWhile you are out clearing gates, keep an eye out for [[urgent-quests|Urgent Quests]] — timed objectives that fire mid-dungeon, more often inside [[red-gates|Red Gates]] and procedural dungeons.",
+      "checklist": [
+        "Dailies reset every day",
+        "Failing one carries a penalty",
+        "Urgent Quests trigger mid-dungeon for extra rewards"
+      ],
+      "nodes": ["daily-quests", "urgent-quests", "titles"]
+    },
+    {
+      "phase": "Choosing your power",
+      "n": 7,
+      "id": "step-job-change",
+      "title": "Take the Job Change trial",
+      "goal": "Pick a Vessel and commit",
+      "gate": "Level 40 by default",
+      "body": "At level **40** — adjustable between 20 and 100 in world settings — the [[job-change-quest|Job Change Quest]] becomes available. This is the biggest decision in the mod.\n\nPassing it lets you take a [[vessels|Vessel]]: the inherited power of a Monarch or a Ruler. [[monarchs|Monarchs]] give you a themed skill tree that unlocks as you level. Rulers hand you their Spiritual Body Manifestation immediately and unlock shared Ruler abilities afterward.\n\nThe [[shadow-monarch|Shadow Monarch]] is the one most people come for — it is the path that lets you [[shadow-extraction|extract shadows]] from things you kill and build an army out of them.",
+      "checklist": [
+        "Level 40 by default, configurable 20-100",
+        "Monarchs unlock over time, Rulers start with their manifestation",
+        "Shadow Monarch is the extraction path"
+      ],
+      "nodes": ["job-change-quest", "vessels", "monarchs", "shadow-monarch"]
+    },
+    {
+      "phase": "Choosing your power",
+      "n": 8,
+      "id": "step-vessel-growth",
+      "title": "Grow into your Vessel",
+      "goal": "Unlock the tree you just committed to",
+      "gate": "Levels 55 through 120",
+      "body": "Vessel abilities are level-gated on a shared ladder: **55, 60, 65, 70, 75, 85, 90, 95, 100**, and finally **120** for [[spiritual-body-manifestation|Spiritual Body Manifestation]].\n\nIf you took the Shadow Monarch, your other axis of growth is the army itself — [[shadow-storage|how many shadows you can hold]], [[shadow-ranks|what rank they climb to]], and [[shadow-types|which ones you can get]]. Bosses you beat are candidates for extraction.\n\nAlongside this, [[runestones|runestones]] teach abilities permanently. The important rule: **a runestone works even when the ability does not belong to your class or style.** Your style decides what you are natively given, not what you are allowed to learn.",
+      "checklist": [
+        "Vessel skills unlock at fixed levels from 55 to 120",
+        "Runestones ignore class and style restrictions",
+        "Shadows grow their own ranks alongside you"
+      ],
+      "nodes": ["vessels", "runestones", "shadow-storage", "shadow-ranks"]
+    },
+    {
+      "phase": "The long climb",
+      "n": 9,
+      "id": "step-dkc",
+      "title": "Earn the key, climb the castle",
+      "goal": "Twenty floors and the Demon King",
+      "gate": "Secret Quest at level 30+, then the climb",
+      "body": "The [[secret-quest|Secret Quest]] becomes available from level 30 and is how you get the key to the [[demon-kings-castle|Demon King's Castle]] — a twenty-floor tower that is the mod's long endgame.\n\nThe floors escalate. [[dkc-vulcans-crucible|Vulcan]] holds Floor 10. Floor 15 puts a genuine choice in front of you at Radiru Castle: make a pact, or take what you want by force. At the summit, Baran waits with Kaiselin.\n\nIf you get stuck inside, you are not trapped: `/slr stuck` returns you to the current floor's entrance and `/slr dkc leave` abandons the castle while keeping your completed floors.",
+      "checklist": [
+        "Secret Quest unlocks at level 30",
+        "Twenty floors, with a real choice on Floor 15",
+        "/slr stuck and /slr dkc leave get you out safely"
+      ],
+      "nodes": ["secret-quest", "demon-kings-castle", "boss-dkc", "recovery-commands"]
+    },
+    {
+      "phase": "The long climb",
+      "n": 10,
+      "id": "step-endgame",
+      "title": "The far end",
+      "goal": "Manifestation, the cap, and what is left",
+      "gate": "Level 120 to 150",
+      "body": "[[spiritual-body-manifestation|Spiritual Body Manifestation]] is the top of every Vessel tree. For the Shadow Monarch specifically it wants four things at once: level **120**, shadow storage usage of **60**, Shadow Exchange unlocked, and **10** floors of the Demon King's Castle cleared.\n\nBeyond that sit the things that do not follow the main line. [[red-gates|Red Gates]] are frozen worlds you cannot simply walk out of. [[monarch-territories|Monarch Territories]] open onto the domains of individual Monarchs. And the hardest fights in the mod — [[boss-monarch|Monarch-tier bosses]] — are waiting whenever you think you are ready.\n\nThe climb ends at level **150**, which reopens the [[cartenon-temple|Cartenon Temple]] one last time.",
+      "checklist": [
+        "Shadow Manifestation needs all four conditions, not just level 120",
+        "Red Gates have no easy exit",
+        "Level 150 is the summit and reopens the Cartenon Temple"
+      ],
+      "nodes": ["spiritual-body-manifestation", "red-gates", "monarch-territories", "boss-monarch"]
+    }
+  ]
+}

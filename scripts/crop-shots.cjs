@@ -29,6 +29,10 @@ const MIN_ASPECT = 1.5;
 const OUT_W = 1280;
 const DENSITY_FLOOR = 0.1; // stop growing below 10% of peak density
 const GAP_TOLERANCE = 14; // sample columns of slack before giving up
+const HUD_TOP = 0.2; // health, mana, fatigue AND the battle bar live above this
+const HOTBAR_TOP = 0.9; // hotbar and chat live below this
+const DARK_TARGET = 78; // mean luminance a world shot is lifted toward
+const DARK_FLOOR = 62; // below this, a shot is too dark to read on the site
 
 function smooth(a, r) {
   const out = new Array(a.length).fill(0);
@@ -125,9 +129,13 @@ async function detect(file) {
         bottom: Math.min(d.H, d.box.bottom + pad),
       };
     } else {
-      const h = Math.round(d.H * 0.78);
-      const top = Math.round((d.H - h) * 0.38);
-      box = { left: 0, top, right: d.W, bottom: top + h };
+      /* Clear the HUD, not slice it. Starting the band at 8% cut the health and
+         mana bars in half and left the stubs floating at the top edge, which
+         reads as a broken image. Take the band between the HUD and the hotbar
+         instead - losing a little sky is cheaper than showing half a meter. */
+      const top = Math.round(d.H * HUD_TOP);
+      const bottom = Math.round(d.H * HOTBAR_TOP);
+      box = { left: 0, top, right: d.W, bottom };
     }
 
     let w = box.right - box.left;
@@ -151,11 +159,36 @@ async function detect(file) {
     );
     if (DRY) continue;
 
-    await sharp(src)
+    let pipe = sharp(src)
       .extract({ left: box.left, top: box.top, width: w, height: h })
-      .resize({ width: Math.min(OUT_W, w) })
-      .png({ compressionLevel: 9 })
-      .toFile(src + '.tmp');
+      .resize({ width: Math.min(OUT_W, w) });
+
+    /* Cave and temple interiors come out near-black, which disappears against
+       the site's own dark ground. Lift only what is genuinely too dark, and
+       only toward a target - a flat boost would wash out the bright UI shots. */
+    if (!d.isPanel) {
+      const st = await sharp(src)
+        .extract({ left: box.left, top: box.top, width: w, height: h })
+        .greyscale()
+        .stats();
+      const mean = st.channels[0].mean;
+      if (mean < DARK_FLOOR) {
+        /* modulate(), not gamma(). sharp's gamma darkens pre-resize and
+           re-brightens after - it exists to make resampling correct, not to
+           lift shadows, and on a mean of 11 it came out darker than it went in.
+           modulate() multiplies perceptual lightness, which is the actual job. */
+        const factor = Math.min(2.8, DARK_TARGET / Math.max(mean, 1));
+        pipe = pipe.modulate({ brightness: factor });
+        console.log(`  ^ lifting mean ${mean.toFixed(1)} by x${factor.toFixed(2)}`);
+      }
+    }
+
+    await pipe.png({ compressionLevel: 9 }).toFile(src + '.tmp');
     fs.renameSync(src + '.tmp', src);
+
+    if (!d.isPanel) {
+      const after = (await sharp(src).greyscale().stats()).channels[0].mean;
+      if (after < 26) console.log(`  ! still dark after lift: mean ${after.toFixed(1)}`);
+    }
   }
 })();

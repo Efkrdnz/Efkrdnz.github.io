@@ -1,0 +1,22 @@
+---
+import { url } from '../lib/util';
+---
+
+<footer class="site-footer">
+  <div class="shell site-footer__in">
+    <div>
+      <div>efkrdnzz &middot; Minecraft mods</div>
+      <div style="margin-top:6px;">Built with Astro. Hosted on GitHub Pages.</div>
+    </div>
+
+    <nav class="site-footer__links" aria-label="Footer">
+      <a href={url('/mods')}>Mods</a>
+      <a href={url('/about')}>About</a>
+      <a
+        href="https://www.curseforge.com/members/efkrdnzz/projects"
+        rel="noopener noreferrer"
+        target="_blank"
+      >CurseForge</a>
+    </nav>
+  </div>
+</footer>

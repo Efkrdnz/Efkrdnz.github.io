@@ -1,0 +1,72 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { url, full, compact } from '../lib/util';
+
+const mods = await getCollection('mods');
+const totalDownloads = mods.reduce((n, m) => n + m.data.downloads, 0);
+const collabs = mods.filter((m) => m.data.role === 'contributor');
+
+/* Everything on this page is drawn from real project data. The personal
+   bio is deliberately left for efkrdnzz to write — see the note below. */
+---
+
+<Base
+  title="About — efkrdnzz"
+  description="Minecraft mod developer behind Solo Leveling: Reawakening and nine other CurseForge projects."
+>
+  <section class="shell section">
+    <div class="section__head">
+      <div class="section__title">
+        <p class="eyebrow">About</p>
+        <h1 class="h2">Who is making these</h1>
+      </div>
+      <p class="mono-note">{compact(totalDownloads)} downloads across {mods.length} projects</p>
+    </div>
+
+    <div class="stack" style="max-width:62ch;gap:var(--s5);">
+      <p class="lede">
+        I build Minecraft mods that add systems rather than single items &mdash; gates
+        and dungeons, class progression, ability sets, and the gear that goes with
+        them. Most of it lives in the Adventure &amp; RPG and Magic corners of
+        CurseForge.
+      </p>
+
+      <p class="lede">
+        The largest is <a href={url('/mods/solo-leveling-reawakening')}>Solo Leveling:
+        Reawakening</a>, an unofficial adaptation of the manhwa, which accounts for
+        most of the download count above. The rest range from full ability mods down
+        to small quality-of-life pieces that do one thing well.
+      </p>
+
+      {collabs.length > 0 && (
+        <p class="lede">
+          Some of it is collaborative &mdash; {collabs.map((c) => c.data.title).join(' and ')}
+          {collabs.length === 1 ? ' is' : ' are'} built alongside{' '}
+          {[...new Set(collabs.map((c) => c.data.author))].join(' and ')}.
+        </p>
+      )}
+    </div>
+  </section>
+
+  <section class="shell section" style="padding-top:0;">
+    <div class="dl">
+      <div class="dl__copy">
+        <p class="eyebrow">Find the mods</p>
+        <h2 class="h3">Everything is on CurseForge</h2>
+        <p class="mono-note">Modrinth links go here once you publish there</p>
+      </div>
+      <div class="actions">
+        <a
+          class="btn btn--primary"
+          href="https://www.curseforge.com/members/efkrdnzz/projects"
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          CurseForge profile <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+        </a>
+        <a class="btn" href={url('/mods')}>All projects</a>
+      </div>
+    </div>
+  </section>
+</Base>

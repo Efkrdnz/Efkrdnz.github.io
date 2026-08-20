@@ -1,0 +1,85 @@
+---
+import '../styles/global.css';
+import '../styles/themes.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { url } from '../lib/util';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Stamps data-mod on <html> so themes.css can reskin the whole page. */
+  mod?: string;
+}
+
+const { title, description, mod } = Astro.props;
+
+/* Chakra Petch only ships on pages whose theme actually asks for it. */
+const needsHud = mod === 'slr';
+const fontHref =
+  'https://fonts.googleapis.com/css2' +
+  '?family=Archivo:wdth,wght@62..125,100..900' +
+  '&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400' +
+  '&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400' +
+  (needsHud ? '&family=Chakra+Petch:wght@500;600;700' : '') +
+  '&display=swap';
+
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+---
+
+<html lang="en" data-mod={mod ?? undefined}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <meta name="theme-color" content="#101317" />
+    <link rel="icon" href={url('/favicon.svg')} type="image/svg+xml" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href={fontHref} />
+
+    <link rel="sitemap" href={url('/sitemap-index.xml')} />
+  </head>
+
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+
+    <script>
+      /* Scroll reveals. One observer, unobserve after firing. */
+      const items = document.querySelectorAll('.reveal');
+      if (items.length) {
+        const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (reduce) {
+          items.forEach((el) => el.classList.add('is-in'));
+        } else {
+          const io = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((entry) => {
+                if (!entry.isIntersecting) return;
+                entry.target.classList.add('is-in');
+                io.unobserve(entry.target);
+              });
+            },
+            { rootMargin: '0px 0px -12% 0px', threshold: 0.05 }
+          );
+          items.forEach((el) => io.observe(el));
+        }
+      }
+    </script>
+  </body>
+</html>

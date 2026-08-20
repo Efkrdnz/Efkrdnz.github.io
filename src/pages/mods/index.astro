@@ -1,0 +1,67 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import ModTip from '../../components/ModTip.astro';
+import { full } from '../../lib/util';
+
+const all = (await getCollection('mods')).sort((a, b) => a.data.order - b.data.order);
+const mods = all.filter((m) => m.data.kind === 'mod');
+const packs = all.filter((m) => m.data.kind === 'modpack');
+const totalDownloads = all.reduce((n, m) => n + m.data.downloads, 0);
+---
+
+<Base
+  title="Mods — efkrdnzz"
+  description="Every Minecraft mod and modpack by efkrdnzz, ordered by downloads."
+>
+  <section class="shell section">
+    <div class="section__head">
+      <div class="section__title">
+        <p class="eyebrow">{all.length} projects</p>
+        <h1 class="h2">Mods &amp; modpacks</h1>
+      </div>
+      <p class="mono-note">{full(totalDownloads)} downloads total</p>
+    </div>
+
+    <div class="stack" style="gap:var(--s5);">
+      <p class="lede">
+        Rarity colour follows download count, so the shelf reads at a glance.
+        Every project links out to its CurseForge page.
+      </p>
+    </div>
+  </section>
+
+  <section class="shell" style="padding-bottom:var(--s8);">
+    <div class="section__head reveal">
+      <div class="section__title">
+        <p class="eyebrow">Mods</p>
+        <h2 class="h2">{mods.length} mods</h2>
+      </div>
+    </div>
+
+    <div class="grid">
+      {mods.map((mod) => (
+        <div class="reveal">
+          <ModTip mod={mod} />
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="shell" style="padding-bottom:var(--s8);">
+    <div class="section__head reveal">
+      <div class="section__title">
+        <p class="eyebrow">Modpacks</p>
+        <h2 class="h2">{packs.length} packs</h2>
+      </div>
+    </div>
+
+    <div class="grid">
+      {packs.map((mod) => (
+        <div class="reveal">
+          <ModTip mod={mod} />
+        </div>
+      ))}
+    </div>
+  </section>
+</Base>

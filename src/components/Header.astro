@@ -1,0 +1,26 @@
+---
+import { url } from '../lib/util';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const here = (Astro.url.pathname.replace(base, '') || '/').replace(/\/$/, '') || '/';
+const on = (p: string) => (p === '/' ? here === '/' : here.startsWith(p));
+---
+
+<header class="site-header">
+  <div class="shell site-header__in">
+    <a class="brand" href={url('/')}>
+      <span class="brand__mark" aria-hidden="true"></span>
+      efkrdnzz
+    </a>
+
+    <nav class="nav" aria-label="Primary">
+      <a href={url('/mods')} aria-current={on('/mods') ? 'page' : undefined}>Mods</a>
+      <a href={url('/about')} aria-current={on('/about') ? 'page' : undefined}>About</a>
+      <a
+        href="https://www.curseforge.com/members/efkrdnzz/projects"
+        rel="noopener noreferrer"
+        target="_blank"
+      >CurseForge</a>
+    </nav>
+  </div>
+</header>

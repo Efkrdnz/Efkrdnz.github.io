@@ -1,0 +1,27 @@
+---
+import Base from '../layouts/Base.astro';
+import { url } from '../lib/util';
+---
+
+<Base
+  title="Not found — efkrdnzz"
+  description="That page does not exist."
+>
+  <section class="shell hero" style="grid-template-columns:1fr;place-items:start;">
+    <div class="hero__copy" style="max-width:60ch;">
+      <p class="eyebrow">Error 404</p>
+      <h1 class="display" style="font-size:clamp(2.8rem,9vw,5.5rem);">Chunk not loaded</h1>
+      <hr class="hero__rule" />
+      <p class="lede">
+        Nothing generated at this address. The link is either wrong or points at a
+        page that has not been built yet.
+      </p>
+      <div class="actions">
+        <a class="btn btn--primary" href={url('/')}>
+          Back to the start <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+        </a>
+        <a class="btn" href={url('/mods')}>All mods</a>
+      </div>
+    </div>
+  </section>
+</Base>

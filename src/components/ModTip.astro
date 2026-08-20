@@ -1,0 +1,36 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { url, full } from '../lib/util';
+
+interface Props {
+  mod: CollectionEntry<'mods'>;
+  feature?: boolean;
+}
+
+const { mod, feature = false } = Astro.props;
+const d = mod.data;
+const credit = d.role === 'contributor' ? `with ${d.author}` : d.author;
+---
+
+<a
+  class:list={['tip', feature && 'tip--feature']}
+  data-rarity={d.rarity}
+  href={url(`/mods/${mod.id}`)}
+>
+  <span class="tip__top">
+    <span class="tip__name">{d.title}</span>
+    <span class="tip__badge">{d.kind}</span>
+  </span>
+
+  <p class="tip__lore">{d.tagline}</p>
+
+  {feature && <p class="tip__blurb">{d.blurb}</p>}
+
+  <span class="tip__spacer"></span>
+
+  <span class="tip__data">
+    <span class="tip__dl">{full(d.downloads)} downloads</span>
+    <span class="tip__cats">{d.categories.join(' \u00b7 ')}</span>
+    <span class="tip__source">{credit}</span>
+  </span>
+</a>

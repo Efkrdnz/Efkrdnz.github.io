@@ -1,0 +1,84 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import ModTip from '../components/ModTip.astro';
+import { url, compact, full } from '../lib/util';
+
+const mods = (await getCollection('mods')).sort((a, b) => a.data.order - b.data.order);
+const featured = mods.find((m) => m.data.featured) ?? mods[0];
+const rest = mods.filter((m) => m.id !== featured.id);
+
+const totalDownloads = mods.reduce((n, m) => n + m.data.downloads, 0);
+const modCount = mods.filter((m) => m.data.kind === 'mod').length;
+const packCount = mods.filter((m) => m.data.kind === 'modpack').length;
+---
+
+<Base
+  title="efkrdnzz — Minecraft mods"
+  description="Minecraft mod developer. Ten projects on CurseForge built around abilities, progression and boss fights, including Solo Leveling: Reawakening."
+>
+  <section class="shell hero">
+    <div class="hero__copy">
+      <p class="eyebrow enter enter--1">Minecraft mod developer</p>
+      <h1 class="display hero__name enter enter--2">efkrdnzz</h1>
+      <hr class="hero__rule enter enter--2" />
+      <p class="lede enter enter--3">
+        Ten projects on CurseForge, built around abilities, progression and the fights
+        that test them. Solo Leveling: Reawakening is the big one.
+      </p>
+      <div class="actions enter enter--4">
+        <a class="btn btn--primary" href={url('/mods')}>
+          Browse the mods <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+        </a>
+        <a class="btn" href={url(`/mods/${featured.id}`)}>
+          {featured.data.short}
+        </a>
+      </div>
+    </div>
+
+    <div class="enter enter--5">
+      <ModTip mod={featured} feature />
+    </div>
+  </section>
+
+  <section class="shell">
+    <div class="rail">
+      <div class="rail__cell">
+        <span class="rail__k">Total downloads</span>
+        <span class="rail__v" title={`${full(totalDownloads)} downloads`}>
+          {compact(totalDownloads)}
+        </span>
+      </div>
+      <div class="rail__cell">
+        <span class="rail__k">Projects</span>
+        <span class="rail__v">{mods.length}</span>
+      </div>
+      <div class="rail__cell">
+        <span class="rail__k">Mods &middot; Packs</span>
+        <span class="rail__v">{modCount} <small>/</small> {packCount}</span>
+      </div>
+      <div class="rail__cell">
+        <span class="rail__k">Published on</span>
+        <span class="rail__v" style="font-size:1rem;">CurseForge</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="shell section">
+    <div class="section__head reveal">
+      <div class="section__title">
+        <p class="eyebrow">Everything else</p>
+        <h2 class="h2">The rest of the shelf</h2>
+      </div>
+      <p class="mono-note">Ordered by downloads</p>
+    </div>
+
+    <div class="grid">
+      {rest.map((mod) => (
+        <div class="reveal">
+          <ModTip mod={mod} />
+        </div>
+      ))}
+    </div>
+  </section>
+</Base>

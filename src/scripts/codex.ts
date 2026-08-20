@@ -281,6 +281,16 @@ export function initCodex(): void {
     parentStone = '';
     rows.forEach((r) => r.classList.remove('is-sel'));
     svg.querySelectorAll('.m-node.is-sel').forEach((n) => n.classList.remove('is-sel'));
+
+    /* The drill-down came in with the panel, so it leaves with it. Dimming
+       every other stone with nothing open to justify it just looks broken.
+       The view only springs back if it was focus that moved it — a pan or
+       zoom the reader did by hand is theirs to keep. */
+    if (mapBox.dataset.focus) {
+      clearFocus();
+      ease({ x: 0, y: 0, k: 1 });
+    }
+
     writeHash();
     opener?.focus({ preventScroll: true });
     opener = null;
@@ -632,17 +642,22 @@ export function initCodex(): void {
     if (gem) {
       opener = gem as unknown as HTMLElement;
       const key = gem.dataset.stone!;
-      if (mapBox.dataset.focus === key && mode === 'stone') {
-        closePanel();
-        clearFocus();
-      } else showStone(key);
+      /* Clicking the gem of the stone already open closes it again.
+         closePanel now drops the focus itself. */
+      if (mapBox.dataset.focus === key && mode === 'stone') closePanel();
+      else showStone(key);
       return;
     }
 
     const node = target.closest<SVGGElement>('[data-node]');
     if (node) {
+      const ref = node.dataset.node!;
       opener = node as unknown as HTMLElement;
-      showAbility(node.dataset.node!, mapBox.dataset.focus ?? '');
+      /* "Back to the stone" is only offered when you actually arrived from
+         that stone's list. Clicking across into another sector is a jump,
+         not a descent, so it gets no back link pointing at where you were. */
+      const from = abilityOf.get(ref)?.stone === mapBox.dataset.focus ? mapBox.dataset.focus! : '';
+      showAbility(ref, from);
       return;
     }
 
@@ -664,14 +679,14 @@ export function initCodex(): void {
     showStone(gem.dataset.stone!);
   });
 
+  /* Focus is a view state — which stone you are looking at — and a view state
+     must never make anything unreachable. A dimmed sector stays fully
+     clickable, and clicking into it moves the highlight there. Only the
+     filter, which is a query, takes orbs out of play. */
   function focusSector(key: string) {
     mapBox.dataset.focus = key;
     svg.querySelectorAll('.m-sector').forEach((s) => {
       s.classList.toggle('is-focus', (s as SVGGElement).dataset.sector === key);
-      /* Only the focused fan is reachable by pointer, so a dimmed sector
-         cannot swallow a click meant for the one on top of it. */
-      (s as SVGGElement).style.pointerEvents =
-        (s as SVGGElement).dataset.sector === key ? 'auto' : 'none';
     });
     if (view !== 'matrix') return;
     const gem = svg.querySelector<SVGGElement>(`[data-stone="${CSS.escape(key)}"] .m-hit`);
@@ -689,10 +704,7 @@ export function initCodex(): void {
 
   function clearFocus() {
     delete mapBox.dataset.focus;
-    svg.querySelectorAll('.m-sector').forEach((s) => {
-      s.classList.remove('is-focus');
-      (s as SVGGElement).style.pointerEvents = '';
-    });
+    svg.querySelectorAll('.m-sector').forEach((s) => s.classList.remove('is-focus'));
   }
 
 

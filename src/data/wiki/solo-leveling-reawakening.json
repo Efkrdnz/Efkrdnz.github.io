@@ -4319,7 +4319,8 @@
    "related": [
     "gates",
     "red-gates",
-    "dungeon-break"
+    "dungeon-break",
+    "magic-reader"
    ],
    "facts": [
     {
@@ -6382,7 +6383,9 @@
    "tagline": "Weapons, runestones and equipment",
    "summary": "Everything you can carry: the ranked weapon ladder, unique weapons, runestones that teach skills, armor, potions and keys.",
    "parents": [],
-   "related": []
+   "related": [
+    "magic-reader"
+   ]
   },
   {
    "id": "settings",
@@ -6963,6 +6966,75 @@
     "the-system"
    ],
    "status": "live"
+  },
+  {
+   "id": "magic-reader",
+   "title": "Magic Reader",
+   "category": "item",
+   "tagline": "Measure a gate before you walk into it",
+   "status": "live",
+   "parents": [
+    "items"
+   ],
+   "summary": "A handheld device that does two jobs: right-click the air and it points you at the closest gate, or hold it while you interact with a gate and it reads that gate's mana level as a number. The number tells you the rank. **It has to be in your main hand** - off-hand does nothing.",
+   "facts": [
+    {
+     "label": "E rank",
+     "value": "101 - 199"
+    },
+    {
+     "label": "D rank",
+     "value": "201 - 399"
+    },
+    {
+     "label": "C rank",
+     "value": "401 - 599"
+    },
+    {
+     "label": "B rank",
+     "value": "601 - 799"
+    },
+    {
+     "label": "A rank",
+     "value": "801 - 999"
+    },
+    {
+     "label": "S rank",
+     "value": "1001 - 1499"
+    },
+    {
+     "label": "Unreadable",
+     "value": "`9999`, `ERROR`, `N/A`, `Cannot Read!`"
+    },
+    {
+     "label": "Requirement",
+     "value": "Held in the main hand"
+    }
+   ],
+   "sections": [
+    {
+     "heading": "Reading the number",
+     "body": "The reading appears in chat as `Magic Reading: <number>`. The exact figure is rolled fresh each time inside that rank's band, so reading the same gate twice gives two different numbers - the **band** is the information, not the digits.\n\nThe bands never overlap and never touch. Nothing ever reads 200, 400, 600, 800 or exactly 1000, so any number you see belongs to exactly one rank with no ambiguity at the edges."
+    },
+    {
+     "heading": "When it fails, that is the answer",
+     "body": "Three gates refuse to be read and return `9999`, `ERROR`, `N/A` or `Cannot Read!` at random: the **[[red-gates|Red Gate]]**, the **Ant Nest** that holds [[beru|Beru]], and the **S-rank gate**.\n\nThat is not a broken device. Those are the three that outrun the scale, and an error where you expected a number is the warning. Treat a failed reading as worse than 1499, not as no data."
+    },
+    {
+     "heading": "What the fixed gates read",
+     "body": "Named gates always report the same rank, so once you learn them you can skip the reader:\n\n**D** - Goblin Sewers, and the plain Gate.\n\n**C** - Ancient Golem Cave, Giant Spider cave.\n\n**B** - Cemetery, Lush Cave.\n\n**A** - Abandoned Lab, Kargalgan's Throne Room.\n\nProcedural and datapack gates have no fixed answer - they report whatever rank they actually rolled, which is the case the reader is really for."
+    },
+    {
+     "heading": "Finding a gate at all",
+     "body": "Right-clicking the Magic Reader on nothing opens a small screen showing the **X, Y and Z of the closest gate**. Useful when you know one spawned somewhere nearby and do not want to comb the landscape for it."
+    }
+   ],
+   "related": [
+    "gates",
+    "gate-ranks",
+    "red-gates",
+    "beru"
+   ]
   }
  ]
 }

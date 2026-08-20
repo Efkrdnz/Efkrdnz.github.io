@@ -15,7 +15,7 @@ loaders: ["Forge"]
 mcVersions: ["1.20.1"]
 featured: true
 order: 1
-hasGuide: false
+hasGuide: true
 features:
   - k: "World"
     t: "Gates"

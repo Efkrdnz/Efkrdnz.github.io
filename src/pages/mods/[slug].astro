@@ -26,7 +26,9 @@ const platforms = d.modrinth ? 'CurseForge and Modrinth' : 'CurseForge';
     <nav class="subnav" aria-label={`${d.short} sections`}>
       <div class="shell subnav__in">
         <a class="subnav__link" href={url(`/mods/${mod.id}`)} aria-current="page">Overview</a>
-        <span class="subnav__soon">Guide</span>
+        {d.hasGuide
+          ? <a class="subnav__link" href={url(`/mods/${mod.id}/guide`)}>Guide</a>
+          : <span class="subnav__soon">Guide</span>}
         <span class="subnav__soon">Changelog</span>
         <a class="subnav__link" href="#download">Download</a>
         <a class="subnav__link" href={url('/mods')} style="margin-left:auto;">&larr; All mods</a>
@@ -102,7 +104,7 @@ const platforms = d.modrinth ? 'CurseForge and Modrinth' : 'CurseForge';
         </div>
 
         <div class="sys__foot">
-          <span>{isHud ? 'awaiting guide data' : 'guide not written yet'}</span>
+          <span>{d.hasGuide ? 'guide online' : isHud ? 'awaiting guide data' : 'guide not written yet'}</span>
           <span class="sys__caret" aria-hidden="true"></span>
         </div>
       </aside>
@@ -130,17 +132,34 @@ const platforms = d.modrinth ? 'CurseForge and Modrinth' : 'CurseForge';
     )}
 
     <section class="shell section" style="padding-top:var(--s6);">
-      <div class="pending reveal">
-        <span class="pending__mark" aria-hidden="true">!</span>
-        <div class="pending__body">
-          <span class="pending__t">Guide in progress</span>
-          <p class="pending__d">
-            The wiki for {d.short} is not written yet. When it lands it will live at
-            <code>/mods/{mod.id}/guide</code>, with the changelog and a version table
-            alongside it.
-          </p>
+      {d.hasGuide ? (
+        <div class="dl reveal">
+          <div class="dl__copy">
+            <p class="eyebrow">Wiki</p>
+            <h2 class="h3">Explore {d.short} as a map</h2>
+            <p class="mono-note">
+              Classes, styles, vessels, gates and bosses — connected and clickable
+            </p>
+          </div>
+          <div class="actions">
+            <a class="btn btn--primary" href={url(`/mods/${mod.id}/guide`)}>
+              Open the Vault <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+            </a>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div class="pending reveal">
+          <span class="pending__mark" aria-hidden="true">!</span>
+          <div class="pending__body">
+            <span class="pending__t">Guide in progress</span>
+            <p class="pending__d">
+              The wiki for {d.short} is not written yet. When it lands it will live at
+              <code>/mods/{mod.id}/guide</code>, with the changelog and a version table
+              alongside it.
+            </p>
+          </div>
+        </div>
+      )}
     </section>
 
     <section class="shell section" id="download" style="padding-top:0;">

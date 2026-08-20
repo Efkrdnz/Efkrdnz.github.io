@@ -10,9 +10,11 @@ interface Props {
   description: string;
   /** Stamps data-mod on <html> so themes.css can reskin the whole page. */
   mod?: string;
+  /** Full-bleed pages (the wiki graph) own the viewport and drop the footer. */
+  bare?: boolean;
 }
 
-const { title, description, mod } = Astro.props;
+const { title, description, mod, bare = false } = Astro.props;
 
 /* Chakra Petch only ships on pages whose theme actually asks for it. */
 const needsHud = mod === 'slr';
@@ -57,7 +59,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
     <main id="main">
       <slot />
     </main>
-    <Footer />
+    {!bare && <Footer />}
 
     <script>
       /* Scroll reveals. One observer, unobserve after firing. */

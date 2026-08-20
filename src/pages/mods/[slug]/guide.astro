@@ -1,0 +1,154 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../../layouts/Base.astro';
+import { url } from '../../../lib/util';
+import '../../../styles/vault.css';
+
+export async function getStaticPaths() {
+  const mods = await getCollection('mods');
+  return mods
+    .filter((m) => m.data.hasGuide)
+    .map((mod) => ({ params: { slug: mod.id }, props: { mod } }));
+}
+
+const { mod } = Astro.props;
+const d = mod.data;
+
+/* One JSON file per mod that has a wiki. Adding another mod's guide is a new
+   file here plus hasGuide: true in its frontmatter — no code changes. */
+const wikis = import.meta.glob<{ default: { nodes: any[] } }>(
+  '../../../data/wiki/*.json',
+  { eager: true }
+);
+const entry = Object.entries(wikis).find(([path]) => path.endsWith(`/${mod.id}.json`));
+const nodes: any[] = entry ? (entry[1].default.nodes ?? []) : [];
+
+/* The Index view is rendered on the server, so the page has real crawlable
+   text and still works with JavaScript switched off. */
+const GROUP_ORDER = [
+  'system', 'evaluation', 'rank', 'class', 'style', 'skill',
+  'vessel', 'shadow', 'dungeon', 'boss', 'item', 'setting',
+];
+const GROUP_LABEL: Record<string, string> = {
+  system: 'The System', evaluation: 'Evaluation', rank: 'Hunter ranks',
+  class: 'Classes', style: 'Styles', skill: 'Skills', vessel: 'Vessels',
+  shadow: 'Shadows', dungeon: 'Dungeons & gates', boss: 'Bosses',
+  item: 'Items & gear', setting: 'Settings & tools',
+};
+
+const grouped = GROUP_ORDER
+  .map((key) => ({
+    key,
+    label: GROUP_LABEL[key] ?? key,
+    items: nodes.filter((n) => n.category === key),
+  }))
+  .filter((g) => g.items.length > 0);
+
+const other = nodes.filter((n) => !GROUP_ORDER.includes(n.category));
+if (other.length) grouped.push({ key: 'other', label: 'Other', items: other });
+
+const rootCount = nodes.filter((n) => !(n.parents ?? []).length).length;
+---
+
+<Base
+  title={`${d.short} Wiki — efkrdnzz`}
+  description={`An interactive wiki for ${d.title}. Explore classes, styles, vessels, gates and bosses as a connected map.`}
+  mod={d.theme}
+  bare
+>
+  <div class="vault" data-vault>
+    <div class="vbar">
+      <a class="vbar__brand" href={url(`/mods/${mod.id}`)}>{d.short} Vault</a>
+
+      <div class="vbar__search">
+        <input type="search" placeholder="Search the vault…" aria-label="Search the vault" />
+      </div>
+
+      <div class="vbar__spacer"></div>
+
+      <div class="vseg" role="group" aria-label="View mode">
+        <button type="button" data-view="graph" aria-pressed="true">Graph</button>
+        <button type="button" data-view="index" aria-pressed="false">Index</button>
+      </div>
+
+      <button type="button" class="vbtn" data-reset>Reset</button>
+    </div>
+
+    <div class="vstage">
+      <svg class="vstage__svg" role="application" aria-label={`${d.short} wiki map. Use the Index view for a plain list.`}>
+        <g class="g-root">
+          <g class="g-links"></g>
+          <g class="g-nodes"></g>
+        </g>
+      </svg>
+
+      <div class="vlegend" aria-hidden="true">
+        <div class="vlegend__h">How to read this</div>
+        <div class="vlegend__ramp">
+          <i style="background:#A6E9FF"></i>
+          <i style="background:#3FC6FF"></i>
+          <i style="background:#2C90C4"></i>
+          <i style="background:#1E6B94"></i>
+        </div>
+        <div class="vlegend__scale"><span>broad</span><span>specific</span></div>
+        <div class="vlegend__row">
+          <svg width="16" height="16" viewBox="-8 -8 16 16"><path d="M0,-7L6.06,-3.5L6.06,3.5L0,7L-6.06,3.5L-6.06,-3.5Z" fill="#3FC6FF"/></svg>
+          <span>opens further</span>
+        </div>
+        <div class="vlegend__row">
+          <svg width="16" height="16" viewBox="-8 -8 16 16"><path d="M0,-5L4.33,-2.5L4.33,2.5L0,5L-4.33,2.5L-4.33,-2.5Z" fill="#060A16" stroke="#2C90C4" stroke-width="1.6"/></svg>
+          <span>final page</span>
+        </div>
+      </div>
+
+      <div class="vhint">
+        <b>Click</b> a node to open it &middot; <b>drag</b> to move &middot; <b>scroll</b> to zoom
+      </div>
+
+      <aside
+        class="vpanel"
+        role="dialog"
+        aria-label="Page details"
+        aria-hidden="true"
+      >
+        <div class="vpanel__head">
+          <div class="vpanel__eyebrow"></div>
+          <h2 class="vpanel__title"></h2>
+          <p class="vpanel__tag"></p>
+          <button type="button" class="vpanel__close" aria-label="Close panel">&#10005;</button>
+        </div>
+        <div class="vpanel__body"></div>
+      </aside>
+
+      <div class="vindex">
+        <div class="vindex__in">
+          <p class="vindex__lead">
+            Every page in the vault, grouped. {nodes.length} entries across {rootCount} sections
+            &mdash; pick one to open it on the map.
+          </p>
+
+          {grouped.map((g) => (
+            <section class="vgroup">
+              <h2 class="vgroup__h">{g.label} &middot; {g.items.length}</h2>
+              <div class="vlist">
+                {g.items.map((n: any) => (
+                  <button type="button" class="vitem" data-goto={n.id}>
+                    <span class="vitem__t">{n.title}</span>
+                    <span class="vitem__d">{n.tagline}</span>
+                  </button>
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <script type="application/json" id="vault-data" set:html={JSON.stringify(nodes)} is:inline></script>
+  </div>
+
+  <script>
+    import { initVault } from '../../../scripts/vault';
+    initVault();
+  </script>
+</Base>

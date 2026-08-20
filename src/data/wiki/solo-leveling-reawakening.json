@@ -2008,7 +2008,10 @@
     "daily-quests",
     "skill-points",
     "evaluation",
-    "story-mode"
+    "story-mode",
+    "guilds",
+    "system-shop",
+    "system-crafting"
    ],
    "parents": []
   },
@@ -4499,7 +4502,8 @@
    "related": [
     "gates",
     "red-gates",
-    "urgent-quests"
+    "urgent-quests",
+    "guilds"
    ],
    "facts": [
     {
@@ -6750,6 +6754,215 @@
     "items"
    ],
    "related": []
+  },
+  {
+   "id": "guilds",
+   "title": "Guilds",
+   "category": "system",
+   "tagline": "Found one, level it, and hire hunters to raid for you",
+   "parents": [
+    "the-system"
+   ],
+   "summary": "A guild is a persistent organisation with its own level, its own XP and its own passive buffs that apply to every member. It also lets you hire NPC hunters and send them into gates without going yourself.",
+   "facts": [
+    {
+     "label": "Where",
+     "value": "The Guild Computer block"
+    },
+    {
+     "label": "Member cap",
+     "value": "25 hunters"
+    },
+    {
+     "label": "Guild XP per level",
+     "value": "level squared x 500"
+    },
+    {
+     "label": "Rank badge",
+     "value": "E, D, C, B, A at levels 1-5, then S"
+    },
+    {
+     "label": "Invites",
+     "value": "Expire after 2 minutes"
+    }
+   ],
+   "sections": [
+    {
+     "heading": "Levelling a guild",
+     "body": "A guild carries its own level, separate from yours. Reaching the next level costs **level squared x 500** guild XP, so level 2 costs 500, level 5 costs 12,500, and level 10 costs 50,000.\n\nThe level drives everything else: which buffs are available, how large your recruit pool is, and the rank badge shown beside the guild name. Levels 1 to 5 read E, D, C, B and A; level 6 and above read **S**."
+    },
+    {
+     "heading": "Buffs",
+     "body": "A guild runs passive buffs that apply to its members. You start with **one buff slot**, and a **second unlocks at guild level 10** - so a mature guild runs two at once. See [[guild-buffs|Guild Buffs]] for the full list and what each one does."
+    },
+    {
+     "heading": "Hiring hunters",
+     "body": "Guilds can recruit NPC hunters. The pool you can pick from grows with the guild - **3 + your guild level**, capped at 10 candidates - and the guild holds up to **25 hunters** in total no matter how high the level goes.\n\nHired hunters are organised into **five teams of five**. Each team is assigned a maximum gate rank it will raid, from E through S, and then deploys on its own. It is the part of the guild that keeps earning while you are doing something else."
+    }
+   ],
+   "related": [
+    "guild-buffs",
+    "parties",
+    "gates"
+   ],
+   "status": "live"
+  },
+  {
+   "id": "guild-buffs",
+   "title": "Guild Buffs",
+   "category": "system",
+   "tagline": "Nine passives, unlocked by guild level",
+   "parents": [
+    "guilds"
+   ],
+   "summary": "Guild buffs apply to every member. You run one at a time until guild level 10, which opens a second slot. Each buff has its own unlock level.",
+   "facts": [
+    {
+     "label": "Lv 2",
+     "value": "**Physical Conditioning** - +15% physical damage."
+    },
+    {
+     "label": "Lv 3",
+     "value": "**Arcane Circulation** - +10% magic damage and +10% mana recovery speed."
+    },
+    {
+     "label": "Lv 4",
+     "value": "**Defensive Formation** - +15% damage reduction while blocking, and +8% briefly after being hit."
+    },
+    {
+     "label": "Lv 5",
+     "value": "**Assassin Footwork** - +12% movement speed in combat, and a 10% chance to dodge incoming damage."
+    },
+    {
+     "label": "Lv 6",
+     "value": "**Hunter's Precision** - +15% critical damage, and a 5% chance for a precision critical hit."
+    },
+    {
+     "label": "Lv 7",
+     "value": "**Combat Recovery** - +20% healing received, and restores mana on kills."
+    },
+    {
+     "label": "Lv 8",
+     "value": "**Mana Efficiency** - Refunds 25% of the mana you spend."
+    },
+    {
+     "label": "Lv 9",
+     "value": "**Battle Rhythm** - +12% damage while chaining class-skill hits."
+    },
+    {
+     "label": "Lv 10",
+     "value": "**System Sponsorship** - +15% XP gained from the System."
+    }
+   ],
+   "sections": [
+    {
+     "heading": "Picking one",
+     "body": "The unlock level is the guild level, not yours. A level 4 guild can choose between Physical Conditioning, Arcane Circulation and Defensive Formation, and nothing further up the list.\n\nBecause you only get one slot early, the choice is real: **Physical Conditioning** and **Arcane Circulation** split cleanly along how your members actually deal damage, and **System Sponsorship** at level 10 is the one that compounds, since it speeds up everyone's levelling rather than any single fight."
+    }
+   ],
+   "related": [
+    "guilds",
+    "levels-and-xp"
+   ],
+   "status": "live"
+  },
+  {
+   "id": "system-shop",
+   "title": "System Shop",
+   "category": "system",
+   "tagline": "Spend Golds on weapons, potions, food and oddities",
+   "parents": [
+    "the-system"
+   ],
+   "summary": "The Shop button in the System panel opens a store with four tabs. Everything is bought with **Golds**.",
+   "facts": [
+    {
+     "label": "Currency",
+     "value": "Golds"
+    },
+    {
+     "label": "Tabs",
+     "value": "Weapons, Potions, Foods, Misc"
+    },
+    {
+     "label": "Opened from",
+     "value": "System panel > Shop"
+    }
+   ],
+   "sections": [
+    {
+     "heading": "Weapons",
+     "body": "The ranked ladder, sold by rank with its damage printed on the entry: **E 5**, **D 6**, **C 7**, **B 8**, **A 9**, **S 11** damage. A steady, unexciting curve - shop weapons are a floor to stand on, not a substitute for [[unique-weapons|named drops]]."
+    },
+    {
+     "heading": "Potions",
+     "body": "Three ladders, each in three sizes. Health restores **+5**, **+20**, or **Full HP**. Mana restores **+1000**, **+5000** or **+10000 MP**. Fatigue removes **10**, **50** or **100 FTG**.\n\nThe fatigue bottles are the ones people forget to buy and then need - see [[fatigue|Fatigue]]."
+    },
+    {
+     "heading": "Misc",
+     "body": "The interesting tab. Gold bundles at 3,000, 10,000 and 20,000, plus a **Class Changer**, a **Special Random Box** and a **Special Selection Box** - random versus pick-your-own, the usual trade.\n\nThe Misc tab can be switched off for a world with the `soloMiscItems` gamerule, so a server can decide the Class Changer is not something it wants sold."
+    }
+   ],
+   "related": [
+    "ranked-weapons",
+    "potions",
+    "keys-and-boxes",
+    "world-settings"
+   ],
+   "status": "live"
+  },
+  {
+   "id": "system-crafting",
+   "title": "System Crafting",
+   "category": "system",
+   "tagline": "Three slots, three recipes, one very good sword",
+   "parents": [
+    "the-system"
+   ],
+   "summary": "The Craft button in the System panel opens a three-slot bench. It is not a crafting table: it takes one specific combination per recipe and has only a handful of them.",
+   "facts": [
+    {
+     "label": "Opened from",
+     "value": "System panel > Craft"
+    },
+    {
+     "label": "Slot 1",
+     "value": "Weapon or Rune"
+    },
+    {
+     "label": "Slot 2",
+     "value": "Potion or Powerstone"
+    },
+    {
+     "label": "Slot 3",
+     "value": "Manastone"
+    },
+    {
+     "label": "Recipes",
+     "value": "3"
+    }
+   ],
+   "sections": [
+    {
+     "heading": "Kamish's Wrath",
+     "body": "**Stick** + **Kamish Tooth** + **S-rank Mana Crystal** produces **[[unique-weapons|Kamish's Wrath]]**.\n\nThe tooth comes off [[kamish|Kamish]] himself, which is the hard part. The stick is a stick."
+    },
+    {
+     "heading": "Kamish's Wrath - Twin Fang",
+     "body": "Swap the stick for a **Blaze Rod** and the same tooth and S-rank crystal produce the **Twin Fang** variant instead.\n\nSame two rare inputs, different handle, different weapon. Decide which one you want before you spend the tooth."
+    },
+    {
+     "heading": "Holy Water of Life",
+     "body": "**Purified Blood of the Demon King** + **World Tree's Fragment** + **Spring Water of the Echoing Forest** produces **six** Holy Water of Life.\n\nThe only recipe that returns a stack rather than a single item."
+    }
+   ],
+   "related": [
+    "unique-weapons",
+    "kamish",
+    "mana-crystals",
+    "the-system"
+   ],
+   "status": "live"
   }
  ]
 }

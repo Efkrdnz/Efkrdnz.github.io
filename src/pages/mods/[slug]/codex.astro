@@ -1,0 +1,590 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../../layouts/Base.astro';
+import { url } from '../../../lib/util';
+import '../../../styles/codex.css';
+
+export async function getStaticPaths() {
+  const mods = await getCollection('mods');
+  return mods
+    .filter((m) => m.data.hasCodex)
+    .map((mod) => ({ params: { slug: mod.id }, props: { mod } }));
+}
+
+const { mod } = Astro.props;
+const d = mod.data;
+
+/* One codex file per mod, matched by id — same convention the rest of the
+   site uses, so adding a second codex is a JSON file and a frontmatter flag. */
+const files = import.meta.glob<{ default: any }>('../../../data/codex/*.json', { eager: true });
+const entry = Object.entries(files).find(([p]) => p.endsWith(`/${mod.id}.json`));
+if (!entry) throw new Error(`codex data missing for ${mod.id} — run node scripts/build-codex.cjs`);
+const cx = entry[1].default;
+
+/* The series band is shared with the home page, so it is read from the
+   series file rather than duplicated into every module's codex. */
+const seriesFiles = import.meta.glob<{ default: any }>('../../../data/series/*.json', { eager: true });
+const series = Object.values(seriesFiles)[0].default;
+
+const stones: any[] = cx.stones;
+const abilities: any[] = cx.abilities;
+const controls: Record<string, { label: string; note: string }> = cx.controls;
+const roles: Record<string, string> = cx.roles;
+
+const byKey = Object.fromEntries(stones.map((s) => [s.key, s]));
+const abilityOf = Object.fromEntries(abilities.map((a) => [a.ref, a]));
+
+/* Control schemes ordered by how many abilities actually use them, so the
+   reference table leads with the ones a player meets first. */
+const controlUse: Record<string, number> = {};
+for (const a of abilities) controlUse[a.control] = (controlUse[a.control] ?? 0) + 1;
+const controlList = Object.keys(controls)
+  .map((k) => ({ k, ...controls[k], n: controlUse[k] ?? 0 }))
+  .sort((a, b) => b.n - a.n || a.label.localeCompare(b.label));
+
+const roleList = Object.entries(roles).map(([k, label]) => ({ k, label }));
+
+/* ── matrix layout ────────────────────────────────────────────────────────
+   Computed here rather than in the browser so the map is real markup: it
+   renders with JavaScript off, and the script only adds pan, zoom and focus.
+
+   Seven equal sectors. Infinity leads at the top because it is the state the
+   gauntlet reaches, not one of the six you collect. */
+const ORDER = ['infinity', 'space', 'power', 'reality', 'time', 'soul', 'mind'];
+const SECTOR = 360 / ORDER.length;
+const USABLE = 44; // degrees of the sector a fan may occupy
+const RINGS = [235, 305, 375, 445];
+const SPACING = 30; // arc px between neighbouring nodes
+const GEM_R = 132;
+const HUB_R = 68;
+
+const rad = (deg: number) => (deg * Math.PI) / 180;
+const px = (r: number, deg: number) => [
+  +(r * Math.cos(rad(deg))).toFixed(2),
+  +(r * Math.sin(rad(deg))).toFixed(2),
+];
+
+function hexPath(r: number) {
+  return (
+    [-90, -30, 30, 90, 150, 210]
+      .map((a, i) => `${i ? 'L' : 'M'}${px(r, a).join(',')}`)
+      .join('') + 'Z'
+  );
+}
+
+function arcPath(r: number, center: number, span: number) {
+  const [x1, y1] = px(r, center - span / 2);
+  const [x2, y2] = px(r, center + span / 2);
+  return `M${x1},${y1}A${r},${r} 0 0 1 ${x2},${y2}`;
+}
+
+const sectors = ORDER.map((key, i) => {
+  const stone = byKey[key];
+  const center = -90 + i * SECTOR;
+  const mine = abilities.filter((a) => a.stone === key);
+
+  /* Fill inner rings first at a fixed angular pitch, so a stone with fewer
+     abilities reads as a smaller fan rather than a stretched one. */
+  const placed: any[] = [];
+  let cursor = 0;
+  RINGS.forEach((r, ringIndex) => {
+    const cap = Math.max(1, Math.floor(((2 * Math.PI * r * USABLE) / 360) / SPACING));
+    const last = ringIndex === RINGS.length - 1;
+    const take = last ? mine.length - cursor : Math.min(cap, mine.length - cursor);
+    if (take <= 0) return;
+    const pitch = USABLE / Math.max(cap, take);
+    for (let j = 0; j < take; j++) {
+      const a = mine[cursor + j];
+      const deg = center + (j - (take - 1) / 2) * pitch;
+      const [x, y] = px(r, deg);
+      placed.push({ ...a, x, y, r, deg });
+    }
+    cursor += take;
+  });
+
+  const [gx, gy] = px(GEM_R, center);
+  const [lx, ly] = px(GEM_R + 40, center);
+  const [ex, ey] = px(RINGS[RINGS.length - 1] + 26, center);
+
+  return { stone, center, gx, gy, lx, ly, ex, ey, nodes: placed };
+});
+
+const VB = RINGS[RINGS.length - 1] + 110;
+
+/* ── inline formatting ────────────────────────────────────────────────────
+   The systems copy carries **emphasis** and `code`; nothing else. Escaping
+   first means the source can contain angle brackets without being markup. */
+function esc(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function inline(s: string): string {
+  return esc(s)
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/`(.+?)`/g, '<code>$1</code>');
+}
+
+const totalOriginal = abilities.filter((a) => a.origin === 'original').length;
+const pageTitle = `${d.short} Codex`;
+---
+
+<Base
+  title={`${d.short} Codex — efkrdnzz`}
+  description={`Every Infinity Stone in ${d.title} and all ${abilities.length} of their abilities: what each one does, how it is triggered, and where it sits in the gauntlet.`}
+  mod={d.theme}
+  bare
+>
+  <div class="cx" data-codex>
+    <div class="cxbar">
+      <a class="cxbar__brand" href={url(`/mods/${mod.id}`)}>
+        <span class="cxbar__gems" aria-hidden="true">
+          {stones.filter((s) => s.key !== 'infinity').map((s) => (
+            <i style={`--g:${s.color}`}></i>
+          ))}
+        </span>
+        {pageTitle}
+      </a>
+
+      <div class="cxbar__spacer"></div>
+
+      <div class="cxbar__search">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.6-3.6"></path>
+        </svg>
+        <input
+          type="search"
+          data-cx-search
+          placeholder="Search 150 abilities…"
+          aria-label="Search abilities by name or description"
+          autocomplete="off"
+        />
+      </div>
+
+      <div class="cxseg" role="group" aria-label="Codex view">
+        <button type="button" data-cx-view="stones" aria-pressed="true">Stones</button>
+        <button type="button" data-cx-view="matrix" aria-pressed="false">Matrix</button>
+        <button type="button" data-cx-view="index" aria-pressed="false">Index</button>
+      </div>
+
+      <a class="cxbtn" href={url(`/mods/${mod.id}`)}>Overview</a>
+    </div>
+
+    <div class="cxstage">
+      {/* ===================================================== STONES === */}
+      <section class="cxview is-on" data-cx-panel-view="stones" aria-label="Stones">
+        <div class="cxdoc">
+          <div class="cxlede">
+            <p class="cxlede__eyebrow">{series.name} &middot; {d.title}</p>
+            <h1 class="cxlede__h">Seven stones, {abilities.length} abilities, one glove.</h1>
+            <p>
+              This is the whole catalog, taken from the mod's own
+              <code>StoneAbilityCatalog</code> rather than written out by hand — so what is
+              listed here is what the server will actually accept. Every ability has a stable
+              <strong> stone.key</strong> reference, a numeric power ID that is never reassigned,
+              and a control contract that says exactly how it fires.
+            </p>
+            <p>
+              Start on a stone below, walk the <strong>Matrix</strong> to see how the catalog is
+              shaped, or go straight to the <strong>Index</strong> and filter it.
+            </p>
+          </div>
+
+          <div class="cxstats">
+            <div class="cxstat"><b>{abilities.length}</b><span>Abilities</span></div>
+            <div class="cxstat"><b>{stones.length}</b><span>Stones</span></div>
+            <div class="cxstat"><b>{controlList.filter((c) => c.n > 0).length}</b><span>Control schemes</span></div>
+            <div class="cxstat"><b>{totalOriginal}</b><span>Shipped originally</span></div>
+            <div class="cxstat"><b>{cx.mod.mc}</b><span>Minecraft</span></div>
+          </div>
+
+          <div class="cxh">
+            <h2 class="cxh__t">The stones</h2>
+            <span class="cxh__n">six you install &middot; one you earn</span>
+          </div>
+
+          <div class="cxgems">
+            {stones.map((s) => (
+              <article class="cxgem" style={`--gem:${s.color}`}>
+                <div class="cxgem__head">
+                  <span class="cxgem__orb" aria-hidden="true">
+                    <svg width="40" height="40" viewBox="0 0 40 40">
+                      <defs>
+                        <radialGradient id={`g-${s.key}`} cx="35%" cy="30%" r="72%">
+                          <stop offset="0%" stop-color="#fff" stop-opacity="0.85"></stop>
+                          <stop offset="42%" stop-color={s.color}></stop>
+                          <stop offset="100%" stop-color={s.color2}></stop>
+                        </radialGradient>
+                      </defs>
+                      <circle cx="20" cy="20" r="17" fill={`url(#g-${s.key})`}></circle>
+                      <circle cx="20" cy="20" r="17.5" fill="none" stroke={s.color} stroke-opacity="0.5"></circle>
+                    </svg>
+                  </span>
+                  <div>
+                    <h3 class="cxgem__name">{s.name}</h3>
+                    <p class="cxgem__lore">{s.lore}</p>
+                  </div>
+                  <span class="cxgem__id">ID {s.id}</span>
+                </div>
+
+                <p class="cxgem__domain">{s.domain}</p>
+                <p class="cxgem__body">{s.summary}</p>
+
+                <div class="cxbars">
+                  <div class="cxbar-track" aria-hidden="true">
+                    {roleList
+                      .filter((r) => s.roles[r.k])
+                      .sort((a, b) => s.roles[b.k] - s.roles[a.k])
+                      .map((r) => (
+                        <span class="cxbar-seg" style={`flex:${s.roles[r.k]}`}></span>
+                      ))}
+                  </div>
+                  <p class="cxbar-key">
+                    {roleList
+                      .filter((r) => s.roles[r.k])
+                      .sort((a, b) => s.roles[b.k] - s.roles[a.k])
+                      .map((r) => (
+                        <span>{r.label} <b>{s.roles[r.k]}</b></span>
+                      ))}
+                  </p>
+                </div>
+
+                <div class="cxgem__foot">
+                  {s.signature.map((ref: string) => (
+                    <button type="button" class="cxchip" data-cx-goto={`${s.key}.${ref}`}>
+                      {abilityOf[`${s.key}.${ref}`]?.name ?? ref}
+                    </button>
+                  ))}
+                  <button type="button" class="cxchip cxchip--go" data-cx-stone={s.key}>
+                    All {s.count} &rarr;
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          <div class="cxh">
+            <h2 class="cxh__t">How it works</h2>
+            <span class="cxh__n">{cx.systems.length} systems</span>
+          </div>
+
+          <div class="cxsys">
+            {cx.systems.map((sys: any, i: number) => (
+              <details class="cxsys__item" open={i === 0}>
+                <summary class="cxsys__sum">
+                  <svg class="cxsys__mark" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M7 2v10M2 7h10"></path>
+                  </svg>
+                  <span class="cxsys__t">{sys.title}</span>
+                  <span class="cxsys__lede">{sys.lede}</span>
+                </summary>
+                <div class="cxsys__body" set:html={inline(sys.body)} />
+              </details>
+            ))}
+          </div>
+
+          <div class="cxh">
+            <h2 class="cxh__t">Control schemes</h2>
+            <span class="cxh__n">how an ability asks to be fired</span>
+          </div>
+
+          <div class="cxkeys">
+            {controlList.map((c) => (
+              <div class="cxkey">
+                <p class="cxkey__t">{c.label}<span class="cxkey__n">{c.n}</span></p>
+                <p class="cxkey__d">{c.note}</p>
+              </div>
+            ))}
+          </div>
+
+          <div class="cxh">
+            <h2 class="cxh__t">{series.name}</h2>
+            <span class="cxh__n">{series.modules.length} modules on one library</span>
+          </div>
+
+          <div class="cxseries">
+            <div class="cxcore">
+              <div>
+                <p class="cxcore__role">{series.core.role}</p>
+                <h3 class="cxcore__n">{series.core.name}</h3>
+                <p class="cxcore__tag">{series.core.tagline}</p>
+                <p class="cxcore__b">{series.core.blurb}</p>
+              </div>
+              <ul class="cxcore__list">
+                {series.core.provides.map((p: string) => <li>{p}</li>)}
+              </ul>
+            </div>
+
+            <div class="cxmods">
+              {series.modules.map((m: any) => (
+                <article class="cxmod">
+                  <p class="cxmod__role">{m.role}</p>
+                  <h3 class="cxmod__n">{m.name}</h3>
+                  <p class="cxmod__tag">{m.tagline}</p>
+                  <p class="cxmod__b">{m.blurb}</p>
+                  <div class="cxmod__foot">
+                    <span class={`cxtag ${m.status === 'published' ? 'cxtag--live' : 'cxtag--dev'}`}>
+                      {m.status === 'published' ? 'Released' : 'In development'}
+                    </span>
+                    {m.slug && m.slug !== mod.id && <a href={url(`/mods/${m.slug}`)}>Open</a>}
+                    {m.slug === mod.id && <span>You are here</span>}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ===================================================== MATRIX === */}
+      <section class="cxview cxview--map" data-cx-panel-view="matrix" aria-label="Matrix">
+        <div class="cxmap" data-cx-map>
+          <svg
+            viewBox={`${-VB} ${-VB} ${VB * 2} ${VB * 2}`}
+            role="application"
+            aria-label={`Ability matrix for ${d.title}. Seven stone sectors around the gauntlet. The Index view lists the same ${abilities.length} abilities as text.`}
+          >
+            <g class="m-root">
+              {/* sector scaffolding, drawn first so nodes sit on top */}
+              {sectors.map((sec) => (
+                <g class="m-sector" data-sector={sec.stone.key}>
+                  <line
+                    class="m-spoke"
+                    x1={sec.gx * 0.5}
+                    y1={sec.gy * 0.5}
+                    x2={sec.ex}
+                    y2={sec.ey}
+                    stroke={sec.stone.color}
+                  ></line>
+                  {RINGS.map((r) => (
+                    <path class="m-arc" d={arcPath(r, sec.center, USABLE + 8)} stroke={sec.stone.color}></path>
+                  ))}
+
+                  {sec.nodes.map((n: any) => (
+                    <g
+                      class="m-node"
+                      data-node={n.ref}
+                      tabindex="-1"
+                      role="button"
+                      aria-label={`${n.name} — ${sec.stone.name}`}
+                    >
+                      <circle class="m-hit" cx={n.x} cy={n.y} r="14"></circle>
+                      <circle
+                        class="m-ring"
+                        cx={n.x}
+                        cy={n.y}
+                        r="11"
+                        stroke={sec.stone.color}
+                        stroke-width="1.6"
+                      ></circle>
+                      <circle
+                        class="m-dot"
+                        cx={n.x}
+                        cy={n.y}
+                        r="5"
+                        fill={n.origin === 'original' ? sec.stone.color : sec.stone.color2}
+                        fill-opacity={n.origin === 'original' ? 1 : 0.9}
+                        stroke={sec.stone.color}
+                        stroke-width={n.origin === 'original' ? 0 : 1.2}
+                      ></circle>
+                    </g>
+                  ))}
+
+                  {/* the gem itself, and its label, above its own fan */}
+                  <g class="m-node m-gem" data-stone={sec.stone.key} tabindex="0" role="button"
+                     aria-label={`${sec.stone.name}, ${sec.stone.count} abilities`}>
+                    <circle class="m-hit" cx={sec.gx} cy={sec.gy} r="30"></circle>
+                    <circle
+                      class="m-ring"
+                      cx={sec.gx}
+                      cy={sec.gy}
+                      r="26"
+                      stroke={sec.stone.color}
+                      stroke-width="1.8"
+                    ></circle>
+                    <circle cx={sec.gx} cy={sec.gy} r="19" fill={`url(#mg-${sec.stone.key})`}></circle>
+                    <circle
+                      cx={sec.gx}
+                      cy={sec.gy}
+                      r="19.6"
+                      fill="none"
+                      stroke={sec.stone.color}
+                      stroke-opacity="0.55"
+                    ></circle>
+                  </g>
+                  <text class="m-label" x={sec.lx} y={sec.ly} fill={sec.stone.color}>
+                    {sec.stone.key === 'infinity' ? 'All six' : sec.stone.key}
+                  </text>
+                  <text class="m-count" x={sec.lx} y={sec.ly + 14}>{sec.stone.count}</text>
+                </g>
+              ))}
+
+              {/* the hub */}
+              <g class="m-hub">
+                <path d={hexPath(HUB_R)} fill="#1B1520" stroke="#D9970B" stroke-width="1.6"></path>
+                <path d={hexPath(HUB_R - 9)} fill="none" stroke="#D9970B" stroke-opacity="0.3"></path>
+                <text class="m-label" x="0" y="-4" fill="#EFB528" style="font-size:11px">Gauntlet</text>
+                <text class="m-count" x="0" y="14">{abilities.length} powers</text>
+              </g>
+
+              <defs>
+                {stones.map((s) => (
+                  <radialGradient id={`mg-${s.key}`} cx="34%" cy="28%" r="74%">
+                    <stop offset="0%" stop-color="#fff" stop-opacity="0.9"></stop>
+                    <stop offset="40%" stop-color={s.color}></stop>
+                    <stop offset="100%" stop-color={s.color2}></stop>
+                  </radialGradient>
+                ))}
+              </defs>
+            </g>
+          </svg>
+
+          <p class="cxmap__hint">
+            <b>Click</b> a gem to open its stone &middot; <b>drag</b> to pan &middot;
+            <b> scroll</b> to zoom
+          </p>
+
+          <div class="cxmap__zoom">
+            <button type="button" data-cx-zoom="in" aria-label="Zoom in">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 2v10M2 7h10"></path></svg>
+            </button>
+            <button type="button" data-cx-zoom="out" aria-label="Zoom out">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 7h10"></path></svg>
+            </button>
+            <button type="button" data-cx-zoom="fit" aria-label="Reset the view">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="2.5" y="2.5" width="9" height="9" rx="1"></rect></svg>
+            </button>
+          </div>
+
+          <noscript>
+            <p class="cxmap__noscript">
+              The matrix pans and zooms with JavaScript on. Without it the shape is still
+              here — and every ability on it is listed as text in the Index view.
+            </p>
+          </noscript>
+        </div>
+      </section>
+
+      {/* ====================================================== INDEX === */}
+      <section class="cxview cxview--index" data-cx-panel-view="index" aria-label="Index">
+        <div class="cxindex">
+          <div class="cxfilters">
+            <div class="cxfrow">
+              <span class="cxflabel" id="cx-f-stone">Stone</span>
+              <button type="button" class="cxchip cxchip--plain" data-cx-filter="stone" data-cx-value="" aria-pressed="true">All</button>
+              {stones.map((s) => (
+                <button
+                  type="button"
+                  class="cxchip"
+                  style={`--gem:${s.color}`}
+                  data-cx-filter="stone"
+                  data-cx-value={s.key}
+                  aria-pressed="false"
+                >
+                  {s.key === 'infinity' ? 'All six' : s.name.replace(' Stone', '')}
+                </button>
+              ))}
+            </div>
+
+            <div class="cxfrow">
+              <span class="cxflabel" id="cx-f-role">Role</span>
+              <button type="button" class="cxchip cxchip--plain" data-cx-filter="role" data-cx-value="" aria-pressed="true">All</button>
+              {roleList.map((r) => (
+                <button type="button" class="cxchip cxchip--plain" data-cx-filter="role" data-cx-value={r.k} aria-pressed="false">
+                  {r.label}
+                </button>
+              ))}
+            </div>
+
+            <div class="cxfrow">
+              <span class="cxflabel" id="cx-f-ctl">Control</span>
+              <button type="button" class="cxchip cxchip--plain" data-cx-filter="control" data-cx-value="" aria-pressed="true">All</button>
+              {controlList.filter((c) => c.n > 0).map((c) => (
+                <button type="button" class="cxchip cxchip--plain" data-cx-filter="control" data-cx-value={c.k} aria-pressed="false">
+                  {c.label}
+                </button>
+              ))}
+              <span class="cxfcount" data-cx-count role="status">{abilities.length} of {abilities.length}</span>
+            </div>
+          </div>
+
+          <div class="cxrows" data-cx-rows>
+            {stones.map((s) => (
+              <div data-cx-group={s.key}>
+                <h2 class="cxgrouph" style={`--gem:${s.color}`}>
+                  {s.name} <b>{s.lore}</b>
+                </h2>
+                {abilities
+                  .filter((a) => a.stone === s.key)
+                  .map((a) => (
+                    <button
+                      type="button"
+                      class="cxrow"
+                      style={`--gem:${s.color}`}
+                      id={`a-${a.stone}-${a.key}`}
+                      data-cx-row={a.ref}
+                      data-stone={a.stone}
+                      data-role={a.role}
+                      data-control={a.control}
+                      data-text={`${a.name} ${a.desc} ${a.hint}`.toLowerCase()}
+                    >
+                      <span class="cxrow__id">{String(a.power).padStart(2, '0')}</span>
+                      <span class="cxrow__main">
+                        <span class="cxrow__t">
+                          <span class="cxrow__n">{a.name}</span>
+                          <span class="cxbadge cxbadge--ctl">{controls[a.control].label}</span>
+                          <span class="cxbadge cxbadge--role">{roles[a.role]}</span>
+                          {a.origin === 'original' && <span class="cxbadge cxbadge--orig">Original</span>}
+                        </span>
+                        <span class="cxrow__d">{a.desc}</span>
+                      </span>
+                    </button>
+                  ))}
+              </div>
+            ))}
+
+            <div class="cxempty is-hidden" data-cx-empty>
+              <b>Nothing matches that</b>
+              <span>Try a shorter search, or clear a filter.</span>
+              <br />
+              <button type="button" class="cxbtn" data-cx-clear>Clear filters</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ====================================================== PANEL === */}
+      <aside class="cxpanel" data-cx-detail role="dialog" aria-label="Entry" aria-hidden="true">
+        <div class="cxpanel__head">
+          <button type="button" class="cxpanel__back is-hidden" data-cx-back>
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+              <path d="M6.5 1 2.5 5l4 4"></path>
+            </svg>
+            <span data-cx-back-label>Back</span>
+          </button>
+          <p class="cxpanel__eyebrow" data-cx-eyebrow></p>
+          <h2 class="cxpanel__title" data-cx-title></h2>
+          <p class="cxpanel__ref" data-cx-ref></p>
+          <button type="button" class="cxpanel__close" data-cx-close aria-label="Close">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+              <path d="M1 1l11 11M12 1L1 12"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="cxpanel__body" data-cx-detail-body></div>
+      </aside>
+    </div>
+
+    <script type="application/json" id="cx-data" set:html={JSON.stringify({
+      stones, abilities, controls, roles,
+    })} is:inline></script>
+  </div>
+
+  <script>
+    import { initCodex } from '../../../scripts/codex';
+    initCodex();
+  </script>
+</Base>

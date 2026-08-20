@@ -19,6 +19,15 @@ const isHud = d.theme === 'slr';
 const panelLabel = isHud ? 'System' : 'Project data';
 const totalDownloads = d.downloads + (d.modrinthDownloads ?? 0);
 const platforms = d.modrinth ? 'CurseForge and Modrinth' : 'CurseForge';
+
+/* A mod's wiki is either a guide (a route through it) or a codex (a database
+   of it). Both live behind the same slot in the nav so a mod only ever
+   advertises the one it actually has. */
+const wiki = d.hasGuide
+  ? { label: 'Guide', href: url(`/mods/${mod.id}/guide`) }
+  : d.hasCodex
+    ? { label: 'Codex', href: url(`/mods/${mod.id}/codex`) }
+    : null;
 ---
 
 <Base title={`${d.title} — efkrdnzz`} description={d.blurb} mod={d.theme}>
@@ -26,8 +35,8 @@ const platforms = d.modrinth ? 'CurseForge and Modrinth' : 'CurseForge';
     <nav class="subnav" aria-label={`${d.short} sections`}>
       <div class="shell subnav__in">
         <a class="subnav__link" href={url(`/mods/${mod.id}`)} aria-current="page">Overview</a>
-        {d.hasGuide
-          ? <a class="subnav__link" href={url(`/mods/${mod.id}/guide`)}>Guide</a>
+        {wiki
+          ? <a class="subnav__link" href={wiki.href}>{wiki.label}</a>
           : <span class="subnav__soon">Guide</span>}
         {d.hasGuide && <a class="subnav__link" href={url(`/mods/${mod.id}/install`)}>Install</a>}
         <span class="subnav__soon">Changelog</span>
@@ -105,7 +114,7 @@ const platforms = d.modrinth ? 'CurseForge and Modrinth' : 'CurseForge';
         </div>
 
         <div class="sys__foot">
-          <span>{d.hasGuide ? 'guide online' : isHud ? 'awaiting guide data' : 'guide not written yet'}</span>
+          <span>{d.hasGuide ? 'guide online' : d.hasCodex ? 'codex online' : isHud ? 'awaiting guide data' : 'guide not written yet'}</span>
           <span class="sys__caret" aria-hidden="true"></span>
         </div>
       </aside>
@@ -145,6 +154,21 @@ const platforms = d.modrinth ? 'CurseForge and Modrinth' : 'CurseForge';
           <div class="actions">
             <a class="btn btn--primary" href={url(`/mods/${mod.id}/guide`)}>
               Open the Vault <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+            </a>
+          </div>
+        </div>
+      ) : d.hasCodex ? (
+        <div class="dl reveal">
+          <div class="dl__copy">
+            <p class="eyebrow">Wiki</p>
+            <h2 class="h3">Every stone, every power</h2>
+            <p class="mono-note">
+              A searchable database of the whole catalog — filter it, or walk the matrix
+            </p>
+          </div>
+          <div class="actions">
+            <a class="btn btn--primary" href={url(`/mods/${mod.id}/codex`)}>
+              Open the Codex <span class="btn__arrow" aria-hidden="true">&rarr;</span>
             </a>
           </div>
         </div>

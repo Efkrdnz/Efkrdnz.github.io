@@ -24,6 +24,13 @@ const mods = defineCollection({
     featured: z.boolean().default(false),
     order: z.number().default(50),
     hasGuide: z.boolean().default(false),
+    /* A codex is the other shape a wiki can take: a searchable database of
+       one mod's own data rather than a route through it. A mod has one or
+       the other, not both — they answer different questions. */
+    hasCodex: z.boolean().default(false),
+    /* Set when a mod belongs to a family that shares a library. Drives the
+       series band on the home page; unset mods are unaffected. */
+    series: z.string().optional(),
     features: z
       .array(z.object({ k: z.string(), t: z.string(), d: z.string() }))
       .default([]),

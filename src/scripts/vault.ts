@@ -41,6 +41,10 @@ interface Pos {
   ty: number;
   ox: number;
   oy: number;
+  vx: number;
+  vy: number;
+  vox: number;
+  voy: number;
 }
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
@@ -188,7 +192,7 @@ export function initVault(): void {
   function ensurePos(id: string, x: number, y: number): Pos {
     let p = pos.get(id);
     if (!p) {
-      p = { x, y, tx: x, ty: y, ox: 0, oy: 0 };
+      p = { x, y, tx: x, ty: y, ox: 0, oy: 0, vx: 0, vy: 0, vox: 0, voy: 0 };
       pos.set(id, p);
     }
     return p;
@@ -361,11 +365,22 @@ export function initVault(): void {
      each parent's spawn point).                                          */
   let raf = 0;
   let safety = 0;
+  let frames = 0;
+
+  /* A light spring rather than a linear ease. Exponential interpolation
+     arrives dead, which is what made the tree feel mechanical next to the
+     old physics; a touch of overshoot reads as alive. Tuned by simulation:
+     ~2% overshoot and a 330-430ms settle at every distance the graph uses. */
+  const STIFF = 0.16;
+  const DAMP = 0.58;
 
   function snap() {
     pos.forEach((p) => {
       p.x = p.tx;
       p.y = p.ty;
+      p.ox = 0;
+      p.oy = 0;
+      p.vx = p.vy = p.vox = p.voy = 0;
     });
   }
 
@@ -377,20 +392,48 @@ export function initVault(): void {
   }
 
   function tick() {
+    frames++;
     let moving = false;
-    pos.forEach((p) => {
-      const dx = p.tx - p.x;
-      const dy = p.ty - p.y;
-      if (Math.abs(dx) + Math.abs(dy) > 0.4) {
-        p.x += dx * 0.2;
-        p.y += dy * 0.2;
+
+    pos.forEach((p, id) => {
+      p.vx += (p.tx - p.x) * STIFF;
+      p.vy += (p.ty - p.y) * STIFF;
+      p.vx *= DAMP;
+      p.vy *= DAMP;
+      p.x += p.vx;
+      p.y += p.vy;
+
+      if (Math.abs(p.tx - p.x) + Math.abs(p.ty - p.y) > 0.4 ||
+          Math.abs(p.vx) + Math.abs(p.vy) > 0.4) {
         moving = true;
       } else {
         p.x = p.tx;
         p.y = p.ty;
+        p.vx = p.vy = 0;
+      }
+
+      /* A node you dragged drifts back into formation once you let go, so
+         the tree always reasserts its own shape. The node under the cursor
+         is exempt while it is still being held. */
+      const held = dragging && downNode === id;
+      if (!held && (p.ox !== 0 || p.oy !== 0 || p.vox !== 0 || p.voy !== 0)) {
+        p.vox += -p.ox * STIFF;
+        p.voy += -p.oy * STIFF;
+        p.vox *= DAMP;
+        p.voy *= DAMP;
+        p.ox += p.vox;
+        p.oy += p.voy;
+        if (Math.abs(p.ox) + Math.abs(p.oy) > 0.4 ||
+            Math.abs(p.vox) + Math.abs(p.voy) > 0.4) {
+          moving = true;
+        } else {
+          p.ox = p.oy = p.vox = p.voy = 0;
+        }
       }
     });
+
     paint();
+
     if (moving) {
       raf = requestAnimationFrame(tick);
     } else {
@@ -406,13 +449,19 @@ export function initVault(): void {
       paint();
       return;
     }
+    frames = 0;
     if (!raf) raf = requestAnimationFrame(tick);
     window.clearTimeout(safety);
+    /* Only rescue the layout when rAF never ran at all (a throttled or
+       non-compositing tab). Snapping on a fixed delay would cut healthy
+       animations short, which is what made expansion feel abrupt. */
     safety = window.setTimeout(() => {
-      stopTween();
-      snap();
-      paint();
-    }, 900);
+      if (frames === 0) {
+        stopTween();
+        snap();
+        paint();
+      }
+    }, 700);
   }
 
   function refresh() {
@@ -621,6 +670,8 @@ export function initVault(): void {
       if (p) {
         p.ox += (e.clientX - downX) / view.k;
         p.oy += (e.clientY - downY) / view.k;
+        p.vox = 0;
+        p.voy = 0;
       }
       paint();
     } else if (panning) {
@@ -643,11 +694,14 @@ export function initVault(): void {
         /* already released */
       }
     }
+    const wasDragging = dragging;
     downNode = null;
     dragging = false;
     panning = false;
     activeId = -1;
     svg.classList.remove('is-panning');
+    /* let go of a node and the layout pulls it home */
+    if (wasDragging) settle();
   }
 
   svg.addEventListener('pointerup', endPointer);

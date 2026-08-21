@@ -93,7 +93,15 @@ function paras(s: string): string {
             data-suit={s.key}
             aria-pressed={i === 0 ? 'true' : 'false'}
           >
-            <span class="man-suit__mark" aria-hidden="true"></span>
+            <img
+              class="man-suit__mark"
+              src={url(s.pieces[0].icon)}
+              alt=""
+              width="16"
+              height="16"
+              loading="eager"
+              decoding="async"
+            />
             <span>
               <span class="man-suit__n">{s.name}</span><br />
               <span class="man-suit__s">{s.style}</span>
@@ -115,6 +123,26 @@ function paras(s: string): string {
           <div>
             <h3 class="man-card__n">{s.full}</h3>
             <p class="man-card__t">{s.tagline}</p>
+
+            {/* All four, because "a suit owns its four pieces" is the whole
+                design and mixing them across suits leaves you powerless. */}
+            <ul class="man-pieces">
+              {s.pieces.map((pc: any) => (
+                <li class="man-piece">
+                  <img
+                    class="man-piece__i"
+                    src={url(pc.icon)}
+                    alt=""
+                    width="16"
+                    height="16"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <span class="man-piece__l">{pc.label}</span>
+                </li>
+              ))}
+            </ul>
+
             <p class="man-card__style"><b>{s.style}.</b> {s.styleNote}</p>
           </div>
 

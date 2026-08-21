@@ -17,36 +17,134 @@
    "name": "Spider-Man",
    "full": "Classic suit",
    "tagline": "The baseline set of powers.",
-   "color": "#E8484C",
-   "color2": "#2F62D9",
+   "color": "#FF4747",
+   "color2": "#0089FF",
    "style": "Silk",
    "styleNote": "A bright core wound with two spiralling fibres.",
-   "abilities": ["web_shooters", "web_swing", "wall_crawl", "spider_sense"],
-   "webs": ["restraining_web", "attack_web", "link_web", "stretchy_web"]
+   "abilities": [
+    "web_shooters",
+    "web_swing",
+    "wall_crawl",
+    "spider_sense"
+   ],
+   "webs": [
+    "restraining_web",
+    "attack_web",
+    "link_web",
+    "stretchy_web"
+   ],
+   "pieces": [
+    {
+     "slot": "helmet",
+     "label": "Mask",
+     "icon": "/img/spiderman/classic-helmet.png"
+    },
+    {
+     "slot": "chestplate",
+     "label": "Suit",
+     "icon": "/img/spiderman/classic-chestplate.png"
+    },
+    {
+     "slot": "leggings",
+     "label": "Leggings",
+     "icon": "/img/spiderman/classic-leggings.png"
+    },
+    {
+     "slot": "boots",
+     "label": "Boots",
+     "icon": "/img/spiderman/classic-boots.png"
+    }
+   ]
   },
   {
    "key": "iron_spider",
    "name": "Iron Spider",
    "full": "Iron Spider suit",
    "tagline": "The same moveset, plus two switches nothing acts on yet.",
-   "color": "#E86A4C",
-   "color2": "#E0A93B",
+   "color": "#FF9E00",
+   "color2": "#840000",
    "style": "Silk",
    "styleNote": "Same silk as the classic suit.",
-   "abilities": ["web_shooters", "web_swing", "wall_crawl", "spider_sense", "spider_legs", "instant_kill"],
-   "webs": ["restraining_web", "attack_web", "link_web", "stretchy_web"]
+   "abilities": [
+    "web_shooters",
+    "web_swing",
+    "wall_crawl",
+    "spider_sense",
+    "spider_legs",
+    "instant_kill"
+   ],
+   "webs": [
+    "restraining_web",
+    "attack_web",
+    "link_web",
+    "stretchy_web"
+   ],
+   "pieces": [
+    {
+     "slot": "helmet",
+     "label": "Mask",
+     "icon": "/img/spiderman/iron_spider-helmet.png"
+    },
+    {
+     "slot": "chestplate",
+     "label": "Suit",
+     "icon": "/img/spiderman/iron_spider-chestplate.png"
+    },
+    {
+     "slot": "leggings",
+     "label": "Leggings",
+     "icon": "/img/spiderman/iron_spider-leggings.png"
+    },
+    {
+     "slot": "boots",
+     "label": "Boots",
+     "icon": "/img/spiderman/iron_spider-boots.png"
+    }
+   ]
   },
   {
    "key": "venom",
    "name": "Venom",
    "full": "Venom symbiote",
    "tagline": "The same moveset, worn by something that is not a costume.",
-   "color": "#C0BACF",
-   "color2": "#6C6580",
+   "color": "#CFC9D9",
+   "color2": "#373737",
    "style": "Symbiote",
    "styleNote": "Not silk recoloured. A heavy column of fluid that swells and pinches along its length, sheds tendrils, drips, and keeps moving after it lands.",
-   "abilities": ["web_shooters", "web_swing", "wall_crawl", "spider_sense"],
-   "webs": ["symbiote_coil", "symbiote_lash", "link_web", "stretchy_web"]
+   "abilities": [
+    "web_shooters",
+    "web_swing",
+    "wall_crawl",
+    "spider_sense"
+   ],
+   "webs": [
+    "symbiote_coil",
+    "symbiote_lash",
+    "link_web",
+    "stretchy_web"
+   ],
+   "pieces": [
+    {
+     "slot": "helmet",
+     "label": "Mask",
+     "icon": "/img/spiderman/venom-helmet.png"
+    },
+    {
+     "slot": "chestplate",
+     "label": "Suit",
+     "icon": "/img/spiderman/venom-chestplate.png"
+    },
+    {
+     "slot": "leggings",
+     "label": "Leggings",
+     "icon": "/img/spiderman/venom-leggings.png"
+    },
+    {
+     "slot": "boots",
+     "label": "Boots",
+     "icon": "/img/spiderman/venom-boots.png"
+    }
+   ]
   }
  ],
  "abilities": [
@@ -144,30 +242,113 @@
   }
  ],
  "controls": [
-  { "key": "R", "name": "Power source", "owner": "Core", "desc": "Confirm the Spider-Man Suit power source." },
-  { "key": "V", "name": "Ability", "owner": "Core", "desc": "Confirm the Normal Web Sling ability." },
-  { "key": "Z", "name": "Suit panel", "owner": "Core", "desc": "Opens the worn suit's panel: wrist loadout on the left, toggles down the right." },
-  { "key": "X", "name": "Raise shooters", "owner": "Core", "desc": "Hold. Both arms draw at once regardless of what is held, and vanilla attack, mining, placement and use are suppressed." },
-  { "key": "C", "name": "Web swing", "owner": "Core", "desc": "Hold to attach and swing. Crouch + C fires the wall latch instead." },
-  { "key": "B", "name": "Wall grip", "owner": "This mod", "desc": "Hold. Nothing sticks to anything unless this is down — mining a corridor puts you against a wall constantly, and a suit that grabs every one is worse than one you ask." },
-  { "key": "1–6", "name": "Quick load", "owner": "This mod", "desc": "Held with the shooter key, loads both wrists without opening anything. Slot 1 is Empty and the rest follow the registry." }
+  {
+   "key": "R",
+   "name": "Power source",
+   "owner": "Core",
+   "desc": "Confirm the Spider-Man Suit power source."
+  },
+  {
+   "key": "V",
+   "name": "Ability",
+   "owner": "Core",
+   "desc": "Confirm the Normal Web Sling ability."
+  },
+  {
+   "key": "Z",
+   "name": "Suit panel",
+   "owner": "Core",
+   "desc": "Opens the worn suit's panel: wrist loadout on the left, toggles down the right."
+  },
+  {
+   "key": "X",
+   "name": "Raise shooters",
+   "owner": "Core",
+   "desc": "Hold. Both arms draw at once regardless of what is held, and vanilla attack, mining, placement and use are suppressed."
+  },
+  {
+   "key": "C",
+   "name": "Web swing",
+   "owner": "Core",
+   "desc": "Hold to attach and swing. Crouch + C fires the wall latch instead."
+  },
+  {
+   "key": "B",
+   "name": "Wall grip",
+   "owner": "This mod",
+   "desc": "Hold. Nothing sticks to anything unless this is down — mining a corridor puts you against a wall constantly, and a suit that grabs every one is worse than one you ask."
+  },
+  {
+   "key": "1–6",
+   "name": "Quick load",
+   "owner": "This mod",
+   "desc": "Held with the shooter key, loads both wrists without opening anything. Slot 1 is Empty and the rest follow the registry."
+  }
  ],
  "wall": [
-  { "name": "Step up", "how": "Automatic", "desc": "The suit raises step height over a full block." },
-  { "name": "Sprint vault", "how": "Sprint into a 2-block obstacle", "desc": "A fast front-flip carries you over." },
-  { "name": "Run up a wall", "how": "Sprint into a wall 3+ blocks tall", "desc": "Momentum carries you up its face." },
-  { "name": "Wall crawl", "how": "Press against a tall wall", "desc": "Cling, then climb with normal movement. Sneak holds position." },
-  { "name": "Ceiling crawl", "how": "Touch a grippable ceiling near a jump's apex", "desc": "Lies flat against the ceiling. Sneak releases it." },
-  { "name": "Wall run", "how": "Jump and travel fast alongside a wall", "desc": "The body rolls onto the wall and the camera rolls most of the way to ninety degrees with it." },
-  { "name": "Wall jump", "how": "Jump while on any wall", "desc": "A strong leap toward where you look." },
-  { "name": "Web vault", "how": "Right click during a wall run, swing web held", "desc": "The web releases and slings you forward, flat and fast." },
-  { "name": "Wall latch", "how": "Crouch + C", "desc": "A straight run at fixed speed to what you aimed at. A vertical face or underside latches for half a second, then throws you wherever you are now looking; a rooftop is just a landing." }
+  {
+   "name": "Step up",
+   "how": "Automatic",
+   "desc": "The suit raises step height over a full block."
+  },
+  {
+   "name": "Sprint vault",
+   "how": "Sprint into a 2-block obstacle",
+   "desc": "A fast front-flip carries you over."
+  },
+  {
+   "name": "Run up a wall",
+   "how": "Sprint into a wall 3+ blocks tall",
+   "desc": "Momentum carries you up its face."
+  },
+  {
+   "name": "Wall crawl",
+   "how": "Press against a tall wall",
+   "desc": "Cling, then climb with normal movement. Sneak holds position."
+  },
+  {
+   "name": "Ceiling crawl",
+   "how": "Touch a grippable ceiling near a jump's apex",
+   "desc": "Lies flat against the ceiling. Sneak releases it."
+  },
+  {
+   "name": "Wall run",
+   "how": "Jump and travel fast alongside a wall",
+   "desc": "The body rolls onto the wall and the camera rolls most of the way to ninety degrees with it."
+  },
+  {
+   "name": "Wall jump",
+   "how": "Jump while on any wall",
+   "desc": "A strong leap toward where you look."
+  },
+  {
+   "name": "Web vault",
+   "how": "Right click during a wall run, swing web held",
+   "desc": "The web releases and slings you forward, flat and fast."
+  },
+  {
+   "name": "Wall latch",
+   "how": "Crouch + C",
+   "desc": "A straight run at fixed speed to what you aimed at. A vertical face or underside latches for half a second, then throws you wherever you are now looking; a rooftop is just a landing."
+  }
  ],
  "flourishes": [
-  { "name": "Bullet spin", "when": "Attach and release inside half a second — a boost, not a swing. Also every stretchy web launch." },
-  { "name": "Front flip", "when": "A real arc released while climbing." },
-  { "name": "Side flip", "when": "A real arc that carved hard to one side." },
-  { "name": "Back flip", "when": "Any other real arc." }
+  {
+   "name": "Bullet spin",
+   "when": "Attach and release inside half a second — a boost, not a swing. Also every stretchy web launch."
+  },
+  {
+   "name": "Front flip",
+   "when": "A real arc released while climbing."
+  },
+  {
+   "name": "Side flip",
+   "when": "A real arc that carved hard to one side."
+  },
+  {
+   "name": "Back flip",
+   "when": "Any other real arc."
+  }
  ],
  "notes": [
   {

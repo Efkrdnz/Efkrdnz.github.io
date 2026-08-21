@@ -116,14 +116,14 @@
   background: color-mix(in srgb, var(--suit) 10%, transparent);
 }
 
-/* the two-tone chip is the suit's own pair, not one flat swatch */
+/* The mask, at four times its 16px source. Pixel art is scaled with nearest
+   neighbour and served unprocessed out of public/ — smoothing it or running
+   it through a lossy encoder would blur the one thing it is made of. */
 .man-suit__mark {
   flex: none;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--suit) 0 50%, var(--suit-2) 50% 100%);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--suit) 50%, transparent);
+  width: 32px;
+  height: 32px;
+  image-rendering: pixelated;
 }
 
 .man-suit__n {
@@ -207,6 +207,50 @@
 
 .man-card__style { margin: 0; font-size: 0.9rem; line-height: 1.65; color: var(--ash); }
 .man-card__style b { color: var(--bone); font-weight: 600; }
+
+/* --------------------------------------------------------- suit pieces --- */
+
+.man-pieces {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s3);
+  margin: 0 0 var(--s5);
+  padding: 0;
+}
+
+/* A slot, lifted off the page rather than matching it. Venom's pieces are
+   mostly black, and on a near-black tile the mask and leggings disappear
+   entirely — a lighter plate is what gives every suit's silhouette an edge
+   to sit against. */
+.man-piece {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  width: 76px;
+  padding: 10px 4px 8px;
+  background: color-mix(in srgb, var(--bone) 7%, var(--panel));
+  border: 1px solid var(--edge-dim);
+  border-radius: var(--radius);
+}
+
+/* 3x of a 16px source. Integer multiples only — at 2.5x, nearest-neighbour
+   makes some source pixels two screen pixels wide and others three, which
+   is exactly the unevenness pixel art shows up. */
+.man-piece__i {
+  width: 48px;
+  height: 48px;
+  image-rendering: pixelated;
+}
+
+.man-piece__l {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ash-dim);
+}
 
 /* --------------------------------------------------------------- lists --- */
 

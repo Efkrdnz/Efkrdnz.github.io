@@ -1,0 +1,308 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../../layouts/Base.astro';
+import { url } from '../../../lib/util';
+import '../../../styles/manual.css';
+
+export async function getStaticPaths() {
+  const mods = await getCollection('mods');
+  return mods
+    .filter((m) => m.data.hasManual)
+    .map((mod) => ({ params: { slug: mod.id }, props: { mod } }));
+}
+
+const { mod } = Astro.props;
+const d = mod.data;
+
+const files = import.meta.glob<{ default: any }>('../../../data/manual/*.json', { eager: true });
+const entry = Object.entries(files).find(([p]) => p.endsWith(`/${mod.id}.json`));
+if (!entry) throw new Error(`manual data missing for ${mod.id}`);
+const m = entry[1].default;
+
+const suits: any[] = m.suits;
+const abilities: any[] = m.abilities;
+const webs: any[] = m.webs;
+
+const abilityOf = Object.fromEntries(abilities.map((a) => [a.key, a]));
+const webOf = Object.fromEntries(webs.map((w) => [w.key, w]));
+
+/* The page opens on the first suit, and the picker rewrites the rest of it.
+   Server-rendering every suit's answer would mean three copies of the same
+   tables; instead each panel carries its own data attributes and the script
+   flips which one is shown. With JavaScript off you get the first suit's
+   answer in full, which is a complete document rather than a broken one. */
+const first = suits[0];
+
+function esc(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function inline(s: string): string {
+  return esc(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+}
+
+function paras(s: string): string {
+  return s.split(/\n{2,}/).map((p) => `<p class="man-note__b">${inline(p.trim())}</p>`).join('');
+}
+---
+
+<Base
+  title={`${d.short} Manual — efkrdnzz`}
+  description={`The moveset for ${d.title}: three suits, six web types, the wall moveset and the swing, and what each suit actually grants.`}
+  mod={d.theme}
+>
+  <div class="mod-page man" data-manual style={`--suit:${first.color};--suit-2:${first.color2}`}>
+    <nav class="subnav" aria-label={`${d.short} sections`}>
+      <div class="shell subnav__in">
+        <a class="subnav__link" href={url(`/mods/${mod.id}`)}>Overview</a>
+        <a class="subnav__link" href={url(`/mods/${mod.id}/manual`)} aria-current="page">Manual</a>
+        <span class="subnav__soon">Changelog</span>
+        <a class="subnav__link" href={url('/mods')} style="margin-left:auto;">&larr; All mods</a>
+      </div>
+    </nav>
+
+    <section class="shell man-hero">
+      <div class="man-hero__in">
+        <p class="eyebrow">{d.series} &middot; Manual</p>
+        <h1 class="man-hero__h">{m.intro.title}</h1>
+        <div set:html={m.intro.body.split(/\n{2,}/).map((p: string) => `<p class="man-hero__b">${inline(p.trim())}</p>`).join('')} />
+
+        <p class="man-spec">
+          <span>v<b>{m.mod.version}</b></span>
+          <span>Minecraft <b>{m.mod.mc}</b></span>
+          <span><b>{m.mod.loader}</b></span>
+          <span>Java <b>{m.mod.java}</b></span>
+          <span>Needs <b>{m.mod.requires}</b></span>
+        </p>
+      </div>
+    </section>
+
+    {/* ------------------------------------------------------ suit picker */}
+    <div class="man-pick">
+      <div class="shell man-pick__in" role="group" aria-label="Choose a suit">
+        <span class="man-pick__label">Worn suit</span>
+        {suits.map((s, i) => (
+          <button
+            type="button"
+            class="man-suit"
+            style={`--suit:${s.color};--suit-2:${s.color2}`}
+            data-suit={s.key}
+            aria-pressed={i === 0 ? 'true' : 'false'}
+          >
+            <span class="man-suit__mark" aria-hidden="true"></span>
+            <span>
+              <span class="man-suit__n">{s.name}</span><br />
+              <span class="man-suit__s">{s.style}</span>
+            </span>
+          </button>
+        ))}
+      </div>
+    </div>
+
+    {/* ----------------------------------------------------------- suits */}
+    <section class="shell man-sec">
+      <div class="man-sec__head">
+        <h2 class="man-sec__h">The suit</h2>
+        <span class="man-sec__n">{suits.length} registered</span>
+      </div>
+
+      {suits.map((s, i) => (
+        <div class="man-card" data-panel={s.key} hidden={i !== 0}>
+          <div>
+            <h3 class="man-card__n">{s.full}</h3>
+            <p class="man-card__t">{s.tagline}</p>
+            <p class="man-card__style"><b>{s.style}.</b> {s.styleNote}</p>
+          </div>
+
+          <div class="man-list">
+            {abilities.map((a) => {
+              const has = s.abilities.includes(a.key);
+              return (
+                <div class:list={['man-row', !has && 'is-absent']}>
+                  <span class="man-row__n">{a.name}</span>
+                  <span class="man-row__m">
+                    {!has ? (
+                      <span class="man-tag">Not on this suit</span>
+                    ) : a.pending ? (
+                      <span class="man-tag man-tag--pending">Not built yet</span>
+                    ) : (
+                      <span class:list={['man-tag', a.default === 'On' && 'man-tag--on']}>
+                        {a.kind === 'Loadout' ? 'Panel' : a.default}
+                      </span>
+                    )}
+                  </span>
+                  <p class="man-row__d">{a.desc}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </section>
+
+    {/* ------------------------------------------------------- web types */}
+    <section class="shell man-sec">
+      <div class="man-sec__head">
+        <h2 class="man-sec__h">Web types</h2>
+        <span class="man-sec__n">loaded per wrist</span>
+      </div>
+      <p class="man-sec__lede">
+        Types are content; the shooter system is not. A suit does not declare its own list — it
+        <strong> substitutes</strong> types into the slots that already exist, so the loadout you
+        chose survives a change of suit. A substituted type is fired but never listed, because it
+        already has a slot: the one it stands in for.
+      </p>
+
+      {suits.map((s, i) => (
+        <div class="man-grid" data-panel={s.key} hidden={i !== 0}>
+          {s.webs.map((key: string) => {
+            const w = webOf[key];
+            return (
+              <div class="man-cell">
+                <div class="man-cell__top">
+                  <span class="man-cell__n">{w.name}</span>
+                  <span class="man-cell__k">{w.control}</span>
+                  {w.substitutes && (
+                    <span class="man-tag man-tag--sub">
+                      Replaces {webOf[w.substitutes].name}
+                    </span>
+                  )}
+                </div>
+                <p class="man-cell__d">{w.desc}</p>
+                <p class="man-row__m" style="margin-top:auto;padding-top:8px;">
+                  {w.cooldown} tick cooldown
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      ))}
+    </section>
+
+    {/* ---------------------------------------------------------- controls */}
+    <section class="shell man-sec">
+      <div class="man-sec__head">
+        <h2 class="man-sec__h">Controls</h2>
+        <span class="man-sec__n">{m.controls.length} bindings</span>
+      </div>
+      <p class="man-sec__lede">
+        Five of these belong to Minefinity Core and are shared with every hero in the series,
+        rebindable under <code>Minefinity Universe</code>. The rest belong to this mod, because
+        they only mean anything to something that can climb.
+      </p>
+
+      <div class="man-keys">
+        {m.controls.map((c: any) => (
+          <div class="man-key">
+            <kbd class="man-cap">{c.key}</kbd>
+            <div>
+              <p class="man-key__n">
+                {c.name}
+                <span class="man-key__o">{c.owner}</span>
+              </p>
+              <p class="man-key__d">{c.desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    {/* ------------------------------------------------------ wall moveset */}
+    <section class="shell man-sec">
+      <div class="man-sec__head">
+        <h2 class="man-sec__h">Off the ground</h2>
+        <span class="man-sec__n">{m.wall.length} moves</span>
+      </div>
+      <p class="man-sec__lede">
+        Wall height decides the response: two blocks is an obstacle to vault, three or more is a
+        wall to climb. Nothing sticks to anything unless the grip key is held.
+      </p>
+
+      <div class="man-list">
+        {m.wall.map((w: any) => (
+          <div class="man-row">
+            <span class="man-row__n">{w.name}</span>
+            <span class="man-row__m">{w.how}</span>
+            <p class="man-row__d">{w.desc}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    {/* ------------------------------------------------------- flourishes */}
+    <section class="shell man-sec">
+      <div class="man-sec__head">
+        <h2 class="man-sec__h">Letting go</h2>
+        <span class="man-sec__n">{m.flourishes.length} flourishes</span>
+      </div>
+      <p class="man-sec__lede">
+        Releasing deliberately plays a one-shot flourish chosen from how the swing actually went;
+        a swing that simply ends stops the pose without one. Anything held longer than half a
+        second had time to swing, and earns a somersault.
+      </p>
+
+      <div class="man-list">
+        {m.flourishes.map((f: any) => (
+          <div class="man-row">
+            <span class="man-row__n">{f.name}</span>
+            <p class="man-row__d">{f.when}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    {/* ------------------------------------------------------------ notes */}
+    <section class="shell man-sec" style="border-bottom:0;">
+      <div class="man-sec__head">
+        <h2 class="man-sec__h">Why it works that way</h2>
+        <span class="man-sec__n">{m.notes.length} notes</span>
+      </div>
+
+      <div class="man-notes">
+        {m.notes.map((n: any) => (
+          <article class="man-note">
+            <h3 class="man-note__h">{n.title}</h3>
+            <div set:html={paras(n.body)} />
+          </article>
+        ))}
+      </div>
+
+      <div class="man-wip">
+        <span class="man-wip__t">Not released</span>
+        <p class="man-wip__d">
+          {d.title} is still in development, so there is nothing to download yet. This manual
+          documents what is built and says plainly where something is declared but not yet wired.
+        </p>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    /* The picker rewrites the page's answer to "which suit is worn". Panels
+       for every suit are already in the document; this only chooses which is
+       shown and retints the page. Nothing here is required to read the page —
+       without it the first suit's panels stay visible. */
+    const root = document.querySelector<HTMLElement>('[data-manual]');
+    if (root) {
+      const buttons = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-suit]'));
+      const panels = Array.from(root.querySelectorAll<HTMLElement>('[data-panel]'));
+
+      const choose = (key: string, btn: HTMLButtonElement) => {
+        buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+        panels.forEach((p) => {
+          p.hidden = p.dataset.panel !== key;
+        });
+        root.style.setProperty('--suit', btn.style.getPropertyValue('--suit'));
+        root.style.setProperty('--suit-2', btn.style.getPropertyValue('--suit-2'));
+      };
+
+      buttons.forEach((btn) =>
+        btn.addEventListener('click', () => choose(btn.dataset.suit!, btn))
+      );
+    }
+  </script>
+</Base>

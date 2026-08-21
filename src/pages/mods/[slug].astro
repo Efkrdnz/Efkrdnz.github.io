@@ -17,7 +17,8 @@ const d = mod.data;
 
 const isHud = d.theme === 'slr';
 const panelLabel = isHud ? 'System' : 'Project data';
-const totalDownloads = d.downloads + (d.modrinthDownloads ?? 0);
+const released = d.status === 'released';
+const totalDownloads = (d.downloads ?? 0) + (d.modrinthDownloads ?? 0);
 const platforms = d.modrinth ? 'CurseForge and Modrinth' : 'CurseForge';
 
 /* A mod's wiki is either a guide (a route through it) or a codex (a database
@@ -27,7 +28,9 @@ const wiki = d.hasGuide
   ? { label: 'Guide', href: url(`/mods/${mod.id}/guide`) }
   : d.hasCodex
     ? { label: 'Codex', href: url(`/mods/${mod.id}/codex`) }
-    : null;
+    : d.hasManual
+      ? { label: 'Manual', href: url(`/mods/${mod.id}/manual`) }
+      : null;
 ---
 
 <Base title={`${d.title} — efkrdnzz`} description={d.blurb} mod={d.theme}>
@@ -40,7 +43,9 @@ const wiki = d.hasGuide
           : <span class="subnav__soon">Guide</span>}
         {d.hasGuide && <a class="subnav__link" href={url(`/mods/${mod.id}/install`)}>Install</a>}
         <span class="subnav__soon">Changelog</span>
-        <a class="subnav__link" href="#download">Download</a>
+        {released
+          ? <a class="subnav__link" href="#download">Download</a>
+          : <span class="subnav__soon">Download</span>}
         <a class="subnav__link" href={url('/mods')} style="margin-left:auto;">&larr; All mods</a>
       </div>
     </nav>
@@ -53,18 +58,31 @@ const wiki = d.hasGuide
         <p class="lede">{d.blurb}</p>
 
         <div class="actions">
-          <a
-            class="btn btn--primary"
-            href={d.curseforge}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Get it on CurseForge <span class="btn__arrow" aria-hidden="true">&rarr;</span>
-          </a>
-          {d.modrinth && (
-            <a class="btn" href={d.modrinth} rel="noopener noreferrer" target="_blank">
-              Modrinth
-            </a>
+          {released ? (
+            <>
+              <a
+                class="btn btn--primary"
+                href={d.curseforge}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                Get it on CurseForge <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+              </a>
+              {d.modrinth && (
+                <a class="btn" href={d.modrinth} rel="noopener noreferrer" target="_blank">
+                  Modrinth
+                </a>
+              )}
+            </>
+          ) : (
+            /* Nothing to link to yet. The wiki is the thing that exists, so
+               that is what the page offers instead of a dead store button. */
+            wiki && (
+              <a class="btn btn--primary" href={wiki.href}>
+                Read the {wiki.label.toLowerCase()}
+                <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+              </a>
+            )
           )}
         </div>
       </div>
@@ -75,16 +93,18 @@ const wiki = d.hasGuide
         <div class="sys__rows">
           <div class="sys__row">
             <span class="sys__k">Status</span>
-            <span class="sys__v sys__v--hot">Published</span>
+            <span class="sys__v sys__v--hot">{released ? 'Published' : 'In development'}</span>
           </div>
           <div class="sys__row">
             <span class="sys__k">Type</span>
             <span class="sys__v">{d.kind}</span>
           </div>
-          <div class="sys__row">
-            <span class="sys__k">CurseForge</span>
-            <span class="sys__v">{full(d.downloads)}</span>
-          </div>
+          {released && (
+            <div class="sys__row">
+              <span class="sys__k">CurseForge</span>
+              <span class="sys__v">{full(d.downloads ?? 0)}</span>
+            </div>
+          )}
           <div class="sys__row">
             <span class="sys__k">Category</span>
             <span class="sys__v">{d.categories.join(', ')}</span>
@@ -114,7 +134,7 @@ const wiki = d.hasGuide
         </div>
 
         <div class="sys__foot">
-          <span>{d.hasGuide ? 'guide online' : d.hasCodex ? 'codex online' : isHud ? 'awaiting guide data' : 'guide not written yet'}</span>
+          <span>{d.hasGuide ? 'guide online' : d.hasCodex ? 'codex online' : d.hasManual ? 'manual online' : isHud ? 'awaiting guide data' : 'guide not written yet'}</span>
           <span class="sys__caret" aria-hidden="true"></span>
         </div>
       </aside>
@@ -199,6 +219,21 @@ const wiki = d.hasGuide
             </a>
           </div>
         </div>
+      ) : d.hasManual ? (
+        <div class="dl reveal">
+          <div class="dl__copy">
+            <p class="eyebrow">Wiki</p>
+            <h2 class="h3">The whole moveset, read by suit</h2>
+            <p class="mono-note">
+              Suits, web types, the wall moveset and the swing — and what each suit grants
+            </p>
+          </div>
+          <div class="actions">
+            <a class="btn btn--primary" href={url(`/mods/${mod.id}/manual`)}>
+              Open the Manual <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+            </a>
+          </div>
+        </div>
       ) : (
         <div class="pending reveal">
           <span class="pending__mark" aria-hidden="true">!</span>
@@ -214,6 +249,7 @@ const wiki = d.hasGuide
       )}
     </section>
 
+    {released ? (
     <section class="shell section" id="download" style="padding-top:0;">
       <div class="dl reveal">
         <div class="dl__copy">
@@ -246,5 +282,19 @@ const wiki = d.hasGuide
         </div>
       </div>
     </section>
+    ) : (
+      <section class="shell section" style="padding-top:0;">
+        <div class="pending reveal">
+          <span class="pending__mark" aria-hidden="true">!</span>
+          <div class="pending__body">
+            <span class="pending__t">Not released yet</span>
+            <p class="pending__d">
+              {d.title} is still in development, so there is nothing to download. When it ships
+              this is where the version table and the store links will be.
+            </p>
+          </div>
+        </div>
+      </section>
+    )}
   </div>
 </Base>

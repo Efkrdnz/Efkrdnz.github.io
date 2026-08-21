@@ -29,7 +29,11 @@ const credit = d.role === 'contributor' ? `with ${d.author}` : d.author;
   <span class="tip__spacer"></span>
 
   <span class="tip__data">
-    <span class="tip__dl">{full(d.downloads)} downloads</span>
+    {/* A mod that has not shipped has no count to show. Saying so is honest;
+        printing "0 downloads" would read as a failure rather than a date. */}
+    <span class="tip__dl">
+      {d.status === 'released' ? `${full(d.downloads ?? 0)} downloads` : 'In development'}
+    </span>
     <span class="tip__cats">{d.categories.join(' \u00b7 ')}</span>
     <span class="tip__source">{credit}</span>
   </span>

@@ -1,0 +1,206 @@
+{
+ "mod": {
+  "id": "minefinity_spiderman",
+  "version": "1.2.0",
+  "mc": "1.21.1",
+  "loader": "NeoForge 21.1.244+",
+  "java": "21",
+  "requires": "Minefinity Core 1.6.x"
+ },
+ "intro": {
+  "title": "A suit is a question, not a branch.",
+  "body": "Every power in this mod asks the same thing before it fires: which suit is worn, and does it grant this. Nothing checks for a particular helmet. A suit owns its four pieces, the skin painted onto whoever wears them, the abilities it grants and the way its webbing is drawn — so adding one is a registration rather than another branch through every gate.\n\nThat is why Venom works. It does not declare its own moveset; it substitutes two types into the slots that already exist, and the loadout you chose survives the change of suit."
+ },
+ "suits": [
+  {
+   "key": "classic",
+   "name": "Spider-Man",
+   "full": "Classic suit",
+   "tagline": "The baseline set of powers.",
+   "color": "#E8484C",
+   "color2": "#2F62D9",
+   "style": "Silk",
+   "styleNote": "A bright core wound with two spiralling fibres.",
+   "abilities": ["web_shooters", "web_swing", "wall_crawl", "spider_sense"],
+   "webs": ["restraining_web", "attack_web", "link_web", "stretchy_web"]
+  },
+  {
+   "key": "iron_spider",
+   "name": "Iron Spider",
+   "full": "Iron Spider suit",
+   "tagline": "The same moveset, plus two switches nothing acts on yet.",
+   "color": "#E86A4C",
+   "color2": "#E0A93B",
+   "style": "Silk",
+   "styleNote": "Same silk as the classic suit.",
+   "abilities": ["web_shooters", "web_swing", "wall_crawl", "spider_sense", "spider_legs", "instant_kill"],
+   "webs": ["restraining_web", "attack_web", "link_web", "stretchy_web"]
+  },
+  {
+   "key": "venom",
+   "name": "Venom",
+   "full": "Venom symbiote",
+   "tagline": "The same moveset, worn by something that is not a costume.",
+   "color": "#C0BACF",
+   "color2": "#6C6580",
+   "style": "Symbiote",
+   "styleNote": "Not silk recoloured. A heavy column of fluid that swells and pinches along its length, sheds tendrils, drips, and keeps moving after it lands.",
+   "abilities": ["web_shooters", "web_swing", "wall_crawl", "spider_sense"],
+   "webs": ["symbiote_coil", "symbiote_lash", "link_web", "stretchy_web"]
+  }
+ ],
+ "abilities": [
+  {
+   "key": "web_shooters",
+   "name": "Web Shooters",
+   "kind": "Loadout",
+   "default": "—",
+   "desc": "Load a web type into each wrist independently. Opens its own panel rather than toggling."
+  },
+  {
+   "key": "web_swing",
+   "name": "Web Swing",
+   "kind": "Toggle",
+   "default": "On",
+   "desc": "Swing from anchors and from strung webs. On with the suit; the switch turns it off."
+  },
+  {
+   "key": "wall_crawl",
+   "name": "Wall Crawl",
+   "kind": "Toggle",
+   "default": "On",
+   "desc": "Cling to walls, run along them, crawl ceilings, vault and leap. Still needs the grip key held."
+  },
+  {
+   "key": "spider_sense",
+   "name": "Spider-Sense",
+   "kind": "Toggle",
+   "default": "Off",
+   "desc": "Outlines nearby threats through walls, tiered by urgency. Opt-in rather than automatic."
+  },
+  {
+   "key": "spider_legs",
+   "name": "Spider Legs",
+   "kind": "Toggle",
+   "default": "Off",
+   "desc": "Four rear legs that grip surfaces. Declared, toggled, persisted and synced — nothing acts on it yet.",
+   "pending": true
+  },
+  {
+   "key": "instant_kill",
+   "name": "Instant Kill Mode",
+   "kind": "Toggle",
+   "default": "Off",
+   "desc": "Lets the legs strike hostiles on their own. Gated behind the legs being out, and likewise not yet built.",
+   "pending": true
+  }
+ ],
+ "webs": [
+  {
+   "key": "restraining_web",
+   "name": "Restraining Web",
+   "control": "Click",
+   "cooldown": 10,
+   "desc": "Binds a target. Load accumulates per hit against a threshold derived from the target's max health, current health, armour and attack damage — a chicken takes about two strands, a Wither about eleven."
+  },
+  {
+   "key": "attack_web",
+   "name": "Attack Web",
+   "control": "Click",
+   "cooldown": 14,
+   "desc": "The same bind plus 4 damage. Damaging a target lowers its threshold, so the attack web makes its own follow-up land harder."
+  },
+  {
+   "key": "link_web",
+   "name": "Link Web",
+   "control": "Hold, release",
+   "cooldown": 8,
+   "desc": "Press anchors the first point, release the second. Each raycast prefers an entity, then an existing line, then a surface — so webs can hang off other webs. Lives one minute."
+  },
+  {
+   "key": "stretchy_web",
+   "name": "Stretchy Web",
+   "control": "Hold, release",
+   "cooldown": 6,
+   "desc": "Anchors an elastic that resists harder the further you back away. One per hand; releasing opens a five-tick window so the other hand can join the same launch."
+  },
+  {
+   "key": "symbiote_lash",
+   "name": "Symbiote Lash",
+   "control": "Click",
+   "cooldown": 16,
+   "substitutes": "attack_web",
+   "desc": "Extends the arm eight blocks with no travel time and strikes for 70% of your attack damage, hauling what it catches back to you. It lands under a full punch on purpose — reach is the advantage.",
+   "venom": true
+  },
+  {
+   "key": "symbiote_coil",
+   "name": "Symbiote Coil",
+   "control": "Click",
+   "cooldown": 12,
+   "substitutes": "restraining_web",
+   "desc": "Binds with the usual stacking slow and drags the target a step closer with every hit. Same eight-block reach, landing the instant you press.",
+   "venom": true
+  }
+ ],
+ "controls": [
+  { "key": "R", "name": "Power source", "owner": "Core", "desc": "Confirm the Spider-Man Suit power source." },
+  { "key": "V", "name": "Ability", "owner": "Core", "desc": "Confirm the Normal Web Sling ability." },
+  { "key": "Z", "name": "Suit panel", "owner": "Core", "desc": "Opens the worn suit's panel: wrist loadout on the left, toggles down the right." },
+  { "key": "X", "name": "Raise shooters", "owner": "Core", "desc": "Hold. Both arms draw at once regardless of what is held, and vanilla attack, mining, placement and use are suppressed." },
+  { "key": "C", "name": "Web swing", "owner": "Core", "desc": "Hold to attach and swing. Crouch + C fires the wall latch instead." },
+  { "key": "B", "name": "Wall grip", "owner": "This mod", "desc": "Hold. Nothing sticks to anything unless this is down — mining a corridor puts you against a wall constantly, and a suit that grabs every one is worse than one you ask." },
+  { "key": "1–6", "name": "Quick load", "owner": "This mod", "desc": "Held with the shooter key, loads both wrists without opening anything. Slot 1 is Empty and the rest follow the registry." }
+ ],
+ "wall": [
+  { "name": "Step up", "how": "Automatic", "desc": "The suit raises step height over a full block." },
+  { "name": "Sprint vault", "how": "Sprint into a 2-block obstacle", "desc": "A fast front-flip carries you over." },
+  { "name": "Run up a wall", "how": "Sprint into a wall 3+ blocks tall", "desc": "Momentum carries you up its face." },
+  { "name": "Wall crawl", "how": "Press against a tall wall", "desc": "Cling, then climb with normal movement. Sneak holds position." },
+  { "name": "Ceiling crawl", "how": "Touch a grippable ceiling near a jump's apex", "desc": "Lies flat against the ceiling. Sneak releases it." },
+  { "name": "Wall run", "how": "Jump and travel fast alongside a wall", "desc": "The body rolls onto the wall and the camera rolls most of the way to ninety degrees with it." },
+  { "name": "Wall jump", "how": "Jump while on any wall", "desc": "A strong leap toward where you look." },
+  { "name": "Web vault", "how": "Right click during a wall run, swing web held", "desc": "The web releases and slings you forward, flat and fast." },
+  { "name": "Wall latch", "how": "Crouch + C", "desc": "A straight run at fixed speed to what you aimed at. A vertical face or underside latches for half a second, then throws you wherever you are now looking; a rooftop is just a landing." }
+ ],
+ "flourishes": [
+  { "name": "Bullet spin", "when": "Attach and release inside half a second — a boost, not a swing. Also every stretchy web launch." },
+  { "name": "Front flip", "when": "A real arc released while climbing." },
+  { "name": "Side flip", "when": "A real arc that carved hard to one side." },
+  { "name": "Back flip", "when": "Any other real arc." }
+ ],
+ "notes": [
+  {
+   "title": "The suit renders nothing",
+   "body": "The armour's material points at blank layer textures, so no shell is drawn over the wearer. A render layer paints the suit onto the player's own model instead, which is what makes it sit flush rather than as bulky armour. Coverage is per piece and the base render skips exactly what the layer draws, so the seam is exact. **Powers do not need the mask** — the shooters and the swing want the chestplate, leggings and boots; the mask only changes how you look."
+  },
+  {
+   "title": "Authority is split, deliberately",
+   "body": "Wall transitions are decided by the owning client, because vanilla movement is client-authoritative and only the client has real velocity and collision. The server validates each claim against world geometry and rebroadcasts. The **wall latch is the opposite** — held entirely by the server, because it dictates velocity rather than reacting to it, so it never has to read the player's own."
+  },
+  {
+   "title": "Spider-sense is an authorization question",
+   "body": "Detection runs server-side and the result goes only to the sensing player. Broadcasting it would hand every client the position of things they cannot see. Outlines come from Core's glow registry, so they are local to that client, need no scoreboard team, and never touch synced glowing state."
+  },
+  {
+   "title": "The reaching arm is not animated",
+   "body": "The swing clip's authored track for the reaching arm is dropped at load, and the arm is solved each frame to point at the live anchor — so it tracks the real web rather than a baked pose. In third person the rope starts at the hand read out of the **posed model** during rendering, not at a position reconstructed from the player; by then the hand has been moved by the clip, the arm aim, the body lean and the spin, and any reconstruction of that is the error that leaves ropes hanging in open air."
+  },
+  {
+   "title": "The bullet spin is not baked",
+   "body": "A bullet rolls about the axis it travels along, and that axis is only known at the moment of the spin — a keyframed root turned an upward launch into a flat propeller sweep. Its clip carries the limb tuck alone and the renderer tips the body to line up with live velocity. Rocketing straight up needs no tip; flat-out travel tips ninety degrees."
+  },
+  {
+   "title": "Catching a web upside down",
+   "body": "Catching mid-somersault carries the inversion into the swing: you hang inverted from the strand, gripping it overhead with both hands and knees splayed, rather than snapping upright. The window is the half of the turn between 90 and 270 degrees, which is why the bullet spin never qualifies — it only pitches to about 78."
+  },
+  {
+   "title": "A side anchor is not a pendulum",
+   "body": "There is no gravity component along a level rope to swing on, so treating one like a pendulum could only spin you around the anchor. Throws far enough off vertical let the line pay out, relieve most of the inward pull, and get more forward drive instead. How side-on a throw was is measured **once**, when the web catches — a rope tips away from vertical simply by swinging, so judging it live would turn every overhead swing into a side one halfway through its own arc."
+  },
+  {
+   "title": "Suits do not wear out",
+   "body": "The pieces have no durability. Not a large amount, and not damage cancelled after the fact — an item with no maximum damage is never damaged at all, so there is no bar, nothing to repair, and no path by which a suit could break. A worn suit also takes fall damage down to nothing, passively: every traversal move here ends in a drop."
+  }
+ ]
+}

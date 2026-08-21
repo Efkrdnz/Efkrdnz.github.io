@@ -13,19 +13,24 @@ const all = (await getCollection('mods')).sort((a, b) => a.data.order - b.data.o
 const own = all.filter((m) => m.data.role === 'author');
 const mentions = all.filter((m) => m.data.role !== 'author');
 
-const featured = own.find((m) => m.data.featured) ?? own[0];
-const rest = own.filter((m) => m.id !== featured.id);
+/* Headline numbers count shipped work only. An unreleased mod has a page and a
+   wiki, but it is not yet a project on the shelf and must not inflate a total
+   the whole site is sorted by. It reaches readers through the series section. */
+const shipped = own.filter((m) => m.data.status === 'released');
+
+const featured = shipped.find((m) => m.data.featured) ?? shipped[0];
+const rest = shipped.filter((m) => m.id !== featured.id);
 
 /* Counts both platforms, but only work efkrdnzz actually authored. */
-const totalDownloads = own.reduce(
-  (n, m) => n + m.data.downloads + (m.data.modrinthDownloads ?? 0),
+const totalDownloads = shipped.reduce(
+  (n, m) => n + (m.data.downloads ?? 0) + (m.data.modrinthDownloads ?? 0),
   0
 );
-const platforms = own.some((m) => m.data.modrinth)
+const platforms = shipped.some((m) => m.data.modrinth)
   ? ['CurseForge', 'Modrinth']
   : ['CurseForge'];
-const modCount = own.filter((m) => m.data.kind === 'mod').length;
-const packCount = own.filter((m) => m.data.kind === 'modpack').length;
+const modCount = shipped.filter((m) => m.data.kind === 'mod').length;
+const packCount = shipped.filter((m) => m.data.kind === 'modpack').length;
 
 /* Series modules that have a real page here. Passing this in keeps the
    series data free of routes, and stops an unpublished module from
@@ -37,7 +42,11 @@ const seriesLinks = Object.fromEntries(
       m.id,
       {
         href: url(`/mods/${m.id}`),
-        wiki: m.data.hasCodex ? url(`/mods/${m.id}/codex`) : undefined,
+        wiki: m.data.hasCodex
+          ? url(`/mods/${m.id}/codex`)
+          : m.data.hasManual
+            ? url(`/mods/${m.id}/manual`)
+            : undefined,
       },
     ])
 );
@@ -82,7 +91,7 @@ const seriesLinks = Object.fromEntries(
       </div>
       <div class="rail__cell">
         <span class="rail__k">Projects</span>
-        <span class="rail__v">{own.length}</span>
+        <span class="rail__v">{shipped.length}</span>
       </div>
       <div class="rail__cell">
         <span class="rail__k">Mods &middot; Packs</span>

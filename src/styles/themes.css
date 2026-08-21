@@ -40,6 +40,22 @@
   --glow: rgba(124, 58, 237, 0.18);
 }
 
+/* Minefinity Spiderman — red on a near-black that leans blue, not brown, so
+   the classic pair is present without painting the page in both at once */
+[data-mod='spiderman'] {
+  --page-bg: #0D0A11;
+  --panel: #16111C;
+  --edge: #342A3E;
+  --edge-dim: #241D2C;
+  --panel-edge: #29212F;
+  --accent: #E8484C;
+  --accent-hi: #FF6B6F;
+  --bone: #F1E9EC;
+  --ash: #A2949F;
+  --ash-dim: #8A7D87;
+  --glow: rgba(47, 98, 217, 0.16);
+}
+
 /* Efk's utility mods — one calm skin so the small mods read as a family */
 [data-mod='efk'] {
   --page-bg: #0E1113;

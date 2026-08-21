@@ -346,7 +346,9 @@ const SERIES = {
       blurb:
         'Web slinging, wall movement and wrist-mounted shooters. Suits are registered data rather than hardcoded checks — a suit owns its four pieces, the skin it paints on the wearer, and the abilities it grants, so adding one is a registration instead of another branch through every power.',
       status: 'dev',
-      stat: 'In development',
+      /* Unreleased, but it has a page and a manual, so it links. */
+      slug: 'minefinity-spiderman',
+      stat: 'Manual online',
     },
     {
       key: 'thor',

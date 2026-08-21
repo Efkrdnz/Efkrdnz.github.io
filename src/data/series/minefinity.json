@@ -44,7 +44,8 @@
    "tagline": "Three suits, and the city to swing through.",
    "blurb": "Web slinging, wall movement and wrist-mounted shooters. Suits are registered data rather than hardcoded checks — a suit owns its four pieces, the skin it paints on the wearer, and the abilities it grants, so adding one is a registration instead of another branch through every power.",
    "status": "dev",
-   "stat": "In development"
+   "slug": "minefinity-spiderman",
+   "stat": "Manual online"
   },
   {
    "key": "thor",

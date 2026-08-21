@@ -1,0 +1,431 @@
+/* ==========================================================================
+   The Manual — a moveset, read by suit
+
+   The third shape a wiki takes here. A guide is a route through a mod and a
+   codex is a database of it; a moveset is neither. Thirty-odd moves across
+   five groups is a document, not a graph and not a filterable table, so this
+   is a document — with one interaction, because the mod has one idea worth
+   making interactive.
+
+   That idea: every gate in the mod asks "which suit is worn, and does it
+   grant this". So the page asks the reader the same question once, at the
+   top, and answers the rest of itself accordingly. Picking a suit retints the
+   page, swaps the web table between silk and symbiote, and marks which
+   toggles that suit actually has.
+
+   Suit hues are decoration and are never the only signal: a substituted web
+   says "replaces Attack Web" in words, and an ability the suit lacks is
+   struck from the list rather than merely dimmed.
+   ========================================================================== */
+
+.man {
+  --suit: var(--accent);
+  --suit-2: var(--accent-hi);
+}
+
+/* ---------------------------------------------------------------- hero --- */
+
+.man-hero {
+  position: relative;
+  padding-block: var(--s8) var(--s7);
+}
+
+.man-hero__in { max-width: 64ch; }
+
+.man-hero__h {
+  font-family: var(--head-font);
+  font-weight: 800;
+  font-size: clamp(2rem, 5.6vw, 3.4rem);
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+  margin: var(--s4) 0 var(--s5);
+  text-wrap: balance;
+}
+
+.man-hero__b { color: var(--ash); line-height: 1.7; margin: 0 0 var(--s4); }
+.man-hero__b strong { color: var(--bone); font-weight: 600; }
+
+.man-spec {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2) var(--s5);
+  margin-top: var(--s5);
+  padding-top: var(--s5);
+  border-top: 1px solid var(--edge-dim);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--ash-dim);
+}
+
+.man-spec b { color: var(--ash); font-weight: 500; }
+
+/* --------------------------------------------------------- suit picker --- */
+
+.man-pick {
+  position: sticky;
+  top: 58px;
+  z-index: 20;
+  background: color-mix(in srgb, var(--page-bg) 92%, transparent);
+  backdrop-filter: blur(10px);
+  border-block: 1px solid var(--panel-edge);
+}
+
+.man-pick__in {
+  display: flex;
+  align-items: center;
+  gap: var(--s4);
+  padding-block: var(--s3);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.man-pick__in::-webkit-scrollbar { display: none; }
+
+.man-pick__label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ash-dim);
+  white-space: nowrap;
+  flex: none;
+}
+
+.man-suit {
+  --suit: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s3);
+  min-height: 44px;
+  padding: 6px 14px 6px 10px;
+  background: transparent;
+  border: 1px solid var(--edge-dim);
+  border-radius: var(--radius);
+  color: var(--ash);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.18s var(--ease), border-color 0.18s var(--ease);
+}
+
+.man-suit:hover { color: var(--bone); border-color: var(--edge); }
+
+.man-suit[aria-pressed='true'] {
+  color: var(--bone);
+  border-color: color-mix(in srgb, var(--suit) 55%, var(--edge));
+  background: color-mix(in srgb, var(--suit) 10%, transparent);
+}
+
+/* the two-tone chip is the suit's own pair, not one flat swatch */
+.man-suit__mark {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--suit) 0 50%, var(--suit-2) 50% 100%);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--suit) 50%, transparent);
+}
+
+.man-suit__n {
+  font-family: var(--head-font);
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: -0.01em;
+}
+
+.man-suit__s {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ash-dim);
+}
+
+/* -------------------------------------------------------------- panels --- */
+
+.man-sec { padding-block: var(--s7); border-bottom: 1px solid var(--edge-dim); }
+
+.man-sec__head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s4);
+  margin-bottom: var(--s5);
+}
+
+.man-sec__h {
+  font-family: var(--head-font);
+  font-weight: 700;
+  font-size: 1.5rem;
+  letter-spacing: -0.025em;
+  margin: 0;
+}
+
+.man-sec__n {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ash-dim);
+  white-space: nowrap;
+}
+
+.man-sec__lede { color: var(--ash); max-width: 68ch; margin: 0 0 var(--s5); line-height: 1.7; }
+
+/* --------------------------------------------------------- suit detail --- */
+
+.man-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+  gap: var(--s6);
+  padding: var(--s6);
+  background:
+    linear-gradient(150deg, color-mix(in srgb, var(--suit) 13%, transparent), transparent 60%),
+    var(--panel);
+  border: 1px solid color-mix(in srgb, var(--suit) 30%, var(--edge-dim));
+  border-radius: var(--radius);
+}
+
+@media (max-width: 820px) { .man-card { grid-template-columns: 1fr; gap: var(--s5); } }
+
+.man-card__n {
+  font-family: var(--head-font);
+  font-weight: 800;
+  font-size: 1.7rem;
+  letter-spacing: -0.03em;
+  margin: 0 0 var(--s2);
+  line-height: 1;
+}
+
+.man-card__t {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-style: italic;
+  color: var(--suit);
+  margin: 0 0 var(--s4);
+}
+
+.man-card__style { margin: 0; font-size: 0.9rem; line-height: 1.65; color: var(--ash); }
+.man-card__style b { color: var(--bone); font-weight: 600; }
+
+/* --------------------------------------------------------------- lists --- */
+
+.man-list { display: flex; flex-direction: column; gap: 1px; }
+
+.man-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--s2) var(--s4);
+  align-items: baseline;
+  padding: var(--s3) 0;
+  border-bottom: 1px solid var(--edge-dim);
+}
+
+.man-row:last-child { border-bottom: 0; }
+
+.man-row__n {
+  font-family: var(--head-font);
+  font-weight: 600;
+  font-size: 0.98rem;
+  letter-spacing: -0.012em;
+  color: var(--bone);
+}
+
+.man-row__d {
+  grid-column: 1 / -1;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--ash);
+  margin: 0;
+  max-width: 74ch;
+}
+
+.man-row__d strong { color: var(--bone); font-weight: 600; }
+
+.man-row__m {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ash-dim);
+  white-space: nowrap;
+}
+
+/* An ability the chosen suit does not grant is struck out, not just faded —
+   the state has to survive being seen in greyscale. */
+.man-row.is-absent .man-row__n {
+  color: var(--ash-dim);
+  text-decoration: line-through;
+  text-decoration-color: color-mix(in srgb, var(--ash-dim) 70%, transparent);
+}
+
+.man-row.is-absent .man-row__d { color: var(--ash-dim); }
+
+.man-tag {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border: 1px solid var(--edge-dim);
+  border-radius: 2px;
+  color: var(--ash-dim);
+  white-space: nowrap;
+}
+
+.man-tag--on { color: var(--suit); border-color: color-mix(in srgb, var(--suit) 40%, var(--edge-dim)); }
+.man-tag--pending { color: var(--r-legendary); border-color: color-mix(in srgb, var(--r-legendary) 35%, var(--edge-dim)); }
+.man-tag--sub { color: var(--bone); border-color: var(--edge); }
+
+/* --------------------------------------------------------------- table --- */
+
+.man-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 1px;
+  background: var(--panel-edge);
+  border: 1px solid var(--panel-edge);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.man-cell {
+  background: var(--page-bg);
+  padding: var(--s5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+}
+
+.man-cell__top { display: flex; align-items: baseline; gap: var(--s3); flex-wrap: wrap; }
+
+.man-cell__n {
+  font-family: var(--head-font);
+  font-weight: 700;
+  font-size: 1.02rem;
+  letter-spacing: -0.015em;
+  color: var(--bone);
+}
+
+.man-cell__k {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--suit);
+}
+
+.man-cell__d { font-size: 0.88rem; line-height: 1.6; color: var(--ash); margin: 0; }
+
+/* ------------------------------------------------------------- keycaps --- */
+
+.man-keys { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--s4); }
+
+.man-key {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--s4);
+  align-items: start;
+  padding: var(--s4);
+  background: var(--panel);
+  border: 1px solid var(--edge-dim);
+  border-radius: var(--radius);
+}
+
+.man-cap {
+  flex: none;
+  min-width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  padding-inline: 9px;
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--bone);
+  background: var(--page-bg);
+  border: 1px solid var(--edge);
+  border-bottom-width: 3px;
+  border-radius: 4px;
+}
+
+.man-key__n {
+  font-family: var(--head-font);
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--bone);
+  display: flex;
+  align-items: baseline;
+  gap: var(--s3);
+  flex-wrap: wrap;
+}
+
+.man-key__o {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ash-dim);
+}
+
+.man-key__d { font-size: 0.86rem; line-height: 1.6; color: var(--ash); margin: var(--s1) 0 0; }
+
+/* --------------------------------------------------------------- notes --- */
+
+.man-notes { display: grid; gap: var(--s4); }
+
+.man-note {
+  padding: var(--s5);
+  background: var(--panel);
+  border: 1px solid var(--edge-dim);
+  border-left: 2px solid color-mix(in srgb, var(--suit) 60%, var(--edge));
+  border-radius: var(--radius);
+}
+
+.man-note__h {
+  font-family: var(--head-font);
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: -0.015em;
+  margin: 0 0 var(--s2);
+  color: var(--bone);
+}
+
+.man-note__b {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--ash);
+  max-width: 76ch;
+}
+
+.man-note__b strong { color: var(--bone); font-weight: 600; }
+.man-note__b + .man-note__b { margin-top: var(--s3); }
+
+/* ------------------------------------------------------------- pending --- */
+
+.man-wip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s4);
+  padding: var(--s5);
+  margin-top: var(--s6);
+  border: 1px dashed var(--edge);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--panel) 55%, transparent);
+}
+
+.man-wip__t {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--bone);
+}
+
+.man-wip__d { font-size: 0.9rem; color: var(--ash); margin: 0; max-width: 62ch; }
+
+@media (prefers-reduced-motion: reduce) {
+  .man-suit, .man-row, .man-cell { transition: none; }
+}

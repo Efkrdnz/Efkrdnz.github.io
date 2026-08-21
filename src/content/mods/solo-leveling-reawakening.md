@@ -16,6 +16,17 @@ mcVersions: ["1.20.1"]
 featured: true
 order: 1
 hasGuide: true
+press:
+  - outlet: "CurseForge"
+    kind: "Community Picks"
+    url: "https://www.curseforge.com/community-picks/minecraft/curseforge-jun25"
+    date: "June 2025"
+    note: "Listed first of ten in Top Anime Mods, ahead of Cobblemon and Jujutsu Craft."
+  - outlet: "CurseForge"
+    kind: "Video"
+    url: "https://www.youtube.com/watch?v=ZZ2lII14Gws"
+    date: "2025"
+    note: "Top 10 Best Anime Mods for Minecraft - SLR opens the countdown."
 features:
   - k: "World"
     t: "Gates"

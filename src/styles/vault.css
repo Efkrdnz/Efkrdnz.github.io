@@ -1113,3 +1113,11 @@
   border-radius: 2px;
   background: var(--void);
 }
+
+/* An outbound link inside panel prose. Marked so it is obviously not another
+   node on the map — following it leaves the site. */
+.vlink--out::after {
+  content: ' ↗';
+  font-size: 0.85em;
+  opacity: 0.75;
+}

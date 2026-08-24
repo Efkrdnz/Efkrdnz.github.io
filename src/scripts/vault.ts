@@ -118,6 +118,12 @@ function fmt(s: string, known?: (id: string) => boolean): string {
         ? `<button type="button" class="vlink" data-goto="${id}">${id.replace(/-/g, ' ')}</button>`
         : id.replace(/-/g, ' ')
     )
+    /* [label](https://…) — addon pages need to point off-site, which
+       wikilinks cannot do. */
+    .replace(
+      /\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,
+      '<a class="vlink vlink--out" href="$2" target="_blank" rel="noopener noreferrer">$1</a>'
+    )
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/`(.+?)`/g, '<code>$1</code>');
 }

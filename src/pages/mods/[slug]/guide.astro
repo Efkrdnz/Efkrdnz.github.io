@@ -29,6 +29,78 @@ const wikis = import.meta.glob<{ default: { nodes: any[] } }>(
 );
 const dataEntry = Object.entries(wikis).find(([p]) => p.endsWith(`/${mod.id}.json`));
 const nodes: any[] = dataEntry ? (dataEntry[1].default.nodes ?? []) : [];
+/* Addons live in the Vault too, generated from the addons collection rather
+   than copied into the wiki JSON - one source, so a new addon appears on the
+   map the moment its markdown file exists. */
+const modAddons = (await getCollection('addons'))
+  .filter((a) => a.data.forMod === mod.id)
+  .sort((a, b) => a.data.order - b.data.order);
+
+const addonNodes: any[] = modAddons.length
+  ? [
+      {
+        id: 'addons',
+        title: 'Addons',
+        category: 'addon',
+        tagline: 'Separate mods other people built on top of this one',
+        status: 'live',
+        parents: [],
+        summary:
+          `Addons are not part of ${d.short}. They are separate mods, written by ` +
+          'other people, that plug into it and need it installed to do anything. ' +
+          'Everything here belongs to whoever made it.',
+        facts: [
+          { label: 'Count', value: String(modAddons.length) },
+          { label: 'Requires', value: d.title },
+        ],
+        sections: [
+          {
+            heading: 'Made one?',
+            body:
+              'Built something on top of this mod? Say so in the Discord and it ' +
+              'can be listed here.',
+          },
+        ],
+        related: [],
+      },
+      ...modAddons.map((a) => ({
+        id: `addon-${a.id}`,
+        title: a.data.title,
+        category: 'addon',
+        tagline: a.data.tagline,
+        status: 'live',
+        parents: ['addons'],
+        summary: a.data.blurb,
+        facts: [
+          { label: 'Made by', value: `**${a.data.author}**` },
+          { label: 'Requires', value: d.title },
+          ...(a.data.mcVersions.length || a.data.loaders.length
+            ? [{
+                label: 'Runs on',
+                value: [...a.data.mcVersions, ...a.data.loaders].join(' · '),
+              }]
+            : []),
+          ...a.data.alsoNeeds.map((n: string) => ({ label: 'Also wants', value: n })),
+        ],
+        sections: [
+          ...(a.data.caveat ? [{ heading: 'Version note', body: a.data.caveat }] : []),
+          {
+            heading: 'Where to get it',
+            body:
+              `[Download on CurseForge](${a.data.curseforge})` +
+              (a.data.modrinth ? ` · [Modrinth](${a.data.modrinth})` : '') +
+              `
+
+Install ${d.short} first — this does nothing without it.`,
+          },
+        ],
+        related: [],
+      })),
+    ]
+  : [];
+
+nodes.push(...addonNodes);
+
 const known = new Set(nodes.map((n) => n.id));
 
 const guides = import.meta.glob<{ default: any }>(
@@ -107,13 +179,13 @@ chapters.forEach((c) => {
 
 const GROUP_ORDER = [
   'system', 'evaluation', 'rank', 'class', 'style', 'skill',
-  'vessel', 'shadow', 'dungeon', 'boss', 'item', 'setting',
+  'vessel', 'shadow', 'dungeon', 'boss', 'item', 'setting', 'addon',
 ];
 const GROUP_LABEL: Record<string, string> = {
   system: 'The System', evaluation: 'Evaluation', rank: 'Hunter ranks',
   class: 'Classes', style: 'Styles', skill: 'Skills', vessel: 'Vessels',
   shadow: 'Shadows', dungeon: 'Dungeons & gates', boss: 'Bosses',
-  item: 'Items & gear', setting: 'Settings & tools',
+  item: 'Items & gear', setting: 'Settings & tools', addon: 'Addons',
 };
 
 const grouped = GROUP_ORDER

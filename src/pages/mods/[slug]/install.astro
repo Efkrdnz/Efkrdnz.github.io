@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../../../layouts/Base.astro';
+import Addons from '../../../components/Addons.astro';
 import { url, full } from '../../../lib/util';
 import '../../../styles/install.css';
 
@@ -13,6 +14,10 @@ export async function getStaticPaths() {
 
 const { mod } = Astro.props;
 const d = mod.data;
+
+const addons = (await getCollection('addons'))
+  .filter((a) => a.data.forMod === mod.id)
+  .sort((a, b) => a.data.order - b.data.order);
 
 const files = import.meta.glob<{ default: any }>('../../../data/wiki/*.install.json', {
   eager: true,
@@ -43,6 +48,7 @@ const totalDownloads = d.downloads + (d.modrinthDownloads ?? 0);
         <a class="subnav__link" href={url(`/mods/${mod.id}`)}>Overview</a>
         <a class="subnav__link" href={url(`/mods/${mod.id}/guide`)}>Guide</a>
         <a class="subnav__link" href={url(`/mods/${mod.id}/install`)} aria-current="page">Install</a>
+        {addons.length > 0 && <a class="subnav__link" href="#addons">Addons</a>}
         <span class="subnav__soon">Changelog</span>
         <a class="subnav__link" href={url('/mods')} style="margin-left:auto;">&larr; All mods</a>
       </div>
@@ -258,6 +264,14 @@ const totalDownloads = d.downloads + (d.modrinthDownloads ?? 0);
             ))}
           </ol>
         </section>
+
+        {addons.length > 0 && <div id="addons"></div>}
+        <Addons
+          items={addons}
+          eyebrow="Addons"
+          heading={`Made for ${d.short}`}
+          note="Install the mod first — these need it"
+        />
 
         <section class="shell section" style="padding-top:0;">
           <div class="dl">

@@ -33,12 +33,14 @@ const {
         <article class="addon reveal">
           <div class="addon__head">
             <h3 class="addon__name">{a.data.title}</h3>
-            <span class="addon__by">
-              by {a.data.authorUrl
-                ? <a href={a.data.authorUrl} rel="noopener noreferrer" target="_blank">{a.data.author}</a>
-                : a.data.author}
-            </span>
           </div>
+
+          <p class="addon__by">
+            <span class="addon__by-label">Made by</span>
+            {a.data.authorUrl
+              ? <a class="addon__author" href={a.data.authorUrl} rel="noopener noreferrer" target="_blank">{a.data.author}</a>
+              : <span class="addon__author">{a.data.author}</span>}
+          </p>
 
           <p class="addon__tag">{a.data.tagline}</p>
           <p class="addon__blurb">{a.data.blurb}</p>

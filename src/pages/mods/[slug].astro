@@ -47,6 +47,7 @@ const wiki = d.hasGuide
           ? <a class="subnav__link" href={wiki.href}>{wiki.label}</a>
           : <span class="subnav__soon">Guide</span>}
         {d.hasGuide && <a class="subnav__link" href={url(`/mods/${mod.id}/install`)}>Install</a>}
+        {addons.length > 0 && <a class="subnav__link" href="#addons">Addons</a>}
         <span class="subnav__soon">Changelog</span>
         {released
           ? <a class="subnav__link" href="#download">Download</a>
@@ -254,7 +255,7 @@ const wiki = d.hasGuide
       )}
     </section>
 
-    {released ? (
+    {addons.length > 0 && <div id="addons"></div>}
     <Addons
       items={addons}
       eyebrow="Addons"
@@ -262,6 +263,7 @@ const wiki = d.hasGuide
       note="By other people — links go to them"
     />
 
+    {released ? (
     <section class="shell section" id="download" style="padding-top:0;">
       <div class="dl reveal">
         <div class="dl__copy">

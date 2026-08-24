@@ -77,4 +77,32 @@ const mods = defineCollection({
     }),
 });
 
-export const collections = { mods };
+/* Community addons. Somebody else's work that extends one of these mods, so
+   the shape deliberately differs from a mod: it leads with the author and the
+   mod it plugs into, and carries no download count. Ranking a brand-new
+   community addon by downloads against a 2M-download mod tells the reader
+   nothing useful and discourages the next person from building one. */
+const addons = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/addons' }),
+  schema: z.object({
+    title: z.string(),
+    /* Whose work this is. Never efkrdnzz. */
+    author: z.string(),
+    authorUrl: z.string().url().optional(),
+    /* The slug in src/content/mods that this addon extends. */
+    forMod: z.string(),
+    tagline: z.string(),
+    blurb: z.string(),
+    curseforge: z.string().url(),
+    modrinth: z.string().url().optional(),
+    loaders: z.array(z.string()).default([]),
+    mcVersions: z.array(z.string()).default([]),
+    /* Optional extras the addon itself asks for, beyond the parent mod. */
+    alsoNeeds: z.array(z.string()).default([]),
+    /* A branch note when the addon does not target the mod's current branch. */
+    caveat: z.string().optional(),
+    order: z.number().default(50),
+  }),
+});
+
+export const collections = { mods, addons };

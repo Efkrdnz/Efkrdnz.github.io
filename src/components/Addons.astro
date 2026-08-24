@@ -1,0 +1,77 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  items: CollectionEntry<'addons'>[];
+  /* Heading copy differs by context: the addons page names them, a mod hub
+     already knows which mod they extend. */
+  eyebrow?: string;
+  heading?: string;
+  note?: string;
+}
+
+const {
+  items,
+  eyebrow = 'Addons',
+  heading = 'Built on these mods by other people',
+  note = 'Community work — links go to their authors',
+} = Astro.props;
+---
+
+{items.length > 0 && (
+  <section class="shell section" style="padding-top:0;">
+    <div class="section__head reveal">
+      <div class="section__title">
+        <p class="eyebrow">{eyebrow}</p>
+        <h2 class="h2">{heading}</h2>
+      </div>
+      <p class="mono-note">{note}</p>
+    </div>
+
+    <div class="addon-list">
+      {items.map((a) => (
+        <article class="addon reveal">
+          <div class="addon__head">
+            <h3 class="addon__name">{a.data.title}</h3>
+            <span class="addon__by">
+              by {a.data.authorUrl
+                ? <a href={a.data.authorUrl} rel="noopener noreferrer" target="_blank">{a.data.author}</a>
+                : a.data.author}
+            </span>
+          </div>
+
+          <p class="addon__tag">{a.data.tagline}</p>
+          <p class="addon__blurb">{a.data.blurb}</p>
+
+          {(a.data.mcVersions.length > 0 || a.data.loaders.length > 0) && (
+            <p class="addon__spec">
+              {[...a.data.mcVersions, ...a.data.loaders].join(' · ')}
+            </p>
+          )}
+
+          {a.data.alsoNeeds.length > 0 && (
+            <p class="addon__needs">Also wants: {a.data.alsoNeeds.join('; ')}</p>
+          )}
+
+          {a.data.caveat && <p class="addon__caveat">{a.data.caveat}</p>}
+
+          <div class="addon__foot">
+            <a
+              class="btn"
+              href={a.data.curseforge}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              CurseForge <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+            </a>
+            {a.data.modrinth && (
+              <a class="btn" href={a.data.modrinth} rel="noopener noreferrer" target="_blank">
+                Modrinth
+              </a>
+            )}
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+)}

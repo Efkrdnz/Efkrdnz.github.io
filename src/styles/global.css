@@ -975,3 +975,113 @@ a.smod:hover .smod__go { transform: translateX(3px); }
 }
 
 .skip-link:focus { top: var(--s4); color: var(--stone-900); }
+
+/* --------------------------------------------------------------- addons --- */
+/* Somebody else's work extending one of these mods. Shaped like a small
+   article rather than a .tip card on purpose: a tip card ranks by download
+   tier, and ranking a new community addon against a 2M-download mod would say
+   something untrue about both. */
+
+.addon-list {
+  display: grid;
+  /* auto-FILL, not auto-fit: with a single addon, auto-fit collapses the empty
+     tracks and stretches one card across the full 1112px, which reads as a
+     broken banner. auto-fill keeps the track width so a lone card sits at its
+     natural size. */
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--s4);
+}
+
+.addon {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+  padding: var(--s5);
+  background: var(--panel);
+  border: 1px solid var(--edge-dim);
+  border-radius: var(--radius);
+  transition: border-color 0.2s var(--ease);
+}
+
+.addon:hover { border-color: var(--edge); }
+
+.addon__head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s3);
+  flex-wrap: wrap;
+}
+
+.addon__name {
+  font-family: var(--head-font);
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: -0.015em;
+  margin: 0;
+  color: var(--bone);
+}
+
+/* the author is the point of this card, so it gets the accent */
+.addon__by {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--ash-dim);
+}
+
+.addon__by a { color: var(--accent); }
+.addon__by a:hover { color: var(--accent-hi); }
+
+.addon__tag {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-style: italic;
+  color: var(--accent);
+}
+
+.addon__blurb {
+  margin: var(--s1) 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--ash);
+  flex: 1;
+}
+
+.addon__spec,
+.addon__needs,
+.addon__caveat {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--ash-dim);
+}
+
+.addon__spec { margin-top: var(--s2); }
+
+/* a version note is information, not an alarm — a left rule, no colour */
+.addon__caveat {
+  margin-top: var(--s2);
+  padding-left: var(--s3);
+  border-left: 1px solid var(--edge);
+  color: var(--ash);
+}
+
+.addon__foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+  margin-top: var(--s4);
+  padding-top: var(--s4);
+  border-top: 1px solid var(--edge-dim);
+}
+
+/* Adding a fourth nav item pushed the header 46px past its container at 375px.
+   The external CurseForge link is the one to drop: it is the only item that
+   leaves the site, and the footer carries it on every page. Tightening the gap
+   alone would not have been enough, and shrinking the type further would have
+   put the nav under 11px. */
+@media (max-width: 560px) {
+  .nav { gap: var(--s4); }
+  .nav a[target='_blank'] { display: none; }
+}

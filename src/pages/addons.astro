@@ -1,0 +1,83 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Addons from '../components/Addons.astro';
+import { url } from '../lib/util';
+
+const addons = (await getCollection('addons')).sort(
+  (a, b) => a.data.order - b.data.order
+);
+const mods = await getCollection('mods');
+
+/* Group by the mod each one extends, so the page reads as "what grew on top
+   of this" rather than a flat pile. */
+const groups = mods
+  .map((m) => ({
+    mod: m,
+    items: addons.filter((a) => a.data.forMod === m.id),
+  }))
+  .filter((g) => g.items.length > 0)
+  .sort((a, b) => a.mod.data.order - b.mod.data.order);
+
+const orphans = addons.filter((a) => !mods.some((m) => m.id === a.data.forMod));
+const authors = [...new Set(addons.map((a) => a.data.author))];
+---
+
+<Base
+  title="Addons — efkrdnzz"
+  description="Community addons built on top of efkrdnzz's Minecraft mods, by the people who made them."
+>
+  <section class="shell section">
+    <div class="section__head">
+      <div class="section__title">
+        <p class="eyebrow">{addons.length} {addons.length === 1 ? 'addon' : 'addons'}</p>
+        <h1 class="h2">Built on top of these mods</h1>
+      </div>
+      <p class="mono-note">
+        {authors.length === 1 ? 'By' : 'By'} {authors.join(', ')}
+      </p>
+    </div>
+
+    <p class="lede">
+      Other people's mods that plug into mine. Everything here needs its parent
+      mod installed to do anything, and everything here belongs to the person who
+      made it &mdash; the links go to them.
+    </p>
+  </section>
+
+  {groups.map((g) => (
+    <Addons
+      items={g.items}
+      eyebrow={`For ${g.mod.data.short}`}
+      heading={g.mod.data.title}
+      note={`Requires ${g.mod.data.short}`}
+    />
+  ))}
+
+  {orphans.length > 0 && (
+    <Addons items={orphans} eyebrow="Other" heading="Elsewhere" note="Community work" />
+  )}
+
+  <section class="shell section" style="padding-top:0;">
+    <div class="dl">
+      <div class="dl__copy">
+        <p class="eyebrow">Made something?</p>
+        <h2 class="h3">Addons are welcome</h2>
+        <p class="mono-note">
+          Built something on one of these mods? Say so in the Discord and it can go here.
+        </p>
+      </div>
+      <div class="actions">
+        <a
+          class="btn btn--primary"
+          href="https://discord.gg/U3RtGxd5uw"
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          Discord <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+        </a>
+        <a class="btn" href={url('/mods')}>All mods</a>
+      </div>
+    </div>
+  </section>
+</Base>

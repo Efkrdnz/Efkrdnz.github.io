@@ -15,6 +15,7 @@ const on = (p: string) => (p === '/' ? here === '/' : here.startsWith(p));
 
     <nav class="nav" aria-label="Primary">
       <a href={url('/mods')} aria-current={on('/mods') ? 'page' : undefined}>Mods</a>
+      <a href={url('/addons')} aria-current={on('/addons') ? 'page' : undefined}>Addons</a>
       <a href={url('/about')} aria-current={on('/about') ? 'page' : undefined}>About</a>
       <a
         href="https://www.curseforge.com/members/efkrdnzz/projects"

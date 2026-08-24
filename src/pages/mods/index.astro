@@ -3,9 +3,11 @@ import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import ModTip from '../../components/ModTip.astro';
 import Mentions from '../../components/Mentions.astro';
+import Addons from '../../components/Addons.astro';
 import { full } from '../../lib/util';
 
 const all = (await getCollection('mods')).sort((a, b) => a.data.order - b.data.order);
+const addons = (await getCollection('addons')).sort((a, b) => a.data.order - b.data.order);
 
 const own = all.filter((m) => m.data.role === 'author');
 const mentions = all.filter((m) => m.data.role !== 'author');
@@ -96,6 +98,8 @@ const totalDownloads = shipped.reduce(
       </div>
     </section>
   )}
+
+  <Addons items={addons} />
 
   <Mentions items={mentions} />
 </Base>

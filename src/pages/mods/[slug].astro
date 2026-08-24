@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
+import Addons from '../../components/Addons.astro';
 import Base from '../../layouts/Base.astro';
 import { url, full } from '../../lib/util';
 
@@ -14,6 +15,10 @@ export async function getStaticPaths() {
 
 const { mod } = Astro.props;
 const d = mod.data;
+
+const addons = (await getCollection('addons'))
+  .filter((a) => a.data.forMod === mod.id)
+  .sort((a, b) => a.data.order - b.data.order);
 
 const isHud = d.theme === 'slr';
 const panelLabel = isHud ? 'System' : 'Project data';
@@ -250,6 +255,13 @@ const wiki = d.hasGuide
     </section>
 
     {released ? (
+    <Addons
+      items={addons}
+      eyebrow="Addons"
+      heading={`Built on ${d.short}`}
+      note="By other people — links go to them"
+    />
+
     <section class="shell section" id="download" style="padding-top:0;">
       <div class="dl reveal">
         <div class="dl__copy">

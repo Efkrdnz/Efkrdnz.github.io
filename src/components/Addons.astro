@@ -33,6 +33,14 @@ const {
         <article class="addon reveal">
           <div class="addon__head">
             <h3 class="addon__name">{a.data.title}</h3>
+            {a.data.tier !== 'community' && (
+              <span class:list={['addon__tier', `addon__tier--${a.data.tier}`]}>
+                {a.data.tier === 'official' ? 'Official' : 'Partnered'}
+              </span>
+            )}
+            {a.data.release === 'upcoming' && (
+              <span class="addon__soon">To be released</span>
+            )}
           </div>
 
           <p class="addon__by">
@@ -58,14 +66,18 @@ const {
           {a.data.caveat && <p class="addon__caveat">{a.data.caveat}</p>}
 
           <div class="addon__foot">
-            <a
-              class="btn"
-              href={a.data.curseforge}
-              rel="noopener noreferrer"
-              target="_blank"
-            >
-              CurseForge <span class="btn__arrow" aria-hidden="true">&rarr;</span>
-            </a>
+            {a.data.curseforge ? (
+              <a
+                class="btn"
+                href={a.data.curseforge}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                CurseForge <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+              </a>
+            ) : (
+              <span class="addon__pending">No download yet</span>
+            )}
             {a.data.modrinth && (
               <a class="btn" href={a.data.modrinth} rel="noopener noreferrer" target="_blank">
                 Modrinth

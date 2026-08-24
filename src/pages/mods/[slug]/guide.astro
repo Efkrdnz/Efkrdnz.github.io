@@ -73,6 +73,17 @@ const addonNodes: any[] = modAddons.length
         summary: a.data.blurb,
         facts: [
           { label: 'Made by', value: `**${a.data.author}**` },
+          ...(a.data.tier !== 'community'
+            ? [{
+                label: 'Standing',
+                value: a.data.tier === 'official'
+                  ? 'Official — by the author of this mod'
+                  : 'Partnered — third party, vouched for',
+              }]
+            : []),
+          ...(a.data.release === 'upcoming'
+            ? [{ label: 'Availability', value: 'Not released yet' }]
+            : []),
           { label: 'Requires', value: d.title },
           ...(a.data.mcVersions.length || a.data.loaders.length
             ? [{
@@ -83,15 +94,35 @@ const addonNodes: any[] = modAddons.length
           ...a.data.alsoNeeds.map((n: string) => ({ label: 'Also wants', value: n })),
         ],
         sections: [
+          ...a.data.detail.map((x: any) => ({ heading: x.heading, body: x.body })),
+          ...(a.data.commands.length
+            ? [{
+                heading: 'Commands',
+                body: a.data.commands
+                  .map((c: any) => `\`${c.cmd}\` — ${c.does}`)
+                  .join('\n\n'),
+              }]
+            : []),
+          ...(a.data.config.length
+            ? [{
+                heading: 'Configuration',
+                body:
+                  'Lives in `config/slrvoice.json`, written on first launch.\n\n' +
+                  a.data.config
+                    .map((c: any) => `**${c.key}** (\`${c.value}\`) — ${c.meaning}`)
+                    .join('\n\n'),
+              }]
+            : []),
           ...(a.data.caveat ? [{ heading: 'Version note', body: a.data.caveat }] : []),
           {
             heading: 'Where to get it',
-            body:
-              `[Download on CurseForge](${a.data.curseforge})` +
-              (a.data.modrinth ? ` · [Modrinth](${a.data.modrinth})` : '') +
-              `
+            body: a.data.curseforge
+              ? `[Download on CurseForge](${a.data.curseforge})` +
+                (a.data.modrinth ? ` · [Modrinth](${a.data.modrinth})` : '') +
+                `
 
-Install ${d.short} first — this does nothing without it.`,
+Install ${d.short} first — this does nothing without it.`
+              : `Not released yet. It needs ${d.short} 1.3.0, so it arrives with that release.`,
           },
         ],
         related: [],

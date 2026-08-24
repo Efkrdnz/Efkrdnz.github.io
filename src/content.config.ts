@@ -86,14 +86,21 @@ const addons = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/addons' }),
   schema: z.object({
     title: z.string(),
-    /* Whose work this is. Never efkrdnzz. */
+    /* Whose work this is. May be efkrdnzz for a first-party addon. */
     author: z.string(),
     authorUrl: z.string().url().optional(),
+    /* Who stands behind it. "official" is efkrdnzz's own; "partnered" is
+       somebody else's that he vouches for; "community" is listed without
+       any claim either way. */
+    tier: z.enum(['official', 'partnered', 'community']).default('community'),
+    /* Unreleased addons are listed without a download, so the store link is
+       optional and the refinement below enforces it once released. */
+    release: z.enum(['released', 'upcoming']).default('released'),
     /* The slug in src/content/mods that this addon extends. */
     forMod: z.string(),
     tagline: z.string(),
     blurb: z.string(),
-    curseforge: z.string().url(),
+    curseforge: z.string().url().optional(),
     modrinth: z.string().url().optional(),
     loaders: z.array(z.string()).default([]),
     mcVersions: z.array(z.string()).default([]),
@@ -101,8 +108,30 @@ const addons = defineCollection({
     alsoNeeds: z.array(z.string()).default([]),
     /* A branch note when the addon does not target the mod's current branch. */
     caveat: z.string().optional(),
+    /* Config keys worth documenting, shown on the addon's Vault page. */
+    config: z
+      .array(z.object({ key: z.string(), value: z.string(), meaning: z.string() }))
+      .default([]),
+    /* Commands the addon adds, same treatment. */
+    commands: z
+      .array(z.object({ cmd: z.string(), does: z.string() }))
+      .default([]),
+    /* Longer prose for the Vault page; the card stays short. */
+    detail: z
+      .array(z.object({ heading: z.string(), body: z.string() }))
+      .default([]),
     order: z.number().default(50),
-  }),
+  })
+    /* A released addon with no store link would render a card nobody can act
+       on, so the build refuses it rather than shipping a dead end. */
+    .superRefine((a, ctx) => {
+      if (a.release === 'released' && !a.curseforge)
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['curseforge'],
+          message: 'a released addon needs its CurseForge URL',
+        });
+    }),
 });
 
 export const collections = { mods, addons };

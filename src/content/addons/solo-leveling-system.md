@@ -1,6 +1,8 @@
 ---
 title: "Solo Leveling: System"
 author: "NexShey"
+tier: "partnered"
+release: "released"
 forMod: "solo-leveling-reawakening"
 tagline: "The System, lifted off the screen and into the world"
 blurb: "Replaces the flat System GUI with a holographic, world-space interface: 3D panels that exist in the world rather than on your screen, radial navigation, and interactive windows. Built specifically for Solo Leveling: Reawakening."

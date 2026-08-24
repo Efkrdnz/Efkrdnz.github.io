@@ -1107,3 +1107,46 @@ a.addon__author:hover { color: var(--accent-hi); }
   .nav { gap: var(--s4); }
   .nav a[target='_blank'] { display: none; }
 }
+
+/* Who stands behind an addon. Official is efkrdnzz's own and takes the accent;
+   partnered is somebody else's that he vouches for, so it stays neutral — the
+   distinction has to be legible without implying the partnered one is lesser.
+   Community addons carry no badge at all rather than a third colour. */
+.addon__tier {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  white-space: nowrap;
+}
+
+.addon__tier--official { color: var(--accent); }
+.addon__tier--partnered { color: var(--ash); }
+
+/* Not out yet. Dashed, so it reads as a placeholder rather than a state badge. */
+.addon__soon {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border: 1px dashed var(--edge);
+  border-radius: 2px;
+  color: var(--ash-dim);
+  white-space: nowrap;
+}
+
+.addon__pending {
+  display: inline-flex;
+  align-items: center;
+  padding: 11px 0;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--ash-dim);
+}

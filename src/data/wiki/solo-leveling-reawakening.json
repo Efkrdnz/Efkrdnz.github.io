@@ -2,170 +2,42 @@
  "nodes": [
   {
    "id": "world-settings",
-   "title": "World Settings & Gamerules",
+   "title": "World Settings",
    "category": "setting",
-   "tagline": "Every Solo Leveling gamerule, what it does, and its default",
-   "summary": "Change '31 gamerules' to '32 gamerules'. Most of them are set from the Solo Leveling tab when you create a world, and every one of them can be changed later with the vanilla /gamerule command.",
-   "status": "live",
-   "accent": "#3FC6FF",
+   "tagline": "32 gamerules, and what each one actually defaults to",
    "parents": [
     "settings"
    ],
-   "related": [
-    "difficulty-presets",
-    "progression-presets",
-    "death-rules",
-    "admin-commands"
-   ],
+   "summary": "Everything the mod exposes is a vanilla gamerule, so it can be set at world creation on the **Solo Leveling** tab or changed later with `/gamerule <name> <value>`. The defaults below are the ones compiled into the mod, not the ones the world-creation presets happen to write.",
    "facts": [
     {
-     "label": "soloLevelingStoryMode (default false)",
-     "value": "Starts new players with the Solo Leveling story introduction. Designed for single-player."
+     "label": "How to change one",
+     "value": "`/gamerule soloFatigue false`"
     },
     {
-     "label": "soloLevelingProgressionPreset (default 0)",
-     "value": "Records the world-creation progression preset: 0 Standard, 1 Fast, 2 Custom. Bookkeeping only; the child rules below hold the real values."
+     "label": "At world creation",
+     "value": "The Solo Leveling tab"
     },
     {
-     "label": "soloLevelingDifficultyPreset (default 0)",
-     "value": "Records the world-creation difficulty preset: 0 Normal, 1 Hard, 2 Brutal, 3 Custom. Bookkeeping only."
-    },
-    {
-     "label": "soloLevelingXPMultiplier (default 10)",
-     "value": "XP multiplier for mod XP. 10 = 1.0x, 15 = 1.5x, 20 = 2.0x."
-    },
-    {
-     "label": "soloLevelingJobChangeLevel (default 40)",
-     "value": "The level at which the Job Change quest unlocks. Valid range 20-100."
-    },
-    {
-     "label": "soloLevelingLevelCap (default 150)",
-     "value": "The peak of the progression curve. 0 = unlimited levelling; anything above 300 is treated as 300. Reaching the cap ends levelling and opens the return to the Cartenon Temple."
-    },
-    {
-     "label": "soloLevelingEnemyScale (default 100)",
-     "value": "Solo Leveling enemy health and damage as a percentage. Clamped to 25-400 at runtime."
-    },
-    {
-     "label": "soloLevelingBossPower (default 100)",
-     "value": "Additional boss health, damage, and resistance as a percentage. Clamped to 25-400 at runtime."
-    },
-    {
-     "label": "soloLevelingRankedGates (default true)",
-     "value": "Limits natural gate ranks to the target player's Solo Leveling progression. Set false to allow every gate rank."
-    },
-    {
-     "label": "soloLevelingDeathRules (default 0)",
-     "value": "Dungeon death handling: 0 Standard, 1 Forgiving, 2 Harsh. See the Death Rules page."
-    },
-    {
-     "label": "soloLevelingMonarchLimit (default 1)",
-     "value": "How many players may hold the same Ruler or Monarch vessel. 0 = unlimited."
-    },
-    {
-     "label": "soloLevelingJobChangePoints (default 50)",
-     "value": "Knight kills required to complete the Job Change advancement trial."
-    },
-    {
-     "label": "soloLevelingLoreAccurateRanks (default true)",
-     "value": "Makes the difference between the starting Hunter ranks larger when enabled."
-    },
-    {
-     "label": "soloLevelingRankOddsE (default 25)",
-     "value": "Awakening weight for E rank. Weights are raw values, not literal percentages; all six are rescaled to total 100 when an evaluation rolls."
-    },
-    {
-     "label": "soloLevelingRankOddsD (default 25)",
-     "value": "Awakening weight for D rank."
-    },
-    {
-     "label": "soloLevelingRankOddsC (default 25)",
-     "value": "Awakening weight for C rank."
-    },
-    {
-     "label": "soloLevelingRankOddsB (default 12)",
-     "value": "Awakening weight for B rank."
-    },
-    {
-     "label": "soloLevelingRankOddsA (default 10)",
-     "value": "Awakening weight for A rank."
-    },
-    {
-     "label": "soloLevelingRankOddsS (default 3)",
-     "value": "Awakening weight for S rank. With the defaults the six weights total exactly 100, so S = 3%."
-    },
-    {
-     "label": "disableBlockBreaking (default false)",
-     "value": "When true, cancels block breaking and placing for players who are currently inside a dungeon run."
-    },
-    {
-     "label": "soloDailyQuest (default true)",
-     "value": "Enables or disables Daily Quests given by the System."
-    },
-    {
-     "label": "soloDungeonProgressionOnly (default true)",
-     "value": "When enabled you only gain mod XP from dungeon monsters."
-    },
-    {
-     "label": "soloFatigue (default true)",
-     "value": "Enables or disables Fatigue buildup."
-    },
-    {
-     "label": "soloAbilityDestruction (default false)",
-     "value": "Legacy on/off switch for ability terrain damage. Kept so old worlds load with their existing preference; new worlds should use soloAbilityDestructionMode."
-    },
-    {
-     "label": "soloAbilityDestructionMode (default -1)",
-     "value": "Three-mode terrain damage setting: 0 = off, 1 = partial (outside dungeons only), 2 = on. -1 means an older world has not chosen yet, so the legacy boolean decides. Red Gates and the Demon King's Castle are always protected."
-    },
-    {
-     "label": "soloGateNotification (default true)",
-     "value": "Toggles the chat notification sent when a new gate appears."
-    },
-    {
-     "label": "soloGateDelay (default 400)",
-     "value": "Minimum time in seconds between natural gate spawns. The timer ticks once per second in the overworld."
-    },
-    {
-     "label": "soloGateSpawning (default true)",
-     "value": "Toggles natural gate spawning entirely."
-    },
-    {
-     "label": "soloMiscItems (default true)",
-     "value": "Toggles whether misc items are offered in the System shop."
-    },
-    {
-     "label": "soloDungeonBreak (default true)",
-     "value": "Toggles dungeon breaks (gates erupting when left alone)."
-    },
-    {
-     "label": "soloBloodEffects (default true)",
-     "value": "Toggles blood visual effects."
-    },
-    {
-     "label": "soloPunishment (default true)",
-     "value": "Toggles the punishment players receive when they do not complete their Daily Quest."
+     "label": "Total",
+     "value": "**32** registered rules"
     }
    ],
    "sections": [
     {
-     "heading": "Where you set these",
-     "body": "When you create a world, a Solo Leveling tab appears in the world creation screen. It exposes Story Mode, Ability Destruction, the Progression and Difficulty preset columns, and an Awakening Odds editor. Everything it writes is a normal gamerule stored with that world. After the world exists, change any value with /gamerule, for example: /gamerule soloLevelingXPMultiplier 15. Changes apply immediately; nothing needs a restart."
-    },
-    {
-     "heading": "Presets versus individual rules",
-     "body": "soloLevelingProgressionPreset and soloLevelingDifficultyPreset only record which preset button was chosen. The child rules (XP multiplier, job change level, enemy scale, boss power, death rules, ranked gates) hold the values the game actually reads. If you edit a child rule by hand, the recorded preset simply stops matching; the tab will show Custom the next time it reads the world."
-    },
-    {
-     "heading": "Ability destruction",
-     "body": "Terrain damage from high-impact abilities has three modes. Off (0) is the safe default: abilities never damage terrain. Partial (1) lets abilities damage eligible terrain outside dungeons only. On (2) allows it everywhere eligible. In every mode, Red Gates and the Demon King's Castle are protected. Old worlds that only have the legacy soloAbilityDestruction boolean keep their behavior: the mode rule stays at -1 and the boolean decides."
-    },
-    {
-     "heading": "Awakening odds",
-     "value": "",
-     "body": "The six soloLevelingRankOdds rules are weights, not percentages. Each weight is clamped to 0-100, then all six are rescaled so they total 100 when a Hunter evaluation rolls a rank. Example from the code: weights of 25/25/25/12/12/11 total 110 and give S a real chance of 10%. The world creation tab has an Awakening Odds screen that edits these and shows the normalized S chance on its button."
+     "heading": "Grouped by what they touch",
+     "body": "The rules split into five jobs: how fast you progress, how hard things hit, how gates behave, what the System does to you, and what the world puts up with.\n\nSee [[rules-progression|Progression]], [[rules-difficulty|Difficulty]], [[rules-gates|Gates]], [[rules-system|System]] and [[rules-world|World]]."
     }
-   ]
+   ],
+   "related": [
+    "rules-progression",
+    "rules-difficulty",
+    "rules-gates",
+    "rules-system",
+    "rules-world",
+    "rank-odds"
+   ],
+   "status": "live"
   },
   {
    "id": "difficulty-presets",
@@ -2064,7 +1936,6 @@
     },
     {
      "heading": "How the odds gamerules work",
-     "value": "",
      "body": "The six gamerules soloLevelingRankOddsE through soloLevelingRankOddsS hold raw weights, not literal percentages. They are normalized proportionally: weights of 25/25/25/12/12/11 total 110, so the S weight of 11 yields a 10% chance. A rank with weight 0 can never be drawn."
     }
    ],
@@ -5735,7 +5606,6 @@
     },
     {
      "heading": "Durability warning",
-     "value": "",
      "body": "Ranked swords break after 80 hits on enemies - each hit on an entity costs one durability, and there is no repair ingredient. The daggers and katanas last several times longer. If you are heading into a long dungeon on a sword budget, buy two."
     },
     {
@@ -7043,6 +6913,306 @@
     "red-gates",
     "beru"
    ]
+  },
+  {
+   "id": "rules-progression",
+   "title": "Progression Rules",
+   "category": "setting",
+   "tagline": "Levels, XP, job change, and the ceiling",
+   "parents": [
+    "world-settings"
+   ],
+   "summary": "How fast you climb and how far the climb goes.",
+   "facts": [
+    {
+     "label": "soloLevelingXPMultiplier",
+     "value": "**10** — tenths, so 10 is 1x and 15 is 1.5x"
+    },
+    {
+     "label": "soloLevelingLevelCap",
+     "value": "**150** — 0 restores the old unbounded levelling"
+    },
+    {
+     "label": "soloLevelingJobChangeLevel",
+     "value": "**40** — range 20 to 100"
+    },
+    {
+     "label": "soloLevelingJobChangePoints",
+     "value": "**50** — knight kills the trial asks for"
+    },
+    {
+     "label": "soloLevelingMonarchLimit",
+     "value": "**1** — players who may hold the same vessel; 0 is unlimited"
+    },
+    {
+     "label": "soloDungeonProgressionOnly",
+     "value": "**true** — XP comes only from dungeon monsters"
+    },
+    {
+     "label": "soloLevelingProgressionPreset",
+     "value": "**0** — records the creation preset: 0 standard, 1 fast, 2 custom"
+    }
+   ],
+   "sections": [
+    {
+     "heading": "The two people trip over",
+     "body": "**soloDungeonProgressionOnly is on by default.** Killing things in the overworld gives you no System XP at all. If levelling feels dead, this is why - it is working as intended and you are meant to be in [[gates|gates]].\n\n**soloLevelingMonarchLimit defaults to 1.** On a shared world the first player to claim a vessel takes it, and nobody else can. Set it to 0 if you would rather everyone could be the Shadow Monarch."
+    },
+    {
+     "heading": "The multiplier is in tenths",
+     "body": "`soloLevelingXPMultiplier` is not a plain multiplier. It is tenths: **10 means 1x**, 15 means 1.5x, 30 means 3x. Setting it to 2 gives you a fifth of normal XP, not double."
+    }
+   ],
+   "related": [
+    "levels-and-xp",
+    "job-change-quest",
+    "vessels",
+    "world-settings"
+   ],
+   "status": "live"
+  },
+  {
+   "id": "rules-difficulty",
+   "title": "Difficulty Rules",
+   "category": "setting",
+   "tagline": "How hard everything hits, and what death costs",
+   "parents": [
+    "world-settings"
+   ],
+   "summary": "Enemy scaling, boss scaling, and what happens when a dungeon kills you.",
+   "facts": [
+    {
+     "label": "soloLevelingEnemyScale",
+     "value": "**100** — enemy health and damage, as a percentage"
+    },
+    {
+     "label": "soloLevelingBossPower",
+     "value": "**100** — extra boss health, damage and resistance, as a percentage"
+    },
+    {
+     "label": "soloLevelingDeathRules",
+     "value": "**0** — 0 standard, 1 forgiving, 2 harsh"
+    },
+    {
+     "label": "soloLevelingDifficultyPreset",
+     "value": "**0** — records the creation preset: 0 normal, 1 hard, 2 brutal, 3 custom"
+    }
+   ],
+   "sections": [
+    {
+     "heading": "Scale and power are separate",
+     "body": "`soloLevelingEnemyScale` moves everything hostile. `soloLevelingBossPower` moves **only** bosses, and it adds resistance on top of health and damage.\n\nRaising both compounds, so a boss on a 150/150 world is a long way past 1.5x."
+    }
+   ],
+   "related": [
+    "bosses",
+    "gates",
+    "world-settings"
+   ],
+   "status": "live"
+  },
+  {
+   "id": "rules-gates",
+   "title": "Gate Rules",
+   "category": "setting",
+   "tagline": "Whether gates appear, how often, and how hard",
+   "parents": [
+    "world-settings"
+   ],
+   "summary": "Everything governing the rifts that open in your world.",
+   "facts": [
+    {
+     "label": "soloGateSpawning",
+     "value": "**true** — gates appear at all"
+    },
+    {
+     "label": "soloGateDelay",
+     "value": "**400** — minimum seconds between gate spawns"
+    },
+    {
+     "label": "soloGateNotification",
+     "value": "**true** — chat message when a gate opens"
+    },
+    {
+     "label": "soloLevelingRankedGates",
+     "value": "**true** — caps natural gate rank to your progression"
+    },
+    {
+     "label": "soloDungeonBreak",
+     "value": "**true** — dungeon breaks can happen"
+    }
+   ],
+   "sections": [
+    {
+     "heading": "Ranked gates is a safety rail",
+     "body": "With `soloLevelingRankedGates` on, natural gates never roll a rank far past what you have earned. Turn it off and an S-rank gate can open next to a level 10 hunter - which is either the point or a disaster, depending on your world."
+    },
+    {
+     "heading": "The delay is in seconds",
+     "body": "`soloGateDelay` is a **minimum**, not a schedule. 400 means at least six and a half minutes must pass between spawns; it does not guarantee one every 400 seconds."
+    }
+   ],
+   "related": [
+    "gates",
+    "gate-ranks",
+    "red-gates",
+    "world-settings"
+   ],
+   "status": "live"
+  },
+  {
+   "id": "rules-system",
+   "title": "System Rules",
+   "category": "setting",
+   "tagline": "Quests, fatigue, punishment, and the shop",
+   "parents": [
+    "world-settings"
+   ],
+   "summary": "What the System is allowed to ask of you and do to you.",
+   "facts": [
+    {
+     "label": "soloDailyQuest",
+     "value": "**true** — the System sets daily quests"
+    },
+    {
+     "label": "soloPunishment",
+     "value": "**true** — failing a daily carries its penalty"
+    },
+    {
+     "label": "soloFatigue",
+     "value": "**true** — fatigue builds while you fight"
+    },
+    {
+     "label": "soloMiscItems",
+     "value": "**true** — the shop Misc tab, including the Class Changer"
+    },
+    {
+     "label": "soloLevelingStoryMode",
+     "value": "**false** — the guided prologue"
+    },
+    {
+     "label": "soloLevelingLoreAccurateRanks",
+     "value": "**true** — widens the gap between starting ranks"
+    }
+   ],
+   "sections": [
+    {
+     "heading": "Turning off the teeth",
+     "body": "`soloDailyQuest` and `soloPunishment` are separate on purpose. Leaving quests on but punishment **off** keeps the free progression and drops the penalty for missing a day - the usual choice for a world people do not log into daily."
+    },
+    {
+     "heading": "Story Mode is off by default",
+     "body": "It is opt-in at world creation. Switching it on for an existing world does not rewind anyone who has already awakened."
+    }
+   ],
+   "related": [
+    "daily-quests",
+    "fatigue",
+    "system-shop",
+    "story-mode",
+    "world-settings"
+   ],
+   "status": "live"
+  },
+  {
+   "id": "rules-world",
+   "title": "World & Griefing Rules",
+   "category": "setting",
+   "tagline": "What abilities are allowed to break",
+   "parents": [
+    "world-settings"
+   ],
+   "summary": "Whether high-impact abilities may destroy terrain, and how much of your world they are allowed to touch.",
+   "facts": [
+    {
+     "label": "soloAbilityDestructionMode",
+     "value": "**-1** — 0 off, 1 partial, 2 on. -1 means \"not chosen yet\""
+    },
+    {
+     "label": "soloAbilityDestruction",
+     "value": "**false** — the legacy boolean, kept for old saves"
+    },
+    {
+     "label": "disableBlockBreaking",
+     "value": "**false** — blanket block-breaking lock"
+    },
+    {
+     "label": "soloBloodEffects",
+     "value": "**true** — blood particles"
+    }
+   ],
+   "sections": [
+    {
+     "heading": "Why the default is -1, not 0",
+     "body": "The three-mode setting replaced an older true/false one. **-1 means this world has not chosen a mode**, so the game falls back to whatever the old boolean said rather than silently changing how an existing world behaves.\n\nA new world resolves that to off. Set the mode explicitly and the boolean is kept in step automatically."
+    },
+    {
+     "heading": "Partial is the useful one",
+     "body": "Mode **1** allows terrain destruction **outside dungeons only**. Red Gates and the Demon King's Castle stay intact regardless, so you get the spectacle without abilities chewing through instanced content."
+    }
+   ],
+   "related": [
+    "world-settings",
+    "red-gates",
+    "demon-kings-castle"
+   ],
+   "status": "live"
+  },
+  {
+   "id": "rank-odds",
+   "title": "Awakening Odds",
+   "category": "rank",
+   "tagline": "What your chances actually are at the Evaluation",
+   "parents": [
+    "ranks"
+   ],
+   "summary": "Six gamerules set how likely each Hunter rank is. They are stored as **weights**, not percentages - the game normalises them to total 100 when an evaluation rolls, so they do not have to add up.",
+   "facts": [
+    {
+     "label": "soloLevelingRankOddsE",
+     "value": "**25**"
+    },
+    {
+     "label": "soloLevelingRankOddsD",
+     "value": "**25**"
+    },
+    {
+     "label": "soloLevelingRankOddsC",
+     "value": "**25**"
+    },
+    {
+     "label": "soloLevelingRankOddsB",
+     "value": "**12**"
+    },
+    {
+     "label": "soloLevelingRankOddsA",
+     "value": "**10**"
+    },
+    {
+     "label": "soloLevelingRankOddsS",
+     "value": "**3**"
+    }
+   ],
+   "sections": [
+    {
+     "heading": "The default chances",
+     "body": "The shipped weights total exactly 100, so they read straight off as percentages: **E 25%, D 25%, C 25%, B 12%, A 10%, S 3%.**\n\nThree quarters of hunters awaken at C or below, and **S is a 1-in-33 roll.**"
+    },
+    {
+     "heading": "They are weights, not percentages",
+     "body": "Set them to 50/50/50/24/20/6 and nothing changes - the ratios are identical. Only the proportions matter.\n\nThat also means you can set a single rule without recalculating the rest. Doubling only the S weight to 6 gives roughly a 5.8% S chance, because the total became 103."
+    },
+    {
+     "heading": "Rank cannot be rerolled",
+     "body": "Class and style are rerollable at the [[evaluation|Evaluation]]; rank is not. These weights are the only lever you have over it."
+    }
+   ],
+   "related": [
+    "ranks",
+    "evaluation",
+    "world-settings"
+   ],
+   "status": "live"
   }
  ]
 }

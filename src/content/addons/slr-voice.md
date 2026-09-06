@@ -26,6 +26,7 @@ commands:
     does: "Switch recognition mode"
   - cmd: "/slrvoice reload"
     does: "Re-read slrvoice.json"
+configNote: "Lives in `config/slrvoice.json`, written on first launch."
 config:
   - key: "mode"
     value: "voiceprint"

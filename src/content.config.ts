@@ -112,6 +112,10 @@ const addons = defineCollection({
     config: z
       .array(z.object({ key: z.string(), value: z.string(), meaning: z.string() }))
       .default([]),
+    /* One line saying where those keys live, because addons do not agree: a
+       JSON file, a TOML file, or gamerules that live in no file at all. Was
+       once hardcoded to one addon's path, which quietly mislabelled the next. */
+    configNote: z.string().optional(),
     /* Commands the addon adds, same treatment. */
     commands: z
       .array(z.object({ cmd: z.string(), does: z.string() }))

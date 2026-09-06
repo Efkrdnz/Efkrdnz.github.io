@@ -107,7 +107,7 @@ const addonNodes: any[] = modAddons.length
             ? [{
                 heading: 'Configuration',
                 body:
-                  'Lives in `config/slrvoice.json`, written on first launch.\n\n' +
+                  (a.data.configNote ? `${a.data.configNote}\n\n` : '') +
                   a.data.config
                     .map((c: any) => `**${c.key}** (\`${c.value}\`) — ${c.meaning}`)
                     .join('\n\n'),

@@ -1,0 +1,52 @@
+---
+title: "SLR: Better Admin Control"
+author: "MikaHa"
+authorUrl: "https://www.curseforge.com/members/MikaHa/projects"
+tier: "community"
+release: "released"
+forMod: "solo-leveling-reawakening"
+tagline: "Every SLR rule in one panel, plus seven knobs SLR keeps welded together"
+blurb: "An in-game admin panel for SLR's world rules, sorted into six pages instead of memorised as gamerule names. Adds seven scaling rules that pull SLR's combined enemy and boss values apart, and translates the settings whose raw numbers read as nonsense."
+curseforge: "https://www.curseforge.com/minecraft/mc-mods/slr-better-admin-control"
+loaders: ["NeoForge"]
+mcVersions: ["1.21.1"]
+alsoNeeds:
+  - "SoloCraft: Dungeon Expansion, optional — adds a second page for that pack's own world rules"
+caveat: "Needs SLR 1.3.1+. Server-side: a joining client needs nothing installed."
+commands:
+  - cmd: "/slradminpanel"
+    does: "Opens the panel. Needs operator level 2, the same bar vanilla puts on /gamerule"
+configNote: "These are gamerules rather than a config file — set them in the panel, or with `/gamerule <name> <value>`, where `300` reads as three times."
+config:
+  - key: "slradminEnemyHealthScale"
+    value: "Inherit"
+    meaning: "Enemy health on its own"
+  - key: "slradminEnemyDamageScale"
+    value: "Inherit"
+    meaning: "Enemy damage on its own"
+  - key: "slradminBossHealthScale"
+    value: "Inherit"
+    meaning: "Boss health, separately from ordinary enemies"
+  - key: "slradminBossDamageScale"
+    value: "Inherit"
+    meaning: "Boss damage, separately from ordinary enemies"
+  - key: "slradminBossArmor"
+    value: "Inherit"
+    meaning: "Boss armour"
+  - key: "slradminBossArmorToughness"
+    value: "Inherit"
+    meaning: "Boss armour toughness"
+  - key: "slradminBossKnockbackResistance"
+    value: "Inherit"
+    meaning: "How far a boss moves when it gets hit"
+detail:
+  - heading: "Six pages instead of thirty-two names"
+    body: "Enemies & Bosses, Progression & Levelling, Ranks & Hunters, Gates & Dungeons, World & Destruction, and Player Rules.\n\nIt is the same set of settings the [[world-settings|World Settings]] pages here document, with the difference that you can see them all at once and change one without knowing its exact name first."
+  - heading: "Seven axes SLR keeps combined"
+    body: "SLR scales enemies and bosses through shared values. This pulls them apart into seven rules that each override their own share — health without damage, bosses without ordinary mobs, armour and knockback resistance on their own.\n\nEvery one of them defaults to **Inherit**, so nothing changes until you deliberately set it. The sliders reach ten times; the number box takes more if you want it."
+  - heading: "It reads the confusing rules for you"
+    body: "SLR's XP multiplier is stored in tenths, so `10` means 1.0x and setting it to `2` quietly gives you a fifth of normal rather than double. That trap is worth knowing about whether or not you install this — see [[rules-progression|the progression rules]] — and the panel simply shows the readable form instead.\n\nDeath rules, ability destruction and the presets get dropdowns rather than raw integers, which matters most for [[rules-world|ability destruction]], where the shipped default of `-1` means *not chosen* rather than *off*.\n\nThere is also an **Apply to loaded entities** button, so a scaling change reaches the mobs already standing in your world instead of only the next ones to spawn."
+  - heading: "It picks up Dungeon Expansion"
+    body: "With [[addon-solocraft-dungeon-expansion|Dungeon Expansion]] installed, an arrow appears in the panel header leading to a second page holding that pack's own world rules, kept apart from the base ones so the two sets do not blur together."
+order: 13
+---

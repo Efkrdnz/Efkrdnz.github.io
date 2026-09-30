@@ -35,6 +35,15 @@ const mods = defineCollection({
     /* The third shape a wiki takes: a moveset. Not a route through the mod
        and not a database of it — a reference you read by suit. */
     hasManual: z.boolean().default(false),
+    /* The fourth shape: a field guide to a mod's powers, one interactive
+       chapter per power. Magical has one, because seven Authorities that
+       each work by a different rule are not a table and not a route - each
+       has to be tried to be understood. */
+    hasAuthorities: z.boolean().default(false),
+    /* The project on the bench right now. The home page gives it a card of
+       its own beside the featured one - smaller, because the featured slot
+       is earned by downloads and a mod in development has none yet. */
+    current: z.boolean().default(false),
     /* Set when a mod belongs to a family that shares a library. Drives the
        series band on the home page; unset mods are unaffected. */
     series: z.string().optional(),

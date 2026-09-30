@@ -4,6 +4,7 @@ import Base from '../layouts/Base.astro';
 import ModTip from '../components/ModTip.astro';
 import Mentions from '../components/Mentions.astro';
 import Series from '../components/Series.astro';
+import NowBuilding from '../components/NowBuilding.astro';
 import { url, compact, full } from '../lib/util';
 
 const all = (await getCollection('mods')).sort((a, b) => a.data.order - b.data.order);
@@ -19,6 +20,10 @@ const mentions = all.filter((m) => m.data.role !== 'author');
 const shipped = own.filter((m) => m.data.status === 'released');
 
 const featured = shipped.find((m) => m.data.featured) ?? shipped[0];
+
+/* The project on the bench. It sits right before the featured mod, a size
+   smaller - the featured slot is earned by downloads, and this has none yet. */
+const current = own.find((m) => m.data.current && m.data.status !== 'released');
 const rest = shipped.filter((m) => m.id !== featured.id);
 
 /* Counts both platforms, but only work efkrdnzz actually authored. */
@@ -64,7 +69,9 @@ const seriesLinks = Object.fromEntries(
       <p class="lede enter enter--3">
         Eight projects on CurseForge, built around abilities, progression and the
         fights that test them. Solo Leveling: Reawakening is the big one; the
-        <a href="#series">Minefinity Series</a> is the one still growing.
+        <a href="#series">Minefinity Series</a> is the one still growing{current ? (
+          <>; and <a href={url(`/mods/${current.id}`)}>{current.data.title}</a> is the one on the bench now.</>
+        ) : '.'}
       </p>
       <div class="actions enter enter--4">
         <a class="btn btn--primary" href={url('/mods')}>
@@ -77,6 +84,7 @@ const seriesLinks = Object.fromEntries(
     </div>
 
     <div class="enter enter--5">
+      {current && <NowBuilding mod={current} />}
       <ModTip mod={featured} feature />
     </div>
   </section>

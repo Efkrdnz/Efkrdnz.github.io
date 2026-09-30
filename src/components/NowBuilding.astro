@@ -1,0 +1,176 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { url } from '../lib/util';
+
+interface Props {
+  mod: CollectionEntry<'mods'>;
+}
+
+const { mod } = Astro.props;
+const d = mod.data;
+
+/* The Authorities in the order the guide lists them, each in its own colour -
+   the one place outside the guide where the seven are shown together. */
+const POWERS = [
+  { name: 'Space', c: '#88DFFF' },
+  { name: 'Soul', c: '#D8F0FF' },
+  { name: 'Mana', c: '#C9D3FF' },
+  { name: 'Chaos', c: '#FF4FD8' },
+  { name: 'Causality', c: '#E8A33D' },
+  { name: 'Mind', c: '#BDA4FF' },
+  { name: 'Sound', c: '#6FE0C0' },
+];
+---
+
+<div class="now">
+  <p class="now__eyebrow"><i class="now__dot" aria-hidden="true"></i> Now building</p>
+
+  <a class="now__name" href={url(`/mods/${mod.id}`)}>{d.title}</a>
+  <p class="now__lore">{d.tagline}</p>
+
+  <ul class="now__pips" aria-label="The seven Authorities">
+    {POWERS.map((p) => (
+      <li style={`--c:${p.c}`}><i aria-hidden="true"></i>{p.name}</li>
+    ))}
+  </ul>
+
+  <div class="now__foot">
+    <span class="now__data">
+      {[...d.loaders, ...d.mcVersions].join(' · ')} &middot; In development
+    </span>
+    {d.hasAuthorities && (
+      <a class="now__cta" href={url(`/mods/${mod.id}/authorities`)}>
+        Try the Authorities <span aria-hidden="true">&rarr;</span>
+      </a>
+    )}
+  </div>
+</div>
+
+<style>
+  /* Deliberately a size down from the featured tooltip it sits on: the big
+     card is earned by downloads, and this one has none yet. */
+  .now {
+    --ice: #8FD3EC;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s2);
+    padding: var(--s4) var(--s5);
+    background:
+      linear-gradient(180deg, rgba(143, 211, 236, 0.06), rgba(143, 211, 236, 0) 70%),
+      #0E151C;
+    border: 1px solid #22323E;
+    border-radius: var(--radius);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.5);
+    margin-bottom: var(--s4);
+  }
+
+  .now::before {
+    content: '';
+    position: absolute;
+    left: -1px;
+    top: 14px;
+    bottom: 14px;
+    width: 2px;
+    background: var(--ice);
+    opacity: 0.8;
+  }
+
+  .now__eyebrow {
+    display: flex;
+    align-items: center;
+    gap: var(--s2);
+    margin: 0;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ice);
+  }
+
+  .now__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--ice);
+    animation: now-pulse 2.4s var(--ease) infinite;
+  }
+
+  @keyframes now-pulse {
+    0% { box-shadow: 0 0 0 0 rgba(143, 211, 236, 0.55); }
+    70% { box-shadow: 0 0 0 7px rgba(143, 211, 236, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(143, 211, 236, 0); }
+  }
+
+  .now__name {
+    font-family: var(--display);
+    font-weight: 700;
+    font-variation-settings: 'wdth' 104;
+    font-size: 1.375rem;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: #E7F1F5;
+    width: fit-content;
+  }
+
+  .now__name:hover { color: var(--ice); }
+
+  .now__lore {
+    margin: 0;
+    font-size: 0.9375rem;
+    font-style: italic;
+    color: #9AB0BC;
+  }
+
+  .now__pips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    margin: var(--s1) 0 0;
+    padding: 0;
+    list-style: none;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: #9AB0BC;
+  }
+
+  .now__pips li { display: inline-flex; align-items: center; gap: 5px; }
+
+  .now__pips i {
+    width: 7px;
+    height: 7px;
+    transform: rotate(45deg);
+    background: var(--c);
+  }
+
+  .now__foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s2) var(--s4);
+    padding-top: var(--s3);
+    margin-top: var(--s1);
+    border-top: 1px solid #1C2A35;
+  }
+
+  .now__data {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: #8199A6;
+  }
+
+  .now__cta {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ice);
+  }
+
+  .now__cta:hover { color: #BDE7F6; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .now__dot { animation: none; }
+  }
+</style>

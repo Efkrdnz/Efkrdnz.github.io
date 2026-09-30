@@ -1,0 +1,285 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../../layouts/Base.astro';
+import { url } from '../../../lib/util';
+import { AUTHORITIES, LAYERS } from '../../../data/authorities/magical';
+import '../../../styles/authorities.css';
+
+export async function getStaticPaths() {
+  const mods = await getCollection('mods');
+  return mods
+    .filter((m) => m.data.hasAuthorities)
+    .map((mod) => ({ params: { slug: mod.id }, props: { mod } }));
+}
+
+const { mod } = Astro.props;
+const d = mod.data;
+
+const skillCount = AUTHORITIES.reduce((n, a) => n + a.skills.length, 0);
+
+/* The iceberg, drawn from the layer list: the surface narrows to a tip above
+   the waterline and the rest widens into the deep, so the Authorities - the
+   last layer - sit furthest down. Each half-width is a band's top edge; the
+   last one closes the bottom of the last band. */
+const W = 520;
+const CX = W / 2;
+const surface = LAYERS.filter((l) => l.surface);
+const below = LAYERS.filter((l) => !l.surface);
+const SURFACE_H = 56;
+const BELOW_H = 50;
+const TOP_Y = 24;
+const WATER_Y = TOP_Y + surface.length * SURFACE_H;
+const surfaceHalf = [26, 70, 112, 150];
+const belowHalf = [168, 196, 214, 222, 218, 204, 150];
+
+type Band = { id: string; name: string; depth: string; count?: string; path: string; y: number; surface: boolean; i: number };
+const band = (l: (typeof LAYERS)[number], i: number, y0: number, h: number, a: number, b: number): Band => ({
+  id: l.id, name: l.name, depth: l.depth, count: l.count, surface: l.surface, i,
+  y: y0 + h / 2,
+  path: `M${CX - a},${y0} L${CX + a},${y0} L${CX + b},${y0 + h} L${CX - b},${y0 + h} Z`,
+});
+const bands: Band[] = [
+  ...surface.map((l, i) => band(l, i, TOP_Y + i * SURFACE_H, SURFACE_H, surfaceHalf[i], surfaceHalf[i + 1])),
+  ...below.map((l, i) => band(l, i, WATER_Y + i * BELOW_H, BELOW_H, belowHalf[i], belowHalf[i + 1])),
+];
+const H = WATER_Y + below.length * BELOW_H + 24;
+
+/* One glyph per Authority on a 24-unit grid, each a picture of the shape the
+   power is built on rather than of its theme: a domain with ribs, two souls
+   on a thread, a deck, a pile, a graph, an eye, a note. */
+const GLYPHS: Record<string, string> = {
+  space: '<circle cx="12" cy="12" r="9"/><path d="M12 3c-3 4-3 14 0 18M12 3c3 4 3 14 0 18M3.5 9h17"/>',
+  soul: '<circle cx="6.5" cy="12" r="3.5"/><circle cx="17.5" cy="12" r="3.5"/><path d="M10 12c1.3-1.6 2.7-1.6 4 0"/>',
+  mana: '<rect x="5" y="3.5" width="11" height="15" rx="1"/><path d="M8 21h11V7.5M8.5 8h4M8.5 11.5h4M8.5 15h2.5"/>',
+  chaos: '<path d="M12 4 21 20H3Z"/><path d="M9 20l3-6 3 6M12 14v-3"/>',
+  causality: '<circle cx="5" cy="6" r="2.2"/><circle cx="5" cy="18" r="2.2"/><circle cx="19" cy="12" r="2.6"/><path d="M7 7l9.5 4M7 17l9.5-4"/>',
+  mind: '<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="3"/>',
+  sound: '<path d="M9 18V5l11-2v13"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/>',
+};
+---
+
+<Base
+  title={`${d.short} Authorities — efkrdnzz`}
+  description={`A hands-on guide to the seven Authorities of ${d.title}: what each one is, how it works, and a small working version of it to try in the browser.`}
+  mod={d.theme}
+>
+  <div class="ag" data-authorities>
+    <nav class="abar" aria-label="Authorities">
+      <div class="abar__in">
+        <a class="abar__brand" href={url(`/mods/${mod.id}`)}>
+          <span class="abar__berg" aria-hidden="true"></span>{d.short} <span>Authorities</span>
+        </a>
+        <div class="abar__chips">
+          <a class="abar__chip abar__chip--map" href="#iceberg">Iceberg</a>
+          {AUTHORITIES.map((a) => (
+            <a class="abar__chip" href={`#${a.id}`} data-chip={a.id} style={`--c:${a.color}`}>
+              <i aria-hidden="true"></i>{a.name}
+            </a>
+          ))}
+        </div>
+      </div>
+    </nav>
+
+    <header class="shell ahero">
+      <p class="eyebrow">The Iceberg of Magic &middot; in development</p>
+      <h1 class="ahero__title">Seven Authorities.<br />One holder each.</h1>
+      <p class="lede ahero__lede">
+        An Authority is not a spell. It is ownership of one of the world's rules, and each of the
+        seven is built on a different shape - a domain, a bond, a deck, a sandpile, a graph, a belief
+        held mind by mind, a beat. So each has its own chapter, and each chapter has a small working
+        version of it to try, right here.
+      </p>
+      <div class="arail">
+        <div class="arail__cell"><span class="arail__k">Authorities</span><span class="arail__v">{AUTHORITIES.length}</span></div>
+        <div class="arail__cell"><span class="arail__k">Skills and actions</span><span class="arail__v">{skillCount}</span></div>
+        <div class="arail__cell"><span class="arail__k">Holders a world</span><span class="arail__v">1 each</span></div>
+        <div class="arail__cell"><span class="arail__k">Depth</span><span class="arail__v">Layer -6</span></div>
+      </div>
+    </header>
+
+    <section class="shell asec" id="iceberg">
+      <div class="asec__head">
+        <div>
+          <p class="eyebrow">The map</p>
+          <h2 class="h2">Where the Authorities sit</h2>
+        </div>
+        <p class="mono-note">Pick a layer</p>
+      </div>
+
+      <div class="berg">
+        <svg class="berg__svg" viewBox={`0 0 ${W} ${H}`} role="group" aria-label="The iceberg of magic, layer by layer">
+          <defs>
+            <linearGradient id="berg-deep" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#0E2230" />
+              <stop offset="1" stop-color="#060B10" />
+            </linearGradient>
+            <linearGradient id="berg-auth" x1="0" y1="0" x2="1" y2="0">
+              {AUTHORITIES.map((a, i) => (
+                <stop offset={i / (AUTHORITIES.length - 1)} stop-color={a.color} />
+              ))}
+            </linearGradient>
+          </defs>
+
+          <rect x="0" y={WATER_Y} width={W} height={H - WATER_Y} fill="url(#berg-deep)" />
+          <path
+            class="berg__water"
+            d={`M0 ${WATER_Y} Q ${W / 8} ${WATER_Y - 5} ${W / 4} ${WATER_Y} T ${W / 2} ${WATER_Y} T ${(3 * W) / 4} ${WATER_Y} T ${W} ${WATER_Y}`}
+          />
+          <text class="berg__waterline" x="14" y={WATER_Y - 8}>WATERLINE</text>
+
+          {bands.map((b) => (
+            <g
+              class:list={['berg__band', b.surface ? 'is-surface' : 'is-deep', b.id === 'authorities' && 'is-auth']}
+              data-layer={b.id}
+              tabindex="0"
+              role="button"
+              aria-label={`${b.name}, ${b.depth}`}
+              style={`--i:${b.i}`}
+            >
+              <path d={b.path} />
+              <text class="berg__name" x={CX} y={b.y + 1}>{b.name}</text>
+              <text class="berg__depth" x={CX} y={b.y + 15}>{b.depth}{b.count ? ` · ${b.count}` : ''}</text>
+            </g>
+          ))}
+        </svg>
+
+        <div class="berg__card" aria-live="polite">
+          {LAYERS.map((l, i) => (
+            <article class="berg__layer" data-layer-card={l.id} hidden={i !== LAYERS.length - 1}>
+              <p class="eyebrow">{l.depth}{l.surface ? ' · above the water' : ' · below the water'}</p>
+              <h3 class="berg__h">{l.name}</h3>
+              <p class="berg__line">{l.line}</p>
+              <p class="berg__body">{l.body}</p>
+              {l.id === 'authorities' && (
+                <div class="berg__jump">
+                  {AUTHORITIES.map((a) => (
+                    <a href={`#${a.id}`} style={`--c:${a.color}`}>{a.name}</a>
+                  ))}
+                </div>
+              )}
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="shell asec" id="authorities">
+      <div class="asec__head">
+        <div>
+          <p class="eyebrow">The seven</p>
+          <h2 class="h2">One chapter each</h2>
+        </div>
+        <p class="mono-note">Each one has something to try</p>
+      </div>
+
+      <div class="apick" role="tablist" aria-label="Choose an Authority">
+        {AUTHORITIES.map((a, i) => (
+          <button
+            type="button"
+            class="apick__btn"
+            role="tab"
+            id={`tab-${a.id}`}
+            aria-controls={`chap-${a.id}`}
+            aria-selected={i === 0 ? 'true' : 'false'}
+            data-pick={a.id}
+            style={`--c:${a.color}`}
+          >
+            <svg class="apick__glyph" viewBox="0 0 24 24" aria-hidden="true" set:html={GLYPHS[a.id]} />
+            <span class="apick__name">{a.name}</span>
+            <span class="apick__shape">{a.shape}</span>
+          </button>
+        ))}
+      </div>
+
+      {AUTHORITIES.map((a, i) => (
+        <article
+          class="achap"
+          id={`chap-${a.id}`}
+          role="tabpanel"
+          aria-labelledby={`tab-${a.id}`}
+          data-chap={a.id}
+          data-active={i === 0 ? 'true' : 'false'}
+          style={`--c:${a.color}`}
+        >
+          <span class="achap__anchor" id={a.id}></span>
+          <header class="achap__head">
+            <svg class="achap__glyph" viewBox="0 0 24 24" aria-hidden="true" set:html={GLYPHS[a.id]} />
+            <div>
+              <p class="achap__of">Authority of</p>
+              <h3 class="achap__name">{a.name}</h3>
+            </div>
+            <div class="achap__shape">
+              <span class="achap__shape-k">Its shape</span>
+              <span class="achap__shape-v">{a.shape}</span>
+              <span class="achap__shape-d">{a.shapeLine}</span>
+            </div>
+          </header>
+
+          <blockquote class="achap__right">{a.right}</blockquote>
+          <p class="achap__pitch">{a.pitch}</p>
+
+          <div class="achap__grid">
+            <div class="achap__read">
+              <h4 class="achap__h">How it works</h4>
+              <ol class="asteps">
+                {a.steps.map((s, n) => (
+                  <li class="astep">
+                    <span class="astep__n">{String(n + 1).padStart(2, '0')}</span>
+                    <div>
+                      <p class="astep__t">{s.title}</p>
+                      <p class="astep__b">{s.body}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+
+              <h4 class="achap__h">{a.skills.length === 1 ? 'The skill' : 'The skills'}</h4>
+              <div class="askills">
+                {a.skills.map((s) => (
+                  <div class="askill">
+                    <div class="askill__top">
+                      <span class="askill__name">{s.name}</span>
+                      <span class="askill__input">{s.input}</span>
+                    </div>
+                    <p class="askill__text">{s.text}</p>
+                    {s.cost && <p class="askill__cost">{s.cost}</p>}
+                  </div>
+                ))}
+              </div>
+
+              <dl class="afacts">
+                {a.facts.map((f) => (
+                  <div class="afact">
+                    <dt>{f.k}</dt>
+                    <dd>{f.v}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+
+            <aside class="atry" aria-label={`Try the Authority of ${a.name}`}>
+              <div class="atry__head">
+                <p class="atry__k">Try it</p>
+                <p class="atry__t">{a.tryTitle}</p>
+                <p class="atry__hint">{a.tryHint}</p>
+              </div>
+              <div class="atry__stage" data-toy={a.id}>
+                <noscript><p class="atry__nojs">This part needs JavaScript.</p></noscript>
+              </div>
+            </aside>
+          </div>
+        </article>
+      ))}
+
+      <p class="afoot">
+        {d.title} is still in development. Everything on this page is read off the mod's own source, and the
+        toys are small, faithful versions of the real rules - but numbers can still move before release.
+      </p>
+    </section>
+  </div>
+
+  <script>
+    import { initAuthorities } from '../../../scripts/authorities/index';
+    initAuthorities();
+  </script>
+</Base>

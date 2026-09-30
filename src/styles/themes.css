@@ -25,6 +25,23 @@
   --glow: rgba(63, 198, 255, 0.18);
 }
 
+/* Magical — the iceberg: deep water under a pale ice accent. Each Authority
+   brings its own colour on its guide page; the shell stays cold and quiet so
+   seven of them can sit side by side without the page turning into a rainbow. */
+[data-mod='magical'] {
+  --page-bg: #0A1016;
+  --panel: #101A22;
+  --edge: #2B3D4B;
+  --edge-dim: #1C2A35;
+  --panel-edge: #22323E;
+  --accent: #8FD3EC;
+  --accent-hi: #BDE7F6;
+  --bone: #E7F1F5;
+  --ash: #9AB0BC;
+  --ash-dim: #8199A6;
+  --glow: rgba(143, 211, 236, 0.14);
+}
+
 /* Minefinity Gauntlet — burnished gold, gem spectrum */
 [data-mod='gauntlet'] {
   --page-bg: #120E14;

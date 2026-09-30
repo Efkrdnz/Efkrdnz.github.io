@@ -46,17 +46,27 @@ order: 5                      # sort position, lowest first
 Optional: `modrinth`, `author` + `role: contributor` for collaborations,
 `features` (a list of `k` / `t` / `d`) to render the systems grid,
 `loaders` and `mcVersions` once that data is confirmed, `series` to place the
-mod in a family on the home page, and `hasGuide` / `hasCodex` to open its wiki.
+mod in a family on the home page, `hasGuide` / `hasCodex` / `hasAuthorities`
+to open its wiki, and `current: true` on an unreleased mod to put it on the
+home page as the project on the bench - a card a size smaller than the
+featured one, right above it.
 
 ### Guides and codices
 
-A mod's wiki takes one of two shapes, and a mod has one or the other:
+A mod's wiki takes one shape, and a mod has one of them:
 
 - **A guide** (`hasGuide: true`, at `/mods/<slug>/guide`) is a route *through* a
   mod — do this, then this. Solo Leveling: Reawakening has one.
 - **A codex** (`hasCodex: true`, at `/mods/<slug>/codex`) is a database *of* a
   mod — every entry, filterable, with no path through it. Minefinity Gauntlet
   has one, because 150 stone abilities are a table, not a journey.
+
+- **An Authorities guide** (`hasAuthorities: true`, at `/mods/<slug>/authorities`)
+  is a chapter per power, each with a small working toy of its rules. Magical
+  has one: the chapters are data in `src/data/authorities/magical.ts`, and each
+  toy is its own module in `src/scripts/authorities/`, loaded the first time its
+  chapter is opened. The toys port the mod's real numbers, so check them against
+  the mod source when the mod changes.
 
 The mod hub advertises whichever exists and falls back to a `SOON` label.
 
